@@ -3,6 +3,67 @@ import { useApp } from '../../context/AppContext'
 import './Admin.css'
 import '../Calendar/Calendar.css'
 
+/* ── Edit / reset-password modal for an existing user ─────── */
+function EditUserModal({ targetUser, technicians, onSave, onClose }) {
+  const [name, setName]           = useState(targetUser.name)
+  const [newPw, setNewPw]         = useState('')
+  const [role, setRole]           = useState(targetUser.role)
+  const [techId, setTechId]       = useState(targetUser.technicianId || '')
+  const isAdmin = targetUser.role === 'admin'
+
+  function handleSave() {
+    if (!name.trim()) return
+    const updates = { name: name.trim(), role, initials: initials(name.trim()) }
+    if (newPw.trim()) updates.password = newPw.trim()
+    if (role === 'technician') updates.technicianId = Number(techId) || null
+    else updates.technicianId = null
+    onSave(updates)
+  }
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal" style={{ width: 420 }} onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-title">Edit — {targetUser.name}</div>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          <div className="form-group">
+            <label className="form-label">Full Name *</label>
+            <input className="form-input" value={name} onChange={e => setName(e.target.value)} autoFocus />
+          </div>
+          <div className="form-group">
+            <label className="form-label">New Password</label>
+            <input className="form-input" type="password" value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="Leave blank to keep current password" />
+          </div>
+          {!isAdmin && (
+            <div className="form-group">
+              <label className="form-label">Role</label>
+              <select className="form-select" value={role} onChange={e => setRole(e.target.value)}>
+                <option value="receptionist">Receptionist</option>
+                <option value="technician">Technician</option>
+              </select>
+            </div>
+          )}
+          {role === 'technician' && (
+            <div className="form-group">
+              <label className="form-label">Linked Technician</label>
+              <select className="form-select" value={techId} onChange={e => setTechId(e.target.value)}>
+                <option value="">Select technician</option>
+                {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+          )}
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleSave}>Save Changes</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const COLORS = ['#7C3AED','#0EA5E9','#10B981','#F59E0B','#EF4444','#EC4899','#8B5CF6','#14B8A6','#F97316','#6366F1']
 const ROLE_COLOR = { admin:'#4f46e5', receptionist:'#0ea5e9', technician:'#10b981' }
 
@@ -261,11 +322,12 @@ function CompanySettings() {
 
 /* ── Page ─────────────────────────────────────────────────── */
 export default function AdminPage() {
-  const { user, users, addUser, deleteUser, technicians, addTechnician, updateTechnician, deleteTechnician } = useApp()
+  const { user, users, addUser, updateUser, deleteUser, technicians, addTechnician, updateTechnician, deleteTechnician } = useApp()
 
   const [tab, setTab]             = useState('technicians')
   const [techModal, setTechModal] = useState(null)   // null | 'new' | tech object
   const [addingStaff, setAddingStaff] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
 
   if (user.role !== 'admin') {
     return (
@@ -348,6 +410,10 @@ export default function AdminPage() {
                     background: (ROLE_COLOR[u.role] ?? '#64748b') + '22',
                     color: ROLE_COLOR[u.role] ?? '#64748b',
                   }}>{u.role}</span>
+                  <button className="btn btn-ghost" style={{ fontSize:11, padding:'4px 10px' }}
+                    onClick={() => setEditingUser(u)}>
+                    Edit
+                  </button>
                   {u.id !== user.id && (
                     <button className="btn btn-danger" style={{ fontSize:11, padding:'4px 10px' }}
                       onClick={() => { if (window.confirm(`Delete account for ${u.name}?`)) deleteUser(u.id) }}>
@@ -373,6 +439,19 @@ export default function AdminPage() {
             if (techModal === 'new') addTechnician(data)
             else updateTechnician(techModal.id, data)
             setTechModal(null)
+          }}
+        />
+      )}
+
+      {/* User edit / password reset modal */}
+      {editingUser && (
+        <EditUserModal
+          targetUser={editingUser}
+          technicians={technicians}
+          onClose={() => setEditingUser(null)}
+          onSave={data => {
+            updateUser(editingUser.id, data)
+            setEditingUser(null)
           }}
         />
       )}

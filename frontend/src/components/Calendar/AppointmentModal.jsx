@@ -35,7 +35,10 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
           const svc = SERVICES.find(s => s.name === e.target.value)
           setForm(f => ({ ...f, service: e.target.value, duration: svc?.duration ?? f.duration }))
         }}>
-          {SERVICES.map(s => <option key={s.name} value={s.name}>{s.name} — ${s.price}</option>)}
+          {!SERVICES.some(s => s.name === form.service) && form.service && (
+            <option value={form.service}>{form.service}</option>
+          )}
+          {SERVICES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
         </select>
       </div>
       <div className="form-group">

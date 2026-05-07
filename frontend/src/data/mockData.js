@@ -117,17 +117,52 @@ const today = dayjs().format('YYYY-MM-DD')
 const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD')
 const tomorrow = dayjs().add(1, 'day').format('YYYY-MM-DD')
 
+// Full service menu — synced with Michael's business.config.js
+// price = base price in dollars | duration = suggested booking time in minutes
 export const SERVICES = [
-  'Full Set Acrylic',
-  'Fill-In',
-  'Gel Manicure',
-  'Classic Manicure',
-  'Pedicure',
-  'Dip Powder',
-  'Nail Art',
-  'Waxing',
-  'Eyebrow Shaping',
-  'Consultation',
+  // Manicures
+  { name: 'Regular Manicure',         price: 20,  duration: 30 },
+  { name: 'Gel Manicure',             price: 38,  duration: 35 },
+  // Pedicures
+  { name: 'Regular Pedicure',         price: 32,  duration: 35 },
+  { name: 'Gel Pedicure',             price: 48,  duration: 45 },
+  { name: 'Special Pedicure',         price: 43,  duration: 45 },
+  { name: 'Deluxe Pedicure',          price: 53,  duration: 60 },
+  { name: 'Reg Mani+Pedi Combo',      price: 52,  duration: 65 },
+  // Acrylic
+  { name: 'Acrylic Full Set',         price: 40,  duration: 45 },
+  { name: 'Acrylic Full Set (Gel)',   price: 50,  duration: 60 },
+  { name: 'Acrylic Fill',             price: 30,  duration: 45 },
+  { name: 'Acrylic Fill (Gel)',       price: 40,  duration: 60 },
+  // Builder Gel
+  { name: 'Builder Gel Full Set',     price: 60,  duration: 75 },
+  { name: 'Builder Gel Fill',         price: 48,  duration: 60 },
+  // Dip Powder
+  { name: 'Dip Powder',               price: 48,  duration: 60 },
+  { name: 'Ombre Dipping',            price: 63,  duration: 75 },
+  { name: 'French Dip',               price: 55,  duration: 60 },
+  { name: 'Dip with Tips',            price: 55,  duration: 60 },
+  // Pink & White
+  { name: 'Pink & White Full Set',    price: 65,  duration: 60 },
+  { name: 'Pink & White Fill',        price: 48,  duration: 45 },
+  { name: 'Pink Fill',                price: 35,  duration: 45 },
+  // Polish
+  { name: 'Shellac Polish',           price: 28,  duration: 30 },
+  { name: 'Reg Polish - Hands',       price: 12,  duration: 15 },
+  { name: 'Reg Polish - Toes',        price: 14,  duration: 15 },
+  // Kids
+  { name: 'Kids Polish',              price: 7,   duration: 15 },
+  { name: 'Kids Pedicure',            price: 25,  duration: 30 },
+  { name: 'Kids Mani+Pedi',           price: 40,  duration: 40 },
+  // Add-ons & extras
+  { name: 'Gel Polish Add-On',        price: 15,  duration: 15 },
+  { name: 'Nail Designs',             price: 5,   duration: 15 },
+  { name: 'Nail Repair',              price: 3,   duration: 10 },
+  // Removal
+  { name: 'Shellac Take Off',         price: 7,   duration: 15 },
+  { name: 'Dip/Acrylic Take Off',     price: 10,  duration: 15 },
+  // Other
+  { name: 'Consultation',             price: 0,   duration: 15 },
 ]
 
 export const initialAppointments = [

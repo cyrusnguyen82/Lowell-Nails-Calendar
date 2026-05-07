@@ -53,7 +53,10 @@ function AddServiceForm({ clientId, technicians, onSave, onCancel }) {
         <div className="form-group" style={{ gridColumn:'1/-1' }}>
           <label className="form-label">Service</label>
           <select className="form-select" value={form.service} onChange={handleServiceChange}>
-            {SERVICES.map(s => <option key={s.name} value={s.name}>{s.name} — ${s.price}</option>)}
+            {!SERVICES.some(s => s.name === form.service) && form.service && (
+              <option value={form.service}>{form.service}</option>
+            )}
+            {SERVICES.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
           </select>
         </div>
         <div className="form-group" style={{ gridColumn:'1/-1' }}>

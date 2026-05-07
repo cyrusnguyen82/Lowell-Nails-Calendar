@@ -64,6 +64,18 @@ export function AppProvider({ children }) {
       console.error('addUser failed:', err.message)
     }
   }
+  async function updateUser(id, data) {
+    const prev = users
+    setUsers(u => u.map(x => x.id === id ? { ...x, ...data } : x))
+    if (user?.id === id) setUser(u => ({ ...u, ...data }))
+    try {
+      const saved = await api.put(`/users/${id}`, data)
+      setUsers(u => u.map(x => x.id === id ? saved : x))
+    } catch (err) {
+      setUsers(prev)
+      console.error('updateUser failed:', err.message)
+    }
+  }
   async function deleteUser(id) {
     setUsers(prev => prev.filter(u => u.id !== id))
     if (user?.id === id) setUser(null)
@@ -210,7 +222,7 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       loading, apiError,
       companyInfo, updateCompanyInfo,
-      user, users, login, logout, addUser, deleteUser,
+      user, users, login, logout, addUser, updateUser, deleteUser,
       technicians, addTechnician, updateTechnician, deleteTechnician,
       appointments, addAppointment, updateAppointment, deleteAppointment,
       clients, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry,
