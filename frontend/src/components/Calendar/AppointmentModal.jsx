@@ -31,8 +31,11 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
       </div>
       <div className="form-group">
         <label className="form-label">Service</label>
-        <select className="form-select" value={form.service} onChange={e => set('service', e.target.value)}>
-          {SERVICES.map(s => <option key={s}>{s}</option>)}
+        <select className="form-select" value={form.service} onChange={e => {
+          const svc = SERVICES.find(s => s.name === e.target.value)
+          setForm(f => ({ ...f, service: e.target.value, duration: svc?.duration ?? f.duration }))
+        }}>
+          {SERVICES.map(s => <option key={s.name} value={s.name}>{s.name} — ${s.price}</option>)}
         </select>
       </div>
       <div className="form-group">
@@ -135,7 +138,7 @@ export default function AppointmentModal({ appointment, newData, technicians, on
               <button className="modal-close" onClick={onClose}>×</button>
             </div>
             <BookingForm
-              initial={{ clientName:'', service: SERVICES[0], technicianId: newData.technicianId, date: newData.date, startTime: newData.time, duration: 60, notes:'' }}
+              initial={{ clientName:'', service: SERVICES[0].name, technicianId: newData.technicianId, date: newData.date, startTime: newData.time, duration: SERVICES[0].duration, notes:'' }}
               technicians={technicians}
               onSave={form => { onSave(form); }}
               onCancel={onClose}

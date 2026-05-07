@@ -80,12 +80,6 @@ export default function LoginScreen() {
           <button type="submit" className="login-btn">Sign In</button>
         </form>
 
-        <div className="login-hint">
-          <p>Accounts:</p>
-          <code>admin / admin123</code>
-          <code>jane / staff123</code>
-          <code>tina / tech123</code>
-        </div>
       </div>
     </div>
   )

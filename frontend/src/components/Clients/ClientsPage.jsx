@@ -33,8 +33,12 @@ const MODAL_TABS = ['Info', 'Service History']
 
 /* ── Service history entry form ─────────────────────────── */
 function AddServiceForm({ clientId, technicians, onSave, onCancel }) {
-  const [form, setForm] = useState({ date: new Date().toISOString().split('T')[0], service: SERVICES[0], technicianId: technicians[0]?.id, amount: '', notes: '' })
+  const [form, setForm] = useState({ date: new Date().toISOString().split('T')[0], service: SERVICES[0].name, technicianId: technicians[0]?.id, amount: String(SERVICES[0].price), notes: '' })
   const set = (k,v) => setForm(f => ({ ...f, [k]: v }))
+  function handleServiceChange(e) {
+    const svc = SERVICES.find(s => s.name === e.target.value)
+    setForm(f => ({ ...f, service: e.target.value, amount: svc ? String(svc.price) : f.amount }))
+  }
   return (
     <div style={{ background:'#f8fafc', borderRadius:8, padding:14, display:'flex', flexDirection:'column', gap:10, marginBottom:12 }}>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
@@ -48,8 +52,8 @@ function AddServiceForm({ clientId, technicians, onSave, onCancel }) {
         </div>
         <div className="form-group" style={{ gridColumn:'1/-1' }}>
           <label className="form-label">Service</label>
-          <select className="form-select" value={form.service} onChange={e => set('service', e.target.value)}>
-            {SERVICES.map(s => <option key={s}>{s}</option>)}
+          <select className="form-select" value={form.service} onChange={handleServiceChange}>
+            {SERVICES.map(s => <option key={s.name} value={s.name}>{s.name} — ${s.price}</option>)}
           </select>
         </div>
         <div className="form-group" style={{ gridColumn:'1/-1' }}>
