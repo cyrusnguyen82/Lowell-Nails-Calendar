@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\\\\.tmp\" \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\\\\tools\" \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\\\\workflows\")",
+      "Bash(Get-ChildItem -Recurse \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\")",
+      "Bash(Select-Object FullName)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Cyrus\\Desktop\\Personal\\2026\\Calendar"
+    ]
+  }
+}

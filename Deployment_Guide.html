@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lowell Nails &amp; Spa — Deployment Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #1e293b;
+    background: #fff;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 48px 0 40px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 36px;
+  }
+  .cover-logo {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #312e81, #4f46e5);
+    border-radius: 16px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 900; color: #fff;
+    margin-bottom: 16px;
+  }
+  .cover h1 { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+  .cover .sub { font-size: 14px; color: #64748b; margin-bottom: 4px; }
+  .cover .date { font-size: 12px; color: #94a3b8; }
+
+  /* Architecture diagram */
+  .arch {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 36px;
+    color: #e2e8f0;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .arch .title { color: #a5b4fc; font-weight: 700; margin-bottom: 12px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+  /* Phase headers */
+  .phase {
+    margin-bottom: 32px;
+    page-break-inside: avoid;
+  }
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .phase-num {
+    width: 32px; height: 32px;
+    background: #4f46e5;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .phase-title { font-size: 17px; font-weight: 700; color: #0f172a; }
+  .phase-sub { font-size: 12px; color: #64748b; }
+
+  /* Steps */
+  .step {
+    margin-bottom: 18px;
+    padding-left: 16px;
+    border-left: 3px solid #e2e8f0;
+  }
+  .step-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #1e293b;
+    margin-bottom: 6px;
+  }
+  .step p { color: #475569; margin-bottom: 6px; }
+
+  /* Code blocks */
+  pre, code {
+    font-family: 'Courier New', Consolas, monospace;
+  }
+  pre {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 11.5px;
+    overflow-x: auto;
+    margin: 8px 0;
+    color: #1e293b;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    color: #4f46e5;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: .05em;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { font-family: 'Courier New', monospace; font-size: 11px; color: #4f46e5; white-space: nowrap; }
+
+  /* Ordered list steps */
+  ol { padding-left: 20px; color: #475569; }
+  ol li { margin-bottom: 5px; }
+
+  /* Callouts */
+  .callout {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #16a34a;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 12px;
+    color: #166534;
+  }
+  .callout.warn {
+    background: #fffbeb;
+    border-color: #fde68a;
+    border-left-color: #f59e0b;
+    color: #92400e;
+  }
+  .callout.info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    border-left-color: #3b82f6;
+    color: #1e40af;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+  }
+
+  /* Print */
+  @media print {
+    body { padding: 20px 28px; font-size: 12px; }
+    .phase { page-break-inside: avoid; }
+    .no-print { display: none; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Print button (hidden when printing) -->
+<div class="no-print" style="position:fixed;top:16px;right:16px;z-index:99;">
+  <button onclick="window.print()"
+    style="background:#4f46e5;color:#fff;border:none;padding:10px 20px;border-radius:8px;
+           font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(79,70,229,.4);">
+    ⬇ Save as PDF
+  </button>
+</div>
+
+<!-- Cover -->
+<div class="cover">
+  <div class="cover-logo">LN</div>
+  <h1>Lowell Nails &amp; Spa</h1>
+  <div class="sub">Live Deployment Guide — Calendar + AI Receptionist</div>
+  <div class="date">Generated May 2026</div>
+</div>
+
+<!-- Architecture -->
+<div class="arch">
+  <div class="title">System Architecture</div>
+  Render PostgreSQL (lowell-nails-db)
+    └── stores all appointments, clients, technicians, gift cards
+          │
+          ├── michael-receptionist  (Render Web Service — port 3000)
+          │     ├── /api/appointments   ← calendar reads/writes here
+          │     ├── /api/clients
+          │     ├── /api/technicians
+          │     ├── /api/giftcards
+          │     └── /voice/*            ← Twilio phone calls → Michael AI
+          │
+          └── lowell-nails-calendar  (Render Static Site)
+                → accessible at https://lowell-nails-calendar.onrender.com
+</div>
+
+<!-- Phase 1 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">1</div>
+    <div>
+      <div class="phase-title">Push Calendar to GitHub</div>
+      <div class="phase-sub">One-time setup — creates the repo that Render will pull from</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 1.1 — Initialize git in the Calendar folder</div>
+    <p>Open a terminal (PowerShell or Command Prompt) and run:</p>
+    <pre>cd "C:\Users\Cyrus\Desktop\Personal\2026\Calendar"
+git init
+git add .
+git commit -m "Initial commit — Lowell Nails calendar app"</pre>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 1.2 — Create a new GitHub repository</div>
+    <ol>
+      <li>Go to <strong>github.com</strong> and sign in</li>
+      <li>Click the <strong>+</strong> button → <strong>New repository</strong></li>
+      <li>Name it <code>lowell-nails-calendar</code></li>
+      <li>Set visibility to <strong>Private</strong></li>
+      <li><strong>Do NOT</strong> check "Add README", "Add .gitignore", or "Choose a license" — keep it completely empty</li>
+      <li>Click <strong>Create repository</strong></li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 1.3 — Push your code</div>
+    <p>GitHub will show you the commands after creating the repo. Run these (replace the URL with your exact repo URL):</p>
+    <pre>git remote add origin https://github.com/cyrusnguyen82/lowell-nails-calendar.git
+git branch -M main
+git push -u origin main</pre>
+    <div class="callout">You should see "main" branch appear on github.com/cyrusnguyen82/lowell-nails-calendar</div>
+  </div>
+</div>
+
+<!-- Phase 2 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">2</div>
+    <div>
+      <div class="phase-title">Create PostgreSQL Database on Render</div>
+      <div class="phase-sub">This is the single database both Michael and the calendar share</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 2.1 — Create the database</div>
+    <ol>
+      <li>Go to <strong>dashboard.render.com</strong></li>
+      <li>Click <strong>New +</strong> → <strong>PostgreSQL</strong></li>
+      <li>Fill in:
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Name</td><td style="font-family:inherit;">lowell-nails-db</td></tr>
+          <tr><td>Region</td><td style="font-family:inherit;">Oregon (US West) — match your existing service</td></tr>
+          <tr><td>Plan</td><td style="font-family:inherit;">Free</td></tr>
+        </table>
+      </li>
+      <li>Click <strong>Create Database</strong> and wait ~1 minute</li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 2.2 — Copy the connection string</div>
+    <ol>
+      <li>On the database info page, scroll to <strong>Connections</strong></li>
+      <li>Copy the <strong>Internal Database URL</strong> — it looks like:<br/>
+        <pre>postgresql://lowell_nails_db_user:xxxxx@dpg-xxxxx-a/lowell_nails_db</pre>
+      </li>
+      <li><strong>Save this URL</strong> — you will use it in the next phase</li>
+    </ol>
+    <div class="callout warn">Use the Internal URL (not External) when both services are on Render — it's faster and free of egress charges.</div>
+  </div>
+</div>
+
+<!-- Phase 3 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">3</div>
+    <div>
+      <div class="phase-title">Update michael-receptionist on Render</div>
+      <div class="phase-sub">Push the new calendar API code and connect it to the database</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 3.1 — Push updated code to GitHub</div>
+    <p>The michael-receptionist project now has new files (<code>db.js</code>, <code>schema.sql</code>, <code>seed.js</code>, <code>routes/api.js</code>) and an updated <code>server.js</code>. Push them:</p>
+    <pre>cd "C:\Users\Cyrus\Desktop\michael-receptionist"
+git add .
+git commit -m "Add PostgreSQL calendar API routes"
+git push</pre>
+    <div class="callout">Render detects the push and starts redeploying automatically. This takes about 1–2 minutes.</div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 3.2 — Add environment variables on Render</div>
+    <ol>
+      <li>Go to your <strong>michael-receptionist</strong> service on the Render dashboard</li>
+      <li>Click <strong>Environment</strong> in the left sidebar</li>
+      <li>Add these variables (click <strong>Add Environment Variable</strong> for each):</li>
+    </ol>
+    <table>
+      <tr><th>Key</th><th>Value</th></tr>
+      <tr><td>DATABASE_URL</td><td style="font-family:inherit;">Paste the Internal Database URL from Step 2.2</td></tr>
+      <tr><td>CORS_ORIGIN</td><td style="font-family:inherit;">Leave blank for now — you will fill this in after Phase 4</td></tr>
+    </table>
+    <p style="margin-top:8px;">Click <strong>Save Changes</strong> — Render will redeploy automatically.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 3.3 — Create the tables and load seed data</div>
+    <p>Once the redeploy finishes (green dot next to the service name):</p>
+    <ol>
+      <li>On the michael-receptionist service page, click <strong>Shell</strong> in the left sidebar</li>
+      <li>In the terminal that opens, run:</li>
+    </ol>
+    <pre>npm run db:setup
+npm run db:seed</pre>
+    <p>You should see:</p>
+    <pre>✅ Database seeded successfully
+   Technicians: Tina, Cyrus, Tianna, Dung, Van
+   Clients: 10 records
+   Appointments: 10 for today
+   Login: admin/admin123  |  jane/staff123  |  tina/tech123  etc.</pre>
+    <div class="callout">You only run this once. After this, all data is persisted in PostgreSQL and survives restarts.</div>
+  </div>
+</div>
+
+<!-- Phase 4 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">4</div>
+    <div>
+      <div class="phase-title">Deploy Calendar Frontend on Render</div>
+      <div class="phase-sub">Static site — always on, free, no spin-down</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 4.1 — Create a Static Site on Render</div>
+    <ol>
+      <li>On the Render dashboard, click <strong>New +</strong> → <strong>Static Site</strong></li>
+      <li>Connect your GitHub account if prompted, then select <code>lowell-nails-calendar</code></li>
+      <li>Fill in the settings:</li>
+    </ol>
+    <table>
+      <tr><th>Setting</th><th>Value</th></tr>
+      <tr><td>Name</td><td style="font-family:inherit;">lowell-nails-calendar</td></tr>
+      <tr><td>Branch</td><td style="font-family:inherit;">main</td></tr>
+      <tr><td>Root Directory</td><td style="font-family:inherit;">frontend</td></tr>
+      <tr><td>Build Command</td><td style="font-family:inherit;">npm install &amp;&amp; npm run build</td></tr>
+      <tr><td>Publish Directory</td><td style="font-family:inherit;">dist</td></tr>
+    </table>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 4.2 — Add the API URL environment variable</div>
+    <p>Before clicking Create, scroll down to <strong>Environment Variables</strong> and add:</p>
+    <table>
+      <tr><th>Key</th><th>Value</th></tr>
+      <tr><td>VITE_API_URL</td><td style="font-family:inherit;">https://michael-receptionist.onrender.com<br/><span style="font-size:11px;color:#94a3b8;">(use your exact Render URL for michael-receptionist)</span></td></tr>
+    </table>
+    <p style="margin-top:8px;">Click <strong>Create Static Site</strong>. Render builds and deploys in ~2 minutes.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 4.3 — Save your live URL</div>
+    <p>After deployment, Render shows your URL at the top of the page:</p>
+    <pre>https://lowell-nails-calendar.onrender.com</pre>
+    <div class="callout">This URL works on any device, anywhere — phone, tablet, or computer.</div>
+  </div>
+</div>
+
+<!-- Phase 5 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">5</div>
+    <div>
+      <div class="phase-title">Connect the Two Services</div>
+      <div class="phase-sub">Allow the frontend to call the backend API</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 5.1 — Update CORS on michael-receptionist</div>
+    <ol>
+      <li>Go back to the <strong>michael-receptionist</strong> service → <strong>Environment</strong></li>
+      <li>Find the <code>CORS_ORIGIN</code> variable and set it to your calendar URL:</li>
+    </ol>
+    <pre>https://lowell-nails-calendar.onrender.com</pre>
+    <ol start="3">
+      <li>Click <strong>Save Changes</strong></li>
+    </ol>
+    <p>Render redeploys in ~30 seconds. After that, both services are live and fully connected.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Step 5.2 — Test everything</div>
+    <ol>
+      <li>Open <code>https://lowell-nails-calendar.onrender.com</code> in your browser</li>
+      <li>Sign in with <code>admin / admin123</code></li>
+      <li>Verify the calendar shows Tina, Cyrus, Tianna, Dung, and Van</li>
+      <li>Book a test appointment → open on your phone → confirm it appears</li>
+      <li>Test Michael by calling the Twilio number — he now has access to real booking data</li>
+    </ol>
+    <div class="callout">If the calendar shows "Cannot connect to server" on first load, wait 30 seconds — the backend may be waking up from idle (free tier). Refresh and it will load.</div>
+  </div>
+</div>
+
+<!-- Ongoing updates -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">6</div>
+    <div>
+      <div class="phase-title">Making Updates After Launch</div>
+      <div class="phase-sub">Every push to GitHub automatically redeploys on Render</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Update the backend (michael-receptionist)</div>
+    <pre>cd "C:\Users\Cyrus\Desktop\michael-receptionist"
+git add .
+git commit -m "describe your change"
+git push</pre>
+    <p>Render redeploys in ~1 minute. No downtime for the frontend.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Update the frontend (calendar)</div>
+    <pre>cd "C:\Users\Cyrus\Desktop\Personal\2026\Calendar"
+git add .
+git commit -m "describe your change"
+git push</pre>
+    <p>Render rebuilds and deploys the static site in ~2 minutes.</p>
+  </div>
+</div>
+
+<!-- Free tier summary -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num" style="background:#64748b;">★</div>
+    <div>
+      <div class="phase-title">Free Tier Summary</div>
+      <div class="phase-sub">What's free and what has limits</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Service</th><th>Free Tier Limit</th><th>Impact</th></tr>
+    <tr>
+      <td>Web Service (michael-receptionist)</td>
+      <td style="font-family:inherit;">Spins down after 15 min idle</td>
+      <td style="font-family:inherit;">First calendar load after idle takes ~30 sec. Already has a keep-alive ping to minimize this.</td>
+    </tr>
+    <tr>
+      <td>Static Site (calendar)</td>
+      <td style="font-family:inherit;">Always on — no limit</td>
+      <td style="font-family:inherit;">No issues. Pages load instantly from CDN.</td>
+    </tr>
+    <tr>
+      <td>PostgreSQL</td>
+      <td style="font-family:inherit;">Free for 90 days, then $7/mo</td>
+      <td style="font-family:inherit;">All your real client and appointment data lives here. Upgrade before day 90.</td>
+    </tr>
+  </table>
+
+  <div class="callout info" style="margin-top:12px;">
+    <strong>To go always-on:</strong> Upgrade the Web Service to the Render Starter plan at $7/mo. This eliminates the spin-down delay and gives you a persistent server. Recommended before going live with real clients.
+  </div>
+</div>
+
+<!-- Account credentials reminder -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num" style="background:#64748b;">!</div>
+    <div>
+      <div class="phase-title">Login Credentials (Change These)</div>
+      <div class="phase-sub">Default accounts seeded into the database</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Username</th><th>Password</th><th>Role</th></tr>
+    <tr><td>admin</td><td style="font-family:inherit;">admin123</td><td style="font-family:inherit;">Admin — full access</td></tr>
+    <tr><td>jane</td><td style="font-family:inherit;">staff123</td><td style="font-family:inherit;">Receptionist</td></tr>
+    <tr><td>tina</td><td style="font-family:inherit;">tech123</td><td style="font-family:inherit;">Technician — Tina</td></tr>
+    <tr><td>cyrus</td><td style="font-family:inherit;">tech123</td><td style="font-family:inherit;">Technician — Cyrus</td></tr>
+    <tr><td>tianna</td><td style="font-family:inherit;">tech123</td><td style="font-family:inherit;">Technician — Tianna</td></tr>
+    <tr><td>dung</td><td style="font-family:inherit;">tech123</td><td style="font-family:inherit;">Technician — Dung</td></tr>
+    <tr><td>van</td><td style="font-family:inherit;">tech123</td><td style="font-family:inherit;">Technician — Van</td></tr>
+  </table>
+  <div class="callout warn" style="margin-top:10px;">Change all passwords through Admin → Staff Accounts before sharing with your team.</div>
+</div>
+
+<footer>
+  Lowell Nails and Spa, LLC &nbsp;·&nbsp; 505 W. Main St. Suite B, Lowell, MI 49331 &nbsp;·&nbsp; (616) 319-7924<br/>
+  Deployment Guide generated by Claude Code &nbsp;·&nbsp; May 2026
+</footer>
+
+</body>
+</html>

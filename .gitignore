@@ -1,0 +1,13 @@
+.env
+.env.local
+credentials.json
+token.json
+.tmp/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+node_modules/
+dist/
+*.log

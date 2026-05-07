@@ -1,0 +1,115 @@
+.login-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 36px;
+  width: 380px;
+  max-width: 95vw;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+
+.login-company-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.login-company-address {
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 4px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 28px;
+}
+
+.login-form { display: flex; flex-direction: column; gap: 16px; }
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.login-field input {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.login-field input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+.login-error {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.login-btn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.login-btn:hover { background: #4338ca; }
+
+.login-hint {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-hint code {
+  font-size: 12px;
+  background: #f8fafc;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: #475569;
+  font-family: 'Courier New', monospace;
+}
