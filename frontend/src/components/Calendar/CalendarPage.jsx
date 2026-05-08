@@ -57,8 +57,6 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
           {isToday && view === 'day' ? 'Today · ' : ''}{navLabel()}
         </span>
 
-        <div style={{ flex:1 }} />
-
         {/* View toggle */}
         <div style={{ display:'flex', gap:2, background:'#1e293b', padding:3, borderRadius:8 }}>
           {['day','week','month'].map(v => (
