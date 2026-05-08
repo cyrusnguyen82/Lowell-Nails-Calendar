@@ -160,24 +160,41 @@
 }
 
 .time-slot-label {
-  height: 120px; /* 2 × 60px per 30-min slot */
+  height: 120px; /* 4 × 30px per 15-min slot */
   display: flex;
   flex-direction: column;
-  padding-top: 6px;
   padding-right: 8px;
-  align-items: flex-end;
 }
 
 .time-label-hour {
+  height: 30px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 4px;
   font-size: 11px;
   font-weight: 600;
   color: #64748b;
 }
 
 .time-label-half {
-  margin-top: 54px;
+  height: 30px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 4px;
   font-size: 10px;
   color: #94a3b8;
+}
+
+.time-label-quarter {
+  height: 30px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 4px;
+  font-size: 9px;
+  color: #cbd5e1;
 }
 
 /* ── Tech Columns Wrapper ───────────────────────────────── */
@@ -224,12 +241,13 @@
 }
 
 .slot {
-  height: 60px;
-  border-bottom: 1px dashed #e2e8f0;
+  height: 30px;
+  border-bottom: 1px dashed #eff1f5;
   cursor: pointer;
   transition: background 0.1s;
 }
-.slot:nth-child(odd) { border-bottom: 1px solid #e8ecf1; }
+.slot:nth-child(2n)  { border-bottom: 1px solid #e2e8f0; }
+.slot:nth-child(4n)  { border-bottom: 1px solid #c8d3df; }
 .slot:hover { background: #eef2ff; }
 
 /* ── Appointment Block ──────────────────────────────────── */

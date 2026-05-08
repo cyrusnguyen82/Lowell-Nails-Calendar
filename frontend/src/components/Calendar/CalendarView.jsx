@@ -7,7 +7,8 @@ import './Calendar.css'
 
 const START_HOUR = 8
 const END_HOUR = 21
-const SLOT_HEIGHT = 60
+const SLOT_HEIGHT = 30    // 30px per 15-min slot → 120px/hr, same visual scale as before
+const SLOT_MINS  = 15
 
 function formatHour(h) {
   if (h === 12) return '12 PM'
@@ -19,7 +20,7 @@ function getTimeOffset() {
   const now = new Date()
   const h = now.getHours(), m = now.getMinutes()
   if (h < START_HOUR || h >= END_HOUR) return null
-  return ((h - START_HOUR) * 60 + m) / 30 * SLOT_HEIGHT
+  return ((h - START_HOUR) * 60 + m) / SLOT_MINS * SLOT_HEIGHT
 }
 
 export default function CalendarView({ currentDate }) {
@@ -89,7 +90,9 @@ export default function CalendarView({ currentDate }) {
             {hours.map(h => (
               <div key={h} className="time-slot-label">
                 <span className="time-label-hour">{formatHour(h)}</span>
+                <span className="time-label-quarter">:15</span>
                 <span className="time-label-half">:30</span>
+                <span className="time-label-quarter">:45</span>
               </div>
             ))}
           </div>

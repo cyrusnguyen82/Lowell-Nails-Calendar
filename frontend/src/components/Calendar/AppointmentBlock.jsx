@@ -1,11 +1,11 @@
 import dayjs from 'dayjs'
 
-const SLOT_HEIGHT = 60
+const SLOT_HEIGHT = 30
 const START_HOUR = 8
 
 function timeToOffset(timeStr) {
   const [h, m] = timeStr.split(':').map(Number)
-  return ((h - START_HOUR) * 60 + m) / 30 * SLOT_HEIGHT
+  return ((h - START_HOUR) * 60 + m) / 15 * SLOT_HEIGHT
 }
 
 function formatTime(timeStr) {
@@ -17,7 +17,7 @@ function formatTime(timeStr) {
 
 export default function AppointmentBlock({ appointment, techColor, onClick }) {
   const top = timeToOffset(appointment.startTime)
-  const height = (appointment.duration / 30) * SLOT_HEIGHT
+  const height = (appointment.duration / 15) * SLOT_HEIGHT
 
   const bg = techColor + '22'
   const border = techColor
