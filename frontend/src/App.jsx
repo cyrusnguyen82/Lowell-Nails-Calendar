@@ -15,9 +15,13 @@ const ACCESS = {
   admin:     ['admin'],
 }
 
+const PAGE_KEY = 'lowell_nails_page'
+
 function Shell() {
   const { user, loading, apiError } = useApp()
-  const [page, setPage] = useState('calendar')
+  const [page, setPage] = useState(() => {
+    try { return sessionStorage.getItem(PAGE_KEY) || 'calendar' } catch { return 'calendar' }
+  })
 
   if (loading) return (
     <div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
@@ -61,7 +65,10 @@ function Shell() {
   if (!user) return <LoginScreen />
 
   function navigate(p) {
-    if (ACCESS[p]?.includes(user.role)) setPage(p)
+    if (ACCESS[p]?.includes(user.role)) {
+      setPage(p)
+      try { sessionStorage.setItem(PAGE_KEY, p) } catch {}
+    }
   }
 
   const safePage = ACCESS[page]?.includes(user.role) ? page : 'calendar'

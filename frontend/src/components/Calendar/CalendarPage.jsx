@@ -1,13 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import dayjs from 'dayjs'
 import { useApp } from '../../context/AppContext'
 import CalendarView from './CalendarView'
 import WeekView from './WeekView'
 import MonthView from './MonthView'
 
+const CAL_KEY = 'lowell_nails_cal'
+
+function loadCalState() {
+  try {
+    const raw = sessionStorage.getItem(CAL_KEY)
+    if (!raw) return null
+    const { date, view } = JSON.parse(raw)
+    return { date: dayjs(date), view }
+  } catch { return null }
+}
+
 export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(dayjs())
-  const [view, setView] = useState('day')
+  const stored = loadCalState()
+  const [currentDate, setCurrentDate] = useState(stored?.date ?? dayjs())
+  const [view, setView] = useState(stored?.view ?? 'day')
+
+  useEffect(() => {
+    sessionStorage.setItem(CAL_KEY, JSON.stringify({
+      date: currentDate.format('YYYY-MM-DD'),
+      view,
+    }))
+  }, [currentDate, view])
 
   function nav(amount, unit) { setCurrentDate(d => d.add(amount, unit)) }
   function goToday() { setCurrentDate(dayjs()) }
