@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AppProvider, useApp } from './context/AppContext'
 import LoginScreen from './components/Auth/LoginScreen'
 import Sidebar from './components/Layout/Sidebar'
@@ -15,13 +15,30 @@ const ACCESS = {
   admin:     ['admin'],
 }
 
-const PAGE_KEY = 'lowell_nails_page'
+const PAGE_KEY     = 'lowell_nails_page'
+const CAL_DATE_KEY = 'lowell_cal_date'
+const CAL_VIEW_KEY = 'lowell_cal_view'
 
 function Shell() {
   const { user, loading, apiError } = useApp()
   const [page, setPage] = useState(() => {
     try { return sessionStorage.getItem(PAGE_KEY) || 'calendar' } catch { return 'calendar' }
   })
+
+  // Calendar state lives here so localStorage is read at Shell mount,
+  // before loading/auth checks — CalendarPage only mounts later.
+  const [calDateStr, setCalDateStr] = useState(() => {
+    try { return localStorage.getItem(CAL_DATE_KEY) || '' } catch { return '' }
+  })
+  const [calView, setCalView] = useState(() => {
+    try { return localStorage.getItem(CAL_VIEW_KEY) || 'day' } catch { return 'day' }
+  })
+  useEffect(() => {
+    if (calDateStr) try { localStorage.setItem(CAL_DATE_KEY, calDateStr) } catch {}
+  }, [calDateStr])
+  useEffect(() => {
+    try { localStorage.setItem(CAL_VIEW_KEY, calView) } catch {}
+  }, [calView])
 
   if (loading) return (
     <div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
@@ -77,7 +94,7 @@ function Shell() {
     <div className="app-shell">
       <Sidebar page={safePage} onNavigate={navigate} />
       <main className="app-main">
-        {safePage === 'calendar'  && <CalendarPage />}
+        {safePage === 'calendar'  && <CalendarPage initDateStr={calDateStr} initView={calView} onDateChange={setCalDateStr} onViewChange={setCalView} />}
         {safePage === 'clients'   && <ClientsPage />}
         {safePage === 'giftcards' && <GiftCardsPage />}
         {safePage === 'admin'     && <AdminPage />}

@@ -114,6 +114,15 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete }) {
             <span className="modal-detail-value">{val}</span>
           </div>
         ))}
+        {appointment.clientPhone && (
+          <div className="modal-detail-row">
+            <span className="modal-detail-label">Phone</span>
+            <a href={`tel:${appointment.clientPhone}`} className="modal-detail-value"
+               style={{ color:'#818cf8', textDecoration:'none' }}>
+              {appointment.clientPhone}
+            </a>
+          </div>
+        )}
         {appointment.notes && (
           <div className="modal-detail-row">
             <span className="modal-detail-label">Notes</span>

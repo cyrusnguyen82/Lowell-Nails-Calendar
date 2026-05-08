@@ -1,38 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import dayjs from 'dayjs'
 import { useApp } from '../../context/AppContext'
 import CalendarView from './CalendarView'
 import WeekView from './WeekView'
 import MonthView from './MonthView'
 
-const CAL_KEY = 'lowell_nails_cal'
+export default function CalendarPage({ initDateStr, initView, onDateChange, onViewChange }) {
+  const [currentDate, setCurrentDate] = useState(() => {
+    if (initDateStr) { const d = dayjs(initDateStr); if (d.isValid()) return d }
+    return dayjs()
+  })
+  const [view, setView] = useState(initView || 'day')
 
-function getStoredDate() {
-  try {
-    const v = localStorage.getItem(CAL_KEY + '_date')
-    if (v) { const d = dayjs(v); if (d.isValid()) return d }
-  } catch {}
-  return dayjs()
-}
+  function setDate(d) {
+    setCurrentDate(d)
+    onDateChange(d.format('YYYY-MM-DD'))
+  }
 
-function getStoredView() {
-  try { return localStorage.getItem(CAL_KEY + '_view') || 'day' } catch { return 'day' }
-}
+  function changeView(v) {
+    setView(v)
+    onViewChange(v)
+  }
 
-export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(getStoredDate)
-  const [view, setView] = useState(getStoredView)
-
-  useEffect(() => {
-    try { localStorage.setItem(CAL_KEY + '_date', currentDate.format('YYYY-MM-DD')) } catch {}
-  }, [currentDate])
-
-  useEffect(() => {
-    try { localStorage.setItem(CAL_KEY + '_view', view) } catch {}
-  }, [view])
-
-  function nav(amount, unit) { setCurrentDate(d => d.add(amount, unit)) }
-  function goToday() { setCurrentDate(dayjs()) }
+  function nav(amount, unit) { setDate(currentDate.add(amount, unit)) }
+  function goToday() { setDate(dayjs()) }
 
   const isToday = currentDate.isSame(dayjs(), 'day')
 
@@ -73,7 +64,7 @@ export default function CalendarPage() {
           {['day','week','month'].map(v => (
             <button
               key={v}
-              onClick={() => setView(v)}
+              onClick={() => changeView(v)}
               style={{
                 padding:'5px 14px', border:'none', borderRadius:6,
                 fontSize:13, fontWeight:600, cursor:'pointer',
@@ -92,8 +83,8 @@ export default function CalendarPage() {
       {/* View */}
       <div style={{ flex:1, overflow:'hidden' }}>
         {view === 'day'   && <CalendarView currentDate={currentDate} />}
-        {view === 'week'  && <WeekView currentDate={currentDate} onDayClick={d => { setCurrentDate(d); setView('day') }} />}
-        {view === 'month' && <MonthView currentDate={currentDate} onDayClick={d => { setCurrentDate(d); setView('day') }} />}
+        {view === 'week'  && <WeekView currentDate={currentDate} onDayClick={d => { setDate(d); changeView('day') }} />}
+        {view === 'month' && <MonthView currentDate={currentDate} onDayClick={d => { setDate(d); changeView('day') }} />}
       </div>
     </div>
   )
