@@ -31,12 +31,30 @@ function Shell() {
 
   if (apiError) return (
     <div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
-                  background:'#0f172a', flexDirection:'column', gap:12 }}>
+                  background:'#0f172a', flexDirection:'column', gap:12, padding:24, textAlign:'center' }}>
       <p style={{ color:'#ef4444', fontSize:16, fontWeight:700 }}>Cannot connect to server</p>
-      <p style={{ color:'#64748b', fontSize:13 }}>Make sure the backend is running on port 3000</p>
-      <code style={{ color:'#94a3b8', fontSize:12, background:'#1e293b', padding:'6px 12px', borderRadius:6 }}>
-        cd michael-receptionist &amp;&amp; npm start
-      </code>
+      {import.meta.env.DEV ? (
+        <>
+          <p style={{ color:'#64748b', fontSize:13 }}>Make sure the backend is running on port 3000</p>
+          <code style={{ color:'#94a3b8', fontSize:12, background:'#1e293b', padding:'6px 12px', borderRadius:6 }}>
+            cd michael-receptionist &amp;&amp; npm start
+          </code>
+        </>
+      ) : (
+        <>
+          <p style={{ color:'#64748b', fontSize:13 }}>
+            {import.meta.env.VITE_API_URL
+              ? <>Trying to reach: <code style={{ color:'#94a3b8' }}>{import.meta.env.VITE_API_URL}</code></>
+              : <><code style={{ color:'#f59e0b' }}>VITE_API_URL</code> is not set — add it to your Render Static Site environment variables and redeploy.</>
+            }
+          </p>
+        </>
+      )}
+      <button onClick={() => window.location.reload()}
+        style={{ marginTop:8, padding:'8px 20px', background:'#4f46e5', color:'#fff',
+                 border:'none', borderRadius:6, cursor:'pointer', fontSize:13, fontWeight:600 }}>
+        Retry
+      </button>
     </div>
   )
 
