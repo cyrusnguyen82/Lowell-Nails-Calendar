@@ -9,4 +9,16 @@ html, body, #root {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  /* Prevent Android Chrome pull-to-refresh from fighting scroll */
+  overscroll-behavior: none;
+}
+
+/* Suppress Android blue tap highlight on all interactive elements */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent double-tap zoom on buttons and inputs (Android Chrome) */
+button, input, select, textarea, a {
+  touch-action: manipulation;
 }
