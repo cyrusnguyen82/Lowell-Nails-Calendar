@@ -238,10 +238,11 @@ export default function ClientsPage() {
   const [importMsg, setImportMsg] = useState('')
   const importRef = useRef(null)
 
-  function importRows(rows) {
+  async function importRows(rows) {
     if (rows.length < 2) { setImportMsg('No data rows found.'); return }
     const headers = rows[0].map(h => String(h ?? '').replace(/^"|"$/g, ''))
-    let imported = 0
+    const clientsToImport = []
+
     rows.slice(1).forEach(vals => {
       const row = Object.fromEntries(headers.map((h, i) => [h, String(vals[i] ?? '').replace(/^"|"$/g, '').trim()]))
       const fullName = pick(row, 'name','fullname','clientname','full name','client name','client')
@@ -249,18 +250,38 @@ export default function ClientsPage() {
                         (fullName ? fullName.split(' ')[0] : '')
       const lastName  = pick(row, 'lastname','last name','last','lname','surname','familyname') ||
                         (fullName ? fullName.split(' ').slice(1).join(' ') : '')
+      
       if (!firstName) return
-      addClient({
+
+      clientsToImport.push({
         firstName, lastName,
-        phone: formatPhone(pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number')),
+        phone: pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number'),
         email: pick(row, 'email','emailaddress','mail','e-mail','email address'),
         notes: pick(row, 'notes','note','comments','comment','memo','description'),
-        serviceHistory: [],
       })
-      imported++
     })
-    setImportMsg(`Imported ${imported} client${imported !== 1 ? 's' : ''}.`)
-    setTimeout(() => setImportMsg(''), 3500)
+
+    if (clientsToImport.length === 0) {
+      setImportMsg('No valid client data found to import.')
+      return
+    }
+
+    try {
+      setImportMsg(`Uploading ${clientsToImport.length} clients...`)
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/clients/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(clientsToImport)
+      })
+      const result = await response.json()
+      setImportMsg(`Import complete! Added: ${result.added}, Updated: ${result.updated}, Skipped: ${result.skipped}`)
+      // Note: In a production app, you would trigger a state refresh here 
+      // if the AppContext doesn't handle it automatically.
+    } catch (err) {
+      setImportMsg('Error during import. Please check console.')
+      console.error('Bulk import error:', err)
+    }
+    setTimeout(() => setImportMsg(''), 5000)
   }
 
   function handleImportCSV(e) {
