@@ -140,6 +140,8 @@
   overflow-y: auto;
   overflow-x: auto;
   background: #f8fafc;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pan-x;
 }
 
 .cal-grid {

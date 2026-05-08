@@ -211,6 +211,7 @@ function NewStaffForm({ technicians, onSave, onCancel }) {
           <select className="form-select" value={form.role} onChange={e => set('role', e.target.value)}>
             <option value="receptionist">Receptionist</option>
             <option value="technician">Technician</option>
+            <option value="admin">Admin</option>
           </select>
         </div>
         {form.role === 'technician' && (
