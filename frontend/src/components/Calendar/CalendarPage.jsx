@@ -9,7 +9,7 @@ const CAL_KEY = 'lowell_nails_cal'
 
 function loadCalState() {
   try {
-    const raw = sessionStorage.getItem(CAL_KEY)
+    const raw = localStorage.getItem(CAL_KEY)
     if (!raw) return null
     const { date, view } = JSON.parse(raw)
     return { date: dayjs(date), view }
@@ -17,12 +17,11 @@ function loadCalState() {
 }
 
 export default function CalendarPage() {
-  const stored = loadCalState()
-  const [currentDate, setCurrentDate] = useState(stored?.date ?? dayjs())
-  const [view, setView] = useState(stored?.view ?? 'day')
+  const [currentDate, setCurrentDate] = useState(() => loadCalState()?.date ?? dayjs())
+  const [view, setView] = useState(() => loadCalState()?.view ?? 'day')
 
   useEffect(() => {
-    sessionStorage.setItem(CAL_KEY, JSON.stringify({
+    localStorage.setItem(CAL_KEY, JSON.stringify({
       date: currentDate.format('YYYY-MM-DD'),
       view,
     }))
