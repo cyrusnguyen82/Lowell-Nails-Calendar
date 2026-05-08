@@ -4,8 +4,24 @@ import { defaultCompanyInfo } from '../data/mockData'
 
 const AppContext = createContext(null)
 
+const SESSION_KEY      = 'lowell_nails_session'
+const INACTIVITY_LIMIT = 30 * 60 * 1000  // 30 minutes
+
+function getStoredUser() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (!raw) return null
+    const { user, lastActivity } = JSON.parse(raw)
+    if (Date.now() - lastActivity < INACTIVITY_LIMIT) return user
+    localStorage.removeItem(SESSION_KEY)
+    return null
+  } catch {
+    return null
+  }
+}
+
 export function AppProvider({ children }) {
-  const [user, setUser]               = useState(null)
+  const [user, setUser]               = useState(getStoredUser)
   const [users, setUsers]             = useState([])
   const [technicians, setTechs]       = useState([])
   const [appointments, setApts]       = useState([])
@@ -39,17 +55,50 @@ export function AppProvider({ children }) {
 
   function updateCompanyInfo(updates) { setCompanyInfo(prev => ({ ...prev, ...updates })) }
 
+  // ── Inactivity logout ──────────────────────────────────────
+  useEffect(() => {
+    if (!user) return
+    const events = ['mousedown', 'keydown', 'touchstart', 'scroll', 'click']
+    function touch() {
+      const raw = localStorage.getItem(SESSION_KEY)
+      if (!raw) return
+      try {
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ ...JSON.parse(raw), lastActivity: Date.now() }))
+      } catch {}
+    }
+    events.forEach(e => window.addEventListener(e, touch, { passive: true }))
+    const timer = setInterval(() => {
+      const raw = localStorage.getItem(SESSION_KEY)
+      if (!raw) { setUser(null); return }
+      try {
+        const { lastActivity } = JSON.parse(raw)
+        if (Date.now() - lastActivity > INACTIVITY_LIMIT) {
+          localStorage.removeItem(SESSION_KEY)
+          setUser(null)
+        }
+      } catch { localStorage.removeItem(SESSION_KEY); setUser(null) }
+    }, 60 * 1000)
+    return () => {
+      events.forEach(e => window.removeEventListener(e, touch))
+      clearInterval(timer)
+    }
+  }, [user])
+
   // ── Auth ───────────────────────────────────────────────────
   async function login(username, password) {
     try {
       const { user: u } = await api.post('/auth/login', { username, password })
       setUser(u)
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ user: u, lastActivity: Date.now() }))
       return true
     } catch {
       return false
     }
   }
-  function logout() { setUser(null) }
+  function logout() {
+    setUser(null)
+    localStorage.removeItem(SESSION_KEY)
+  }
 
   // ── Staff accounts ─────────────────────────────────────────
   async function addUser(u) {
