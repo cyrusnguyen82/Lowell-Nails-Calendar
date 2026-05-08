@@ -7,25 +7,29 @@ import MonthView from './MonthView'
 
 const CAL_KEY = 'lowell_nails_cal'
 
-function loadCalState() {
+function getStoredDate() {
   try {
-    const raw = localStorage.getItem(CAL_KEY)
-    if (!raw) return null
-    const { date, view } = JSON.parse(raw)
-    return { date: dayjs(date), view }
-  } catch { return null }
+    const v = localStorage.getItem(CAL_KEY + '_date')
+    if (v) { const d = dayjs(v); if (d.isValid()) return d }
+  } catch {}
+  return dayjs()
+}
+
+function getStoredView() {
+  try { return localStorage.getItem(CAL_KEY + '_view') || 'day' } catch { return 'day' }
 }
 
 export default function CalendarPage() {
-  const [currentDate, setCurrentDate] = useState(() => loadCalState()?.date ?? dayjs())
-  const [view, setView] = useState(() => loadCalState()?.view ?? 'day')
+  const [currentDate, setCurrentDate] = useState(getStoredDate)
+  const [view, setView] = useState(getStoredView)
 
   useEffect(() => {
-    localStorage.setItem(CAL_KEY, JSON.stringify({
-      date: currentDate.format('YYYY-MM-DD'),
-      view,
-    }))
-  }, [currentDate, view])
+    try { localStorage.setItem(CAL_KEY + '_date', currentDate.format('YYYY-MM-DD')) } catch {}
+  }, [currentDate])
+
+  useEffect(() => {
+    try { localStorage.setItem(CAL_KEY + '_view', view) } catch {}
+  }, [view])
 
   function nav(amount, unit) { setCurrentDate(d => d.add(amount, unit)) }
   function goToday() { setCurrentDate(dayjs()) }
