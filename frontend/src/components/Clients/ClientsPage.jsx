@@ -33,10 +33,11 @@ function pick(row, ...aliases) {
 const MODAL_TABS = ['Info', 'Service History']
 
 function formatPhone(raw) {
-  const d = raw.replace(/\D/g, '').slice(0, 10)
-  if (d.length < 4) return d
-  if (d.length < 7) return `(${d.slice(0,3)}) ${d.slice(3)}`
-  return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+  const digits = (raw || "").replace(/\D/g, "");
+  // Handle 11 digits (e.g., 15551234567) by stripping the leading 1
+  const cleaned = (digits.length === 11 && digits.startsWith('1')) ? digits.slice(1) : digits;
+  if (cleaned.length !== 10) return raw; // Return original if not 10 digits after cleaning
+  return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
 }
 
 /* ── Service history entry form ─────────────────────────── */
@@ -230,7 +231,7 @@ function ClientModal({ client, canEdit, technicians, onClose, onSave, onDelete, 
 
 /* ── Page ────────────────────────────────────────────────── */
 export default function ClientsPage() {
-  const { user, clients, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry, technicians } = useApp()
+  const { user, clients, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry, technicians, fetchClients } = useApp()
   const [search, setSearch]     = useState('')
   const [selected, setSelected] = useState(null)
   const [sortKey, setSortKey]   = useState('name')
@@ -275,8 +276,9 @@ export default function ClientsPage() {
       })
       const result = await response.json()
       setImportMsg(`Import complete! Added: ${result.added}, Updated: ${result.updated}, Skipped: ${result.skipped}`)
-      // Note: In a production app, you would trigger a state refresh here 
-      // if the AppContext doesn't handle it automatically.
+      // Refresh the client list from the backend to show newly imported clients
+      // This assumes AppContext provides a fetchClients function.
+      if (fetchClients) fetchClients();
     } catch (err) {
       setImportMsg('Error during import. Please check console.')
       console.error('Bulk import error:', err)
