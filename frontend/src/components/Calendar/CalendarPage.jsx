@@ -45,26 +45,26 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
     <div style={{ display:'flex', flexDirection:'column', height:'100%', overflow:'hidden' }}>
       {/* Toolbar */}
       <div className="cal-toolbar">
-        <div className="cal-toolbar-nav">
-          <button className="nav-btn" onClick={() => nav(-1, navUnit())}>‹ Prev</button>
-          <button className="nav-btn today" onClick={goToday}>Today</button>
-          <button className="nav-btn" onClick={() => nav(1, navUnit())}>Next ›</button>
-        </div>
-
         <span className="cal-toolbar-date">
           {isToday && view === 'day' ? 'Today · ' : ''}{navLabel()}
         </span>
-
-        <div className="cal-toolbar-views">
-          {['day','week','month'].map(v => (
-            <button
-              key={v}
-              onClick={() => changeView(v)}
-              className={`view-btn${view === v ? ' active' : ''}`}
-            >
-              {v.charAt(0).toUpperCase() + v.slice(1)}
-            </button>
-          ))}
+        <div className="cal-toolbar-controls">
+          <div className="cal-toolbar-nav">
+            <button className="nav-btn" onClick={() => nav(-1, navUnit())}>‹ Prev</button>
+            <button className="nav-btn today" onClick={goToday}>Today</button>
+            <button className="nav-btn" onClick={() => nav(1, navUnit())}>Next ›</button>
+          </div>
+          <div className="cal-toolbar-views">
+            {['day','week','month'].map(v => (
+              <button
+                key={v}
+                onClick={() => changeView(v)}
+                className={`view-btn${view === v ? ' active' : ''}`}
+              >
+                {v.charAt(0).toUpperCase() + v.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

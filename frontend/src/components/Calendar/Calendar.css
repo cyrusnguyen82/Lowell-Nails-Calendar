@@ -475,23 +475,28 @@
 /* ── Toolbar ─────────────────────────────────────────────── */
 .cal-toolbar {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
   padding: 10px 18px;
   background: #0f172a;
   flex-shrink: 0;
   border-bottom: 1px solid #1e293b;
 }
 
-.cal-toolbar-nav { display: flex; gap: 6px; }
-
 .cal-toolbar-date {
   font-size: 15px;
   font-weight: 600;
   color: #f1f5f9;
-  min-width: 240px;
   text-align: center;
 }
+
+.cal-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cal-toolbar-nav { display: flex; gap: 6px; }
 
 .cal-toolbar-views {
   display: flex;
@@ -499,6 +504,7 @@
   background: #1e293b;
   padding: 3px;
   border-radius: 8px;
+  margin-left: auto;
 }
 
 .view-btn {
@@ -517,19 +523,8 @@
 
 /* ── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .cal-toolbar {
-    flex-wrap: wrap;
-    padding: 8px 12px;
-    gap: 6px;
-  }
-  .cal-toolbar-date {
-    order: -1;
-    width: 100%;
-    min-width: unset;
-    font-size: 14px;
-    text-align: center;
-  }
-  .cal-toolbar-nav { flex: 1; }
+  .cal-toolbar { padding: 8px 12px; gap: 4px; }
+  .cal-toolbar-date { font-size: 13px; }
   .view-btn { padding: 5px 8px; font-size: 12px; }
 
   .modal-overlay { align-items: flex-end; padding: 0; }

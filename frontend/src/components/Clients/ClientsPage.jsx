@@ -237,14 +237,6 @@ export default function ClientsPage() {
   const [importMsg, setImportMsg] = useState('')
   const importRef = useRef(null)
 
-  function downloadTemplate() {
-    const csv = 'first_name,last_name,phone,email,notes\nJane,Smith,(616) 555-0100,jane@example.com,Regular client'
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
-    a.download = 'clients_template.csv'
-    a.click()
-  }
-
   function handleImportCSV(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -331,9 +323,6 @@ export default function ClientsPage() {
         <input className="clients-search" placeholder="Search by name, phone, or email..." value={search} onChange={e => setSearch(e.target.value)} />
         {canEdit && (
           <>
-            <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={downloadTemplate}>
-              CSV Template
-            </button>
             <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={() => importRef.current?.click()}>
               Import CSV
             </button>
