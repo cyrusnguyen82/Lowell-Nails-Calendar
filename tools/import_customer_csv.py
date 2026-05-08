@@ -19,15 +19,10 @@ def import_customer_csv(csv_file_path):
         return
 
     try:
-        url = urlparse(database_url)
-        conn = psycopg2.connect(
-            database=url.path[1:],
-            user=url.username,
-            password=url.password,
-            host=url.hostname,
-            port=url.port
-        )
+        # Using the URL directly is more robust for complex connection strings
+        conn = psycopg2.connect(database_url)
         cur = conn.cursor()
+        print(f"Connected to database: {urlparse(database_url).hostname}")
     except Exception as e:
         print(f"Error connecting to database: {e}")
         return
@@ -54,8 +49,13 @@ def import_customer_csv(csv_file_path):
 
                 # Clean and format phone number to 10 digits
                 cleaned_phone = ''.join(filter(str.isdigit, phone))
+                
+                # Handle 11 digits (e.g., 15551234567) by stripping the leading 1
+                if len(cleaned_phone) == 11 and cleaned_phone.startswith('1'):
+                    cleaned_phone = cleaned_phone[1:]
+
                 if len(cleaned_phone) != 10:
-                    print(f"Warning: Skipping row {i+1} due to invalid phone number format (not 10 digits after cleaning): {phone}")
+                    print(f"Warning: Skipping row {i+1} (Invalid length: {len(cleaned_phone)}): {phone}")
                     skipped_rows_count += 1
                     continue
                 formatted_phone = f"({cleaned_phone[0:3]}) {cleaned_phone[3:6]}-{cleaned_phone[6:10]}"
