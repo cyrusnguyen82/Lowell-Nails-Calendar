@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import * as XLSX from 'xlsx'
 import { useApp } from '../../context/AppContext'
 import { SERVICES } from '../../data/mockData'
 import './Clients.css'
@@ -237,37 +238,53 @@ export default function ClientsPage() {
   const [importMsg, setImportMsg] = useState('')
   const importRef = useRef(null)
 
+  function importRows(rows) {
+    if (rows.length < 2) { setImportMsg('No data rows found.'); return }
+    const headers = rows[0].map(h => String(h ?? '').replace(/^"|"$/g, ''))
+    let imported = 0
+    rows.slice(1).forEach(vals => {
+      const row = Object.fromEntries(headers.map((h, i) => [h, String(vals[i] ?? '').replace(/^"|"$/g, '').trim()]))
+      const fullName = pick(row, 'name','fullname','clientname','full name','client name','client')
+      const firstName = pick(row, 'firstname','first name','first','fname','givenname') ||
+                        (fullName ? fullName.split(' ')[0] : '')
+      const lastName  = pick(row, 'lastname','last name','last','lname','surname','familyname') ||
+                        (fullName ? fullName.split(' ').slice(1).join(' ') : '')
+      if (!firstName) return
+      addClient({
+        firstName, lastName,
+        phone: formatPhone(pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number')),
+        email: pick(row, 'email','emailaddress','mail','e-mail','email address'),
+        notes: pick(row, 'notes','note','comments','comment','memo','description'),
+        serviceHistory: [],
+      })
+      imported++
+    })
+    setImportMsg(`Imported ${imported} client${imported !== 1 ? 's' : ''}.`)
+    setTimeout(() => setImportMsg(''), 3500)
+  }
+
   function handleImportCSV(e) {
     const file = e.target.files?.[0]
     if (!file) return
+    const ext = file.name.split('.').pop().toLowerCase()
     const reader = new FileReader()
-    reader.onload = ev => {
-      const lines = ev.target.result.split('\n').map(l => l.trim()).filter(Boolean)
-      if (lines.length < 2) { setImportMsg('No data rows found.'); return }
-      const headers = parseCSVLine(lines[0]).map(h => h.replace(/^"|"$/g,''))
-      let imported = 0
-      lines.slice(1).forEach(line => {
-        const vals = parseCSVLine(line)
-        const row = Object.fromEntries(headers.map((h,i) => [h, (vals[i] || '').replace(/^"|"$/g,'')]))
-        const fullName = pick(row, 'name','fullname','clientname','full name','client name','client')
-        const firstName = pick(row, 'firstname','first name','first','fname','givenname') ||
-                          (fullName ? fullName.split(' ')[0] : '')
-        const lastName  = pick(row, 'lastname','last name','last','lname','surname','familyname') ||
-                          (fullName ? fullName.split(' ').slice(1).join(' ') : '')
-        if (!firstName) return
-        addClient({
-          firstName, lastName,
-          phone: formatPhone(pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number')),
-          email: pick(row, 'email','emailaddress','mail','e-mail','email address'),
-          notes: pick(row, 'notes','note','comments','comment','memo','description'),
-          serviceHistory: [],
-        })
-        imported++
-      })
-      setImportMsg(`Imported ${imported} client${imported !== 1 ? 's' : ''}.`)
-      setTimeout(() => setImportMsg(''), 3500)
+
+    if (ext === 'xlsx' || ext === 'xls') {
+      reader.onload = ev => {
+        const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' })
+        const ws = wb.Sheets[wb.SheetNames[0]]
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
+        importRows(rows)
+      }
+      reader.readAsArrayBuffer(file)
+    } else {
+      reader.onload = ev => {
+        const lines = ev.target.result.split('\n').map(l => l.trim()).filter(Boolean)
+        const rows = lines.map(line => parseCSVLine(line))
+        importRows(rows)
+      }
+      reader.readAsText(file)
     }
-    reader.readAsText(file)
     e.target.value = ''
   }
 
@@ -326,7 +343,7 @@ export default function ClientsPage() {
             <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={() => importRef.current?.click()}>
               Import CSV
             </button>
-            <input ref={importRef} type="file" accept=".csv,text/csv" style={{ display:'none' }} onChange={handleImportCSV} />
+            <input ref={importRef} type="file" accept=".csv,.xlsx,.xls,text/csv" style={{ display:'none' }} onChange={handleImportCSV} />
             <button className="btn btn-primary" onClick={() => setSelected('new')}>+ New Client</button>
           </>
         )}
