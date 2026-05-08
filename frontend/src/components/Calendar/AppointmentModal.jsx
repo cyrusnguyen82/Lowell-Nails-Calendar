@@ -25,12 +25,18 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
 
   return (
     <div className="modal-body">
-      <div className="form-group">
-        <label className="form-label">Client Name *</label>
-        <input className="form-input" value={form.clientName} onChange={e => set('clientName', e.target.value)} placeholder="Enter client name" autoFocus />
+      <div style={{ display:'flex', gap:10 }}>
+        <div className="form-group" style={{ flex:2 }}>
+          <label className="form-label">Client Name *</label>
+          <input className="form-input" value={form.clientName} onChange={e => set('clientName', e.target.value)} placeholder="Enter client name" autoFocus />
+        </div>
+        <div className="form-group" style={{ flex:1 }}>
+          <label className="form-label">Phone *</label>
+          <input className="form-input" type="tel" value={form.clientPhone || ''} onChange={e => set('clientPhone', e.target.value)} placeholder="555-0100" />
+        </div>
       </div>
       <div className="form-group">
-        <label className="form-label">Service</label>
+        <label className="form-label">Service *</label>
         <select className="form-select" value={form.service} onChange={e => {
           const svc = SERVICES.find(s => s.name === e.target.value)
           setForm(f => ({ ...f, service: e.target.value, duration: svc?.duration ?? f.duration }))
@@ -72,7 +78,7 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
       </div>
       <div className="modal-footer" style={{ padding:0, border:'none' }}>
         <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
-        <button className="btn btn-primary" onClick={() => form.clientName.trim() && onSave(form)}>Save</button>
+        <button className="btn btn-primary" onClick={() => form.clientName.trim() && form.clientPhone?.trim() && form.service && onSave(form)}>Save</button>
       </div>
     </div>
   )
@@ -141,7 +147,7 @@ export default function AppointmentModal({ appointment, newData, technicians, on
               <button className="modal-close" onClick={onClose}>×</button>
             </div>
             <BookingForm
-              initial={{ clientName:'', service: SERVICES[0].name, technicianId: newData.technicianId, date: newData.date, startTime: newData.time, duration: SERVICES[0].duration, notes:'' }}
+              initial={{ clientName:'', clientPhone:'', service: SERVICES[0].name, technicianId: newData.technicianId, date: newData.date, startTime: newData.time, duration: SERVICES[0].duration, notes:'' }}
               technicians={technicians}
               onSave={form => { onSave(form); }}
               onCancel={onClose}
