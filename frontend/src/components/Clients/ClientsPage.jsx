@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import * as XLSX from 'xlsx'
+import XLSX from 'xlsx'
 import { useApp } from '../../context/AppContext'
 import { SERVICES } from '../../data/mockData'
 import './Clients.css'
