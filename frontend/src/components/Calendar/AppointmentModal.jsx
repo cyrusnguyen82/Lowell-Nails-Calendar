@@ -4,6 +4,13 @@ import { SERVICES } from '../../data/mockData'
 
 const DURATIONS = [15, 30, 45, 60, 75, 90, 120]
 
+function formatPhone(raw) {
+  const d = raw.replace(/\D/g, '').slice(0, 10)
+  if (d.length < 4) return d
+  if (d.length < 7) return `(${d.slice(0,3)}) ${d.slice(3)}`
+  return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+}
+
 function formatTime(t) {
   if (!t) return ''
   const [h, m] = t.split(':').map(Number)
@@ -32,7 +39,7 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
         </div>
         <div className="form-group" style={{ flex:1 }}>
           <label className="form-label">Phone *</label>
-          <input className="form-input" type="tel" value={form.clientPhone || ''} onChange={e => set('clientPhone', e.target.value)} placeholder="555-0100" />
+          <input className="form-input" type="tel" value={form.clientPhone || ''} onChange={e => set('clientPhone', formatPhone(e.target.value))} placeholder="(616) 555-0100" />
         </div>
       </div>
       <div className="form-group">

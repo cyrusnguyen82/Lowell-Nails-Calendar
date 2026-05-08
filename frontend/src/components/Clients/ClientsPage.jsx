@@ -31,6 +31,13 @@ function pick(row, ...aliases) {
 
 const MODAL_TABS = ['Info', 'Service History']
 
+function formatPhone(raw) {
+  const d = raw.replace(/\D/g, '').slice(0, 10)
+  if (d.length < 4) return d
+  if (d.length < 7) return `(${d.slice(0,3)}) ${d.slice(3)}`
+  return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+}
+
 /* ── Service history entry form ─────────────────────────── */
 function AddServiceForm({ clientId, technicians, onSave, onCancel }) {
   const [form, setForm] = useState({ date: new Date().toISOString().split('T')[0], service: SERVICES[0].name, technicianId: technicians[0]?.id, amount: String(SERVICES[0].price), notes: '' })
@@ -81,7 +88,7 @@ function AddServiceForm({ clientId, technicians, onSave, onCancel }) {
 function ClientModal({ client, canEdit, technicians, onClose, onSave, onDelete, onAddService, onDeleteService }) {
   const isNew = !client
   const [tab, setTab]           = useState('Info')
-  const [form, setForm]         = useState(client || { name:'', phone:'', email:'', notes:'', serviceHistory:[] })
+  const [form, setForm]         = useState(client || { firstName:'', lastName:'', phone:'', email:'', notes:'', serviceHistory:[] })
   const [addingService, setAddingService] = useState(false)
   const set = (k,v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -95,7 +102,7 @@ function ClientModal({ client, canEdit, technicians, onClose, onSave, onDelete, 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{ width:520 }} onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <div className="modal-title">{isNew ? 'New Client' : form.name}</div>
+          <div className="modal-title">{isNew ? 'New Client' : `${form.firstName || ''} ${form.lastName || ''}`.trim() || 'Client'}</div>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
@@ -121,21 +128,27 @@ function ClientModal({ client, canEdit, technicians, onClose, onSave, onDelete, 
         {/* Info tab */}
         {(isNew || tab === 'Info') && (
           <div className="modal-body">
-            {['name','phone','email'].map(field => (
-              <div key={field} className="form-group">
-                <label className="form-label">{field.charAt(0).toUpperCase()+field.slice(1)}{field==='name'?' *':''}</label>
-                <input
-                  className="form-input"
-                  value={form[field]}
-                  onChange={e => set(field, e.target.value)}
-                  disabled={!canEdit}
-                  placeholder={field==='name'?'Full name':field==='phone'?'555-0100':'email@example.com'}
-                />
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+              <div className="form-group">
+                <label className="form-label">First Name *</label>
+                <input className="form-input" value={form.firstName || ''} onChange={e => set('firstName', e.target.value)} disabled={!canEdit} placeholder="First name" autoFocus={isNew} />
               </div>
-            ))}
+              <div className="form-group">
+                <label className="form-label">Last Name</label>
+                <input className="form-input" value={form.lastName || ''} onChange={e => set('lastName', e.target.value)} disabled={!canEdit} placeholder="Last name" />
+              </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Phone</label>
+              <input className="form-input" type="tel" value={form.phone || ''} onChange={e => set('phone', formatPhone(e.target.value))} disabled={!canEdit} placeholder="(616) 555-0100" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input className="form-input" type="email" value={form.email || ''} onChange={e => set('email', e.target.value)} disabled={!canEdit} placeholder="email@example.com" />
+            </div>
             <div className="form-group">
               <label className="form-label">Notes</label>
-              <textarea className="form-textarea" value={form.notes} onChange={e => set('notes', e.target.value)} disabled={!canEdit} />
+              <textarea className="form-textarea" value={form.notes || ''} onChange={e => set('notes', e.target.value)} disabled={!canEdit} />
             </div>
           </div>
         )}
@@ -204,7 +217,7 @@ function ClientModal({ client, canEdit, technicians, onClose, onSave, onDelete, 
           )}
           <button className="btn btn-ghost" onClick={onClose}>Close</button>
           {canEdit && tab === 'Info' && (
-            <button className="btn btn-primary" onClick={() => { if (form.name.trim()) onSave(form) }}>
+            <button className="btn btn-primary" onClick={() => { if ((form.firstName || '').trim()) onSave(form) }}>
               {isNew ? 'Add Client' : 'Save Changes'}
             </button>
           )}
@@ -236,14 +249,18 @@ export default function ClientsPage() {
       lines.slice(1).forEach(line => {
         const vals = parseCSVLine(line)
         const row = Object.fromEntries(headers.map((h,i) => [h, (vals[i] || '').replace(/^"|"$/g,'')]))
-        const name = pick(row, 'name','fullname','clientname','full name','client name','client')
-        if (!name) return
+        const fullName = pick(row, 'name','fullname','clientname','full name','client name','client')
+        const firstName = pick(row, 'firstname','first name','first','fname','givenname') ||
+                          (fullName ? fullName.split(' ')[0] : '')
+        const lastName  = pick(row, 'lastname','last name','last','lname','surname','familyname') ||
+                          (fullName ? fullName.split(' ').slice(1).join(' ') : '')
+        if (!firstName) return
         addClient({
-          name,
-          phone: pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number'),
+          firstName, lastName,
+          phone: formatPhone(pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number')),
           email: pick(row, 'email','emailaddress','mail','e-mail','email address'),
           notes: pick(row, 'notes','note','comments','comment','memo','description'),
-          lastVisit: '—', totalVisits: 0, serviceHistory: [],
+          serviceHistory: [],
         })
         imported++
       })
@@ -257,11 +274,14 @@ export default function ClientsPage() {
   const canEdit = user.role === 'admin' || user.role === 'receptionist'
 
   const filtered = clients
-    .filter(c =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.phone.includes(search) ||
-      c.email.toLowerCase().includes(search.toLowerCase())
-    )
+    .filter(c => {
+      const q = search.toLowerCase()
+      return (c.name || '').toLowerCase().includes(q) ||
+        (c.firstName || '').toLowerCase().includes(q) ||
+        (c.lastName  || '').toLowerCase().includes(q) ||
+        (c.phone || '').includes(search) ||
+        (c.email || '').toLowerCase().includes(q)
+    })
     .sort((a, b) => {
       let va = a[sortKey] ?? '', vb = b[sortKey] ?? ''
       if (typeof va === 'string') va = va.toLowerCase()
@@ -284,8 +304,9 @@ export default function ClientsPage() {
   }
 
   function handleSave(form) {
-    if (selected === 'new') addClient({ ...form, lastVisit: '—', totalVisits: 0, serviceHistory: [] })
-    else updateClient(selected.id, form)
+    const payload = { ...form, phone: formatPhone(form.phone || '') }
+    if (selected === 'new') addClient({ ...payload, serviceHistory: [] })
+    else updateClient(selected.id, payload)
     setSelected(null)
   }
 
