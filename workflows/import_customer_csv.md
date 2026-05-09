@@ -28,3 +28,4 @@ To import a list of customer records from a CSV file into the `clients` table of
 - **Phone Number Format:** The tool will attempt to clean and format phone numbers to a 10-digit string for matching.
 - **Database Connection:** Ensure the `DATABASE_URL` environment variable is correctly set for the tool to connect to PostgreSQL.
 - **Large Files:** For very large CSV files, consider running the import in batches or optimizing the tool for memory usage.
+- **Windows Environment:** If you see "Python was not found," disable "App execution aliases" in Windows Settings for python.exe or use the `py` command instead of `python`.
