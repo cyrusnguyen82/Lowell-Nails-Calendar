@@ -44,7 +44,18 @@ export default function WeekView({ currentDate, onDayClick }) {
   const [selectedApt, setSelectedApt] = useState(null)
   const [newAptData, setNewAptData]   = useState(null)
   const [timeOffset, setTimeOffset]   = useState(getTimeOffset())
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const bodyRef = useRef(null)
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const isMobile = windowWidth < 640
+  const isTablet = windowWidth >= 640 && windowWidth < 1024
+  const numVisibleDays = isMobile ? 1 : (isTablet ? 3 : 7)
 
   useEffect(() => {
     const id = setInterval(() => setTimeOffset(getTimeOffset()), 60_000)
@@ -56,9 +67,9 @@ export default function WeekView({ currentDate, onDayClick }) {
       bodyRef.current.scrollTop = Math.max(0, timeOffset - 180)
   }, [])
 
-  /* Week: Sun–Sat of the currentDate */
-  const weekStart = currentDate.startOf('week')
-  const days = Array.from({ length: 7 }, (_, i) => weekStart.add(i, 'day'))
+  /* Adapt view: Show full week if desktop, otherwise show 1 or 3 days starting from currentDate */
+  const viewStart = numVisibleDays === 7 ? currentDate.startOf('week') : currentDate
+  const days = Array.from({ length: numVisibleDays }, (_, i) => viewStart.add(i, 'day'))
   const today = dayjs()
   const hours = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => START_HOUR + i)
   const totalSlots = (END_HOUR - START_HOUR) * 2
@@ -129,12 +140,12 @@ export default function WeekView({ currentDate, onDayClick }) {
             {/* Current time line — only if today is in this week */}
             {days.some(d => d.isSame(today,'day')) && timeOffset !== null && (() => {
               const idx = days.findIndex(d => d.isSame(today,'day'))
-              const colW = 100 / 7
+              const colW = 100 / numVisibleDays
               return (
                 <div className="current-time-line" style={{
                   top: timeOffset,
                   left: `${idx * colW}%`,
-                  right: `${(6 - idx) * colW}%`,
+                  right: `${(numVisibleDays - 1 - idx) * colW}%`,
                 }}>
                   <div className="current-time-dot" />
                 </div>
