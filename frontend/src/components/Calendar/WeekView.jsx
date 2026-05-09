@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { useApp } from '../../context/AppContext'
 import AppointmentModal from './AppointmentModal'
 import './Calendar.css'
+import config from '../../../../michael-receptionist/business.config' // Assuming shared config or similar structure
 
 const START_HOUR = 8
 const END_HOUR = 21
@@ -46,6 +47,10 @@ export default function WeekView({ currentDate, onDayClick }) {
   const [timeOffset, setTimeOffset]   = useState(getTimeOffset())
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const bodyRef = useRef(null)
+
+  useEffect(() => {
+    document.title = `${config.businessName} | Calendar`;
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
@@ -167,11 +172,14 @@ export default function WeekView({ currentDate, onDayClick }) {
                       <div
                         key={i}
                         className="slot"
-                        onClick={() => setNewAptData({
-                          technicianId: technicians[0]?.id,
-                          time: slotToTime(i),
-                          date: day.format('YYYY-MM-DD'),
-                        })}
+                        onClick={() => {
+                          const time = slotToTime(i);
+                          setNewAptData({
+                            technicianId: technicians[0]?.id,
+                            time: time,
+                            date: day.format('YYYY-MM-DD'),
+                          });
+                        }}
                       />
                     ))}
                   </div>
