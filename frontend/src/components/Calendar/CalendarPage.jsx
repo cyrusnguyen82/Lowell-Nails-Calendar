@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import dayjs from 'dayjs'
 import { useApp } from '../../context/AppContext'
 import CalendarView from './CalendarView'
@@ -11,6 +11,16 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
     return dayjs()
   })
   const [view, setView] = useState(initView || 'day')
+
+  useEffect(() => {
+    const apiUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
+    fetch(`${apiUrl}/api/business-config`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.businessName) document.title = data.businessName;
+      })
+      .catch(() => { document.title = "Salon Calendar"; });
+  }, []);
 
   function setDate(d) {
     setCurrentDate(d)

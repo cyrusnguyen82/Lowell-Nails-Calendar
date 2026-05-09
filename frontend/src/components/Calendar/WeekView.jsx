@@ -48,16 +48,6 @@ export default function WeekView({ currentDate, onDayClick }) {
   const bodyRef = useRef(null)
 
   useEffect(() => {
-    const apiUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
-    fetch(`${apiUrl}/api/business-config`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.businessName) document.title = `${data.businessName} | Calendar`;
-      })
-      .catch(() => { document.title = "Salon | Calendar"; });
-  }, []);
-
-  useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)

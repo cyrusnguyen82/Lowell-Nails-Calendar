@@ -9,10 +9,11 @@ async function runDedupe() {
   console.log("[Dedupe] Starting automated database cleanup...");
   try {
     // 1. Remove duplicate clients based on normalized phone numbers (keeping the oldest)
+    // Compares only the last 10 digits to catch numbers with or without leading '1'
     const clientRes = await db.query(`
       DELETE FROM clients a USING clients b
       WHERE a.id > b.id
-        AND regexp_replace(a.phone, '\\D', '', 'g') = regexp_replace(b.phone, '\\D', '', 'g')
+        AND RIGHT(regexp_replace(a.phone, '\\D', '', 'g'), 10) = RIGHT(regexp_replace(b.phone, '\\D', '', 'g'), 10)
     `);
 
     // 2. Remove identical duplicate appointments
