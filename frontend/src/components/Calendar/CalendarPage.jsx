@@ -13,13 +13,14 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
   const [view, setView] = useState(initView || 'day')
 
   useEffect(() => {
+    document.title = "Salon Calendar"; // Immediate fallback
     const apiUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
     fetch(`${apiUrl}/api/business-config`)
       .then(res => res.json())
       .then(data => {
         if (data.businessName) document.title = data.businessName;
       })
-      .catch(() => { document.title = "Salon Calendar"; });
+      .catch(() => {}); 
   }, []);
 
   function setDate(d) {
