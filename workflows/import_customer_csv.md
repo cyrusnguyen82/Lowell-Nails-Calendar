@@ -1,7 +1,5 @@
 # Workflow: Import Customer Data from CSV
 
-# Workflow: Import Customer Data from CSV
-
 ## Objective
 To import a list of customer records from a CSV file into the `clients` table of the PostgreSQL database. This is typically used for initial data migration or bulk updates.
 
@@ -25,12 +23,10 @@ To import a list of customer records from a CSV file into the `clients` table of
 5. Review the output of the tool for any errors or warnings regarding skipped rows or data inconsistencies.
 ## Expected Output
 - Customer data from the CSV file is successfully added to or updated in the `clients` table in the PostgreSQL database.
-- A summary report from the tool indicating the number of new clients added and existing clients updated.
+- A summary report indicating the number of new clients added and existing records updated.
 
 ## Edge Cases & Notes
 - **Duplicate Phone Numbers:** The tool will attempt to update existing clients if a matching phone number is found. If multiple rows in the CSV have the same phone number, only the last one processed will be reflected for updates.
 - **Missing Data:** Rows with missing `first_name` or `phone` will be skipped with a warning.
 - **Phone Number Format:** The tool will attempt to clean and format phone numbers to a 10-digit string for matching.
 - **Database Connection:** Ensure the `DATABASE_URL` environment variable is correctly set for the tool to connect to PostgreSQL.
-- **Large Files:** For very large CSV files, consider running the import in batches or optimizing the tool for memory usage.
-- **Windows Environment:** If you see "Python was not found," disable "App execution aliases" in Windows Settings for python.exe or use the `py` command instead of `python`.
