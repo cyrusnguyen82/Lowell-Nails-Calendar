@@ -3,7 +3,6 @@ import dayjs from 'dayjs'
 import { useApp } from '../../context/AppContext'
 import AppointmentModal from './AppointmentModal'
 import './Calendar.css'
-import config from '../../../../michael-receptionist/business.config' // Assuming shared config or similar structure
 
 const START_HOUR = 8
 const END_HOUR = 21
@@ -49,7 +48,13 @@ export default function WeekView({ currentDate, onDayClick }) {
   const bodyRef = useRef(null)
 
   useEffect(() => {
-    document.title = `${config.businessName} | Calendar`;
+    const apiUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
+    fetch(`${apiUrl}/api/business-config`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.businessName) document.title = `${data.businessName} | Calendar`;
+      })
+      .catch(() => { document.title = "Salon | Calendar"; });
   }, []);
 
   useEffect(() => {
