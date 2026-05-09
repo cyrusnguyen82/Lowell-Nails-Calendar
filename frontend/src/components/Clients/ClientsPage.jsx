@@ -252,30 +252,45 @@ export default function ClientsPage() {
       const lastName  = pick(row, 'lastname','last name','last','lname','surname','familyname') ||
                         (fullName ? fullName.split(' ').slice(1).join(' ') : '')
       
-      if (!firstName) return
+      const rawPhone = pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number')
+      let digits = rawPhone.replace(/\D/g, '')
+      
+      // Handle 11 digits (e.g., 15551234567) by stripping the leading 1
+      if (digits.length === 11 && digits.startsWith('1')) {
+        digits = digits.slice(1)
+      }
+
+      if (!firstName || digits.length !== 10) return
 
       clientsToImport.push({
         firstName, lastName,
-        phone: pick(row, 'phone','phonenumber','telephone','tel','mobile','cell','phone number'),
+        phone: digits, // Send clean 10-digit string to backend for consistent lookups
         email: pick(row, 'email','emailaddress','mail','e-mail','email address'),
         notes: pick(row, 'notes','note','comments','comment','memo','description'),
       })
     })
 
     if (clientsToImport.length === 0) {
-      setImportMsg('No valid client data found to import.')
+      setImportMsg('No valid client data found. Ensure rows have a First Name and a 10-digit phone number.')
       return
     }
 
     try {
       setImportMsg(`Uploading ${clientsToImport.length} clients...`)
-      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/clients/bulk`, {
+
+      // Use VITE_ environment variables. In Vite, process.env is usually not available and causes crashes.
+      const apiUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
+
+      const response = await fetch(`${apiUrl}/api/clients/bulk`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(clientsToImport)
       })
       
-      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Server error: ${response.status}`);
+      }
       
       const result = await response.json()
       setImportMsg(`Import complete! Added: ${result.added}, Updated: ${result.updated}, Skipped: ${result.skipped}`)
@@ -283,7 +298,7 @@ export default function ClientsPage() {
       // Critical: Wait for the state to update from the DB before finishing
       if (fetchClients) await fetchClients();
     } catch (err) {
-      setImportMsg('Error during import. Please check console.')
+      setImportMsg(`Error: ${err.message}`)
       console.error('Bulk import error:', err)
     }
     setTimeout(() => setImportMsg(''), 5000)
