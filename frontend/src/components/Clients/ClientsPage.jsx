@@ -274,11 +274,14 @@ export default function ClientsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(clientsToImport)
       })
+      
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      
       const result = await response.json()
       setImportMsg(`Import complete! Added: ${result.added}, Updated: ${result.updated}, Skipped: ${result.skipped}`)
-      // Refresh the client list from the backend to show newly imported clients
-      // This assumes AppContext provides a fetchClients function.
-      if (fetchClients) fetchClients();
+      
+      // Critical: Wait for the state to update from the DB before finishing
+      if (fetchClients) await fetchClients();
     } catch (err) {
       setImportMsg('Error during import. Please check console.')
       console.error('Bulk import error:', err)
