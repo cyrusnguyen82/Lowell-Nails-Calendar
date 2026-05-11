@@ -14,7 +14,9 @@
       "Bash(node --check routes/api.js)",
       "Bash(node --check migrate.js)",
       "Bash(node --check dedupe_clients.js)",
-      "Bash(node --check startup.js)"
+      "Bash(node --check startup.js)",
+      "Bash(Copy-Item \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\\\\ui\\\\src\\\\assets\\\\logo_transparent.png\" -Destination \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\\\\frontend\\\\public\\\\logo.png\" -Force)",
+      "Bash(git commit -m ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Cyrus\\Desktop\\Personal\\2026\\Calendar"
