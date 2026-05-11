@@ -11,7 +11,10 @@
       "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\michael-receptionist\" -Recurse -Depth 3 | ForEach-Object { $_.FullName })",
       "Bash(grep -E '\\\\.\\(js|sql|config\\)$')",
       "Bash(node --check server.js)",
-      "Bash(node --check routes/api.js)"
+      "Bash(node --check routes/api.js)",
+      "Bash(node --check migrate.js)",
+      "Bash(node --check dedupe_clients.js)",
+      "Bash(node --check startup.js)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Cyrus\\Desktop\\Personal\\2026\\Calendar"
