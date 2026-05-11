@@ -138,6 +138,61 @@
 .pos-ticket-service { flex: 1; font-weight: 600; color: #475569; }
 .pos-ticket-tech { font-size: 10px; font-weight: 800; letter-spacing: 0.04em; }
 
+.pos-ticket.checked-in {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf9 0%, #f9fffe 100%);
+}
+
+.pos-ticket-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.pos-apt-badge-checked {
+  font-size: 9px;
+  font-weight: 700;
+  color: #10b981;
+  background: #dcfce7;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.pos-checkin-btn {
+  margin-left: auto;
+  padding: 5px 14px;
+  background: #f0fdf9;
+  border: 1.5px solid #3ab592;
+  border-radius: 6px;
+  color: #3ab592;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s, color 0.12s;
+}
+.pos-checkin-btn:hover { background: #3ab592; color: #fff; }
+
+.pos-cashout-btn {
+  margin-left: auto;
+  padding: 5px 14px;
+  background: linear-gradient(90deg, #3ab592, #3a82c4);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.12s;
+}
+.pos-cashout-btn:hover { opacity: 0.85; }
+
 /* ── Available Techs grid ───────────────────────────────────── */
 .pos-tech-grid {
   display: grid;

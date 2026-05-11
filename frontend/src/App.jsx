@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AppProvider, useApp } from './context/AppContext'
 import LoginScreen from './components/Auth/LoginScreen'
-import Sidebar from './components/Layout/Sidebar'
+import TopBar from './components/Layout/TopBar'
 import CalendarPage from './components/Calendar/CalendarPage'
 import ClientsPage from './components/Clients/ClientsPage'
 import GiftCardsPage from './components/GiftCards/GiftCardsPage'
@@ -93,7 +93,7 @@ function Shell() {
 
   return (
     <div className="app-shell">
-      <Sidebar page={safePage} onNavigate={navigate} />
+      <TopBar page={safePage} onNavigate={navigate} />
       <main className="app-main">
         {safePage === 'calendar'  && <CalendarPage initDateStr={calDateStr} initView={calView} onDateChange={setCalDateStr} onViewChange={setCalView} />}
         {safePage === 'clients'   && <ClientsPage />}

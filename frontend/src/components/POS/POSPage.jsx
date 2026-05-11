@@ -41,9 +41,7 @@ function ClosedTicketsView({ onBack }) {
         </div>
 
         <div className="pos-closed-list">
-          {loading && (
-            <div style={{ textAlign:'center', padding:40, color:'#94a3b8' }}>Loading…</div>
-          )}
+          {loading && <div style={{ textAlign:'center', padding:40, color:'#94a3b8' }}>Loading…</div>}
           {!loading && filtered.length === 0 && (
             <div style={{ textAlign:'center', padding:40, color:'#94a3b8' }}>No closed tickets found</div>
           )}
@@ -59,7 +57,6 @@ function ClosedTicketsView({ onBack }) {
                 <span className="pos-closed-total">${(txn.total || 0).toFixed(2)}</span>
                 <span className="pos-closed-chevron">{expanded === txn.id ? '▲' : '▼'}</span>
               </div>
-
               {expanded === txn.id && (
                 <div className="pos-closed-details">
                   {(txn.lineItems || []).map((li, i) => (
@@ -105,21 +102,21 @@ function Receipt({ txn, companyInfo, onClose, onNew }) {
           <div className="pos-receipt-title">{companyInfo.name}</div>
           <div className="pos-receipt-sub">{companyInfo.address}</div>
           <div className="pos-receipt-sub">{companyInfo.phone}</div>
-          <div className="pos-receipt-sub" style={{ marginTop: 6, fontWeight: 600 }}>
+          <div className="pos-receipt-sub" style={{ marginTop:6, fontWeight:600 }}>
             {new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' })}
           </div>
-          {txn.clientName && <div className="pos-receipt-sub" style={{ marginTop: 4 }}>Client: {txn.clientName}</div>}
+          {txn.clientName && <div className="pos-receipt-sub" style={{ marginTop:4 }}>Client: {txn.clientName}</div>}
         </div>
         {txn.lineItems.map((item, i) => (
           <div key={i} className="pos-receipt-item">
-            <span style={{ flex: 1 }}>{item.service}{item.techName ? ` — ${item.techName}` : ''}</span>
+            <span style={{ flex:1 }}>{item.service}{item.techName ? ` — ${item.techName}` : ''}</span>
             <span>{fmt(item.price)}</span>
           </div>
         ))}
         <div className="pos-receipt-totals">
           <div className="pos-receipt-row"><span>Subtotal</span><span>{fmt(txn.subtotal)}</span></div>
           {txn.discount > 0 && (
-            <div className="pos-receipt-row" style={{ color: '#10b981' }}>
+            <div className="pos-receipt-row" style={{ color:'#10b981' }}>
               <span>Discount</span><span>-{fmt(txn.discount)}</span>
             </div>
           )}
@@ -127,7 +124,7 @@ function Receipt({ txn, companyInfo, onClose, onNew }) {
           {txn.tip > 0 && <div className="pos-receipt-row"><span>Tip</span><span>{fmt(txn.tip)}</span></div>}
           <div className="pos-receipt-row grand"><span>TOTAL</span><span>{fmt(txn.total)}</span></div>
           {txn.giftCardAmount > 0 && (
-            <div className="pos-receipt-row" style={{ color: '#3ab592' }}>
+            <div className="pos-receipt-row" style={{ color:'#3ab592' }}>
               <span>Gift Card</span><span>-{fmt(txn.giftCardAmount)}</span>
             </div>
           )}
@@ -145,23 +142,23 @@ function Receipt({ txn, companyInfo, onClose, onNew }) {
 }
 
 /* ── Checkout view ──────────────────────────────────────────── */
-function CheckoutView({ initialTechId, onBack }) {
+function CheckoutView({ initialTechId, initialClient, initialCartItems, onBack }) {
   const { user, technicians, clients, giftCards, redeemGiftCard, companyInfo } = useApp()
 
-  const [clientSearch, setClientSearch]   = useState('')
-  const [selectedClient, setSelectedClient] = useState(null)
-  const [showMatches, setShowMatches]     = useState(false)
-  const [activeTechId, setActiveTechId]   = useState(initialTechId || technicians[0]?.id || null)
-  const [cart, setCart]                   = useState([])
-  const [tipPct, setTipPct]               = useState(null)
-  const [customTip, setCustomTip]         = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('cash')
-  const [gcSearch, setGcSearch]           = useState('')
-  const [selectedGC, setSelectedGC]       = useState(null)
-  const [gcAmount, setGcAmount]           = useState('')
-  const [receipt, setReceipt]             = useState(null)
-  const [saving, setSaving]               = useState(false)
-  const [error, setError]                 = useState('')
+  const [clientSearch, setClientSearch]     = useState(initialClient?.name || '')
+  const [selectedClient, setSelectedClient] = useState(initialClient || null)
+  const [showMatches, setShowMatches]       = useState(false)
+  const [activeTechId, setActiveTechId]     = useState(initialTechId || technicians[0]?.id || null)
+  const [cart, setCart]                     = useState(initialCartItems || [])
+  const [tipPct, setTipPct]                 = useState(null)
+  const [customTip, setCustomTip]           = useState('')
+  const [paymentMethod, setPaymentMethod]   = useState('cash')
+  const [gcSearch, setGcSearch]             = useState('')
+  const [selectedGC, setSelectedGC]         = useState(null)
+  const [gcAmount, setGcAmount]             = useState('')
+  const [receipt, setReceipt]               = useState(null)
+  const [saving, setSaving]                 = useState(false)
+  const [error, setError]                   = useState('')
 
   useEffect(() => {
     if (!activeTechId && technicians.length) setActiveTechId(technicians[0].id)
@@ -259,15 +256,14 @@ function CheckoutView({ initialTechId, onBack }) {
       <div className="pos-checkout-body">
         {/* ── Left: client + tech + services ── */}
         <div className="pos-checkout-left">
-          {/* Client */}
           <div className="pos-co-section">
             <div className="pos-co-label">Client</div>
-            <div style={{ position: 'relative' }}>
+            <div style={{ position:'relative' }}>
               {selectedClient ? (
                 <div className="pos-client-chip">
                   <span>👤</span>
-                  <span style={{ flex: 1, fontWeight: 600, fontSize: 13 }}>{selectedClient.name}</span>
-                  {selectedClient.phone && <span style={{ fontSize: 11, color: '#64748b' }}>{selectedClient.phone}</span>}
+                  <span style={{ flex:1, fontWeight:600, fontSize:13 }}>{selectedClient.name}</span>
+                  {selectedClient.phone && <span style={{ fontSize:11, color:'#64748b' }}>{selectedClient.phone}</span>}
                   <button onClick={() => setSelectedClient(null)} className="pos-chip-clear">×</button>
                 </div>
               ) : (
@@ -291,8 +287,8 @@ function CheckoutView({ initialTechId, onBack }) {
                   {clientMatches.map(c => (
                     <div key={c.id} className="pos-client-match"
                       onMouseDown={() => { setSelectedClient(c); setClientSearch(''); setShowMatches(false) }}>
-                      <span style={{ fontWeight: 600 }}>{c.name}</span>
-                      <span style={{ fontSize: 11, color: '#94a3b8' }}>{c.phone}</span>
+                      <span style={{ fontWeight:600 }}>{c.name}</span>
+                      <span style={{ fontSize:11, color:'#94a3b8' }}>{c.phone}</span>
                     </div>
                   ))}
                 </div>
@@ -300,7 +296,6 @@ function CheckoutView({ initialTechId, onBack }) {
             </div>
           </div>
 
-          {/* Tech */}
           <div className="pos-co-section">
             <div className="pos-co-label">Technician</div>
             <div className="pos-tech-pills">
@@ -315,12 +310,11 @@ function CheckoutView({ initialTechId, onBack }) {
             </div>
           </div>
 
-          {/* Services */}
           <div className="pos-co-section pos-services-section">
             <div className="pos-co-label">Services</div>
             <div className="pos-service-scroll">
               {categories.map(cat => (
-                <div key={cat.label} style={{ marginBottom: 12 }}>
+                <div key={cat.label} style={{ marginBottom:12 }}>
                   <div className="pos-cat-label">{cat.label}</div>
                   <div className="pos-service-grid">
                     {cat.services.map(svc => (
@@ -338,7 +332,7 @@ function CheckoutView({ initialTechId, onBack }) {
 
         {/* ── Right: cart + payment ── */}
         <div className="pos-checkout-right">
-          <div style={{ padding: '10px 12px 6px' }}>
+          <div style={{ padding:'10px 12px 6px' }}>
             <div className="pos-co-label">Cart {cart.length > 0 && `(${cart.length})`}</div>
           </div>
 
@@ -347,7 +341,7 @@ function CheckoutView({ initialTechId, onBack }) {
               <div className="pos-cart-empty">Tap a service to add</div>
             ) : cart.map(item => (
               <div key={item._id} className="pos-cart-item">
-                <div style={{ flex: 1 }}>
+                <div style={{ flex:1 }}>
                   <div className="pos-cart-item-name">{item.service}</div>
                   <div className="pos-cart-item-tech">{technicians.find(t => t.id === item.technicianId)?.name || '—'}</div>
                 </div>
@@ -361,8 +355,8 @@ function CheckoutView({ initialTechId, onBack }) {
             <div className="pos-total-row"><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
             <div className="pos-total-row"><span>Tax (6%)</span><span>{fmt(tax)}</span></div>
             <div className="pos-tip-row">
-              <span style={{ fontSize: 12, color: '#64748b', whiteSpace: 'nowrap' }}>Tip:</span>
-              <div style={{ display: 'flex', gap: 4, flex: 1, flexWrap: 'wrap' }}>
+              <span style={{ fontSize:12, color:'#64748b', whiteSpace:'nowrap' }}>Tip:</span>
+              <div style={{ display:'flex', gap:4, flex:1, flexWrap:'wrap' }}>
                 <button className={`pos-tip-btn${tipPct === 0 ? ' active' : ''}`}
                   onClick={() => { setTipPct(0); setCustomTip('') }}>No tip</button>
                 {TIP_PRESETS.map(p => (
@@ -375,7 +369,7 @@ function CheckoutView({ initialTechId, onBack }) {
             </div>
             {tip > 0 && <div className="pos-total-row"><span>Tip</span><span>{fmt(tip)}</span></div>}
             {giftCardApplied > 0 && (
-              <div className="pos-total-row" style={{ color: '#3ab592' }}>
+              <div className="pos-total-row" style={{ color:'#3ab592' }}>
                 <span>Gift Card</span><span>-{fmt(giftCardApplied)}</span>
               </div>
             )}
@@ -383,7 +377,7 @@ function CheckoutView({ initialTechId, onBack }) {
           </div>
 
           <div className="pos-payment-section">
-            <div className="pos-co-label" style={{ marginBottom: 8 }}>Payment Method</div>
+            <div className="pos-co-label" style={{ marginBottom:8 }}>Payment Method</div>
             <div className="pos-payment-btns">
               {[
                 { id: 'cash',  icon: '💵', label: 'Cash' },
@@ -394,7 +388,7 @@ function CheckoutView({ initialTechId, onBack }) {
                 <button key={m.id}
                   className={`pos-payment-btn${paymentMethod === m.id ? ' active' : ''}`}
                   onClick={() => setPaymentMethod(m.id)}>
-                  <span style={{ fontSize: 16 }}>{m.icon}</span>{m.label}
+                  <span style={{ fontSize:16 }}>{m.icon}</span>{m.label}
                 </button>
               ))}
             </div>
@@ -403,10 +397,10 @@ function CheckoutView({ initialTechId, onBack }) {
               selectedGC ? (
                 <div className="pos-gc-chip">
                   <span>🎁</span>
-                  <span style={{ flex: 1 }}>{selectedGC.cardNumber}</span>
-                  <span style={{ fontWeight: 700 }}>Bal: {fmt(selectedGC.balance)}</span>
+                  <span style={{ flex:1 }}>{selectedGC.cardNumber}</span>
+                  <span style={{ fontWeight:700 }}>Bal: {fmt(selectedGC.balance)}</span>
                   <button onClick={() => { setSelectedGC(null); setGcSearch(''); setGcAmount('') }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3ab592', fontSize: 16 }}>×</button>
+                    style={{ background:'none', border:'none', cursor:'pointer', color:'#3ab592', fontSize:16 }}>×</button>
                 </div>
               ) : (
                 <div>
@@ -420,7 +414,7 @@ function CheckoutView({ initialTechId, onBack }) {
                   </div>
                   {gcMatches.map(g => (
                     <div key={g.id}
-                      style={{ padding: '6px 10px', cursor: 'pointer', background: '#f8fafc', borderRadius: 6, fontSize: 12, marginTop: 4 }}
+                      style={{ padding:'6px 10px', cursor:'pointer', background:'#f8fafc', borderRadius:6, fontSize:12, marginTop:4 }}
                       onClick={() => { setSelectedGC(g); setGcAmount(String(Math.min(g.balance, subtotal + tax + tip).toFixed(2))) }}>
                       {g.cardNumber} — Balance: {fmt(g.balance)}
                     </div>
@@ -431,7 +425,7 @@ function CheckoutView({ initialTechId, onBack }) {
           </div>
 
           {error && (
-            <div style={{ margin: '0 12px 8px', padding: '6px 10px', fontSize: 12, color: '#dc2626', background: '#fee2e2', borderRadius: 6 }}>
+            <div style={{ margin:'0 12px 8px', padding:'6px 10px', fontSize:12, color:'#dc2626', background:'#fee2e2', borderRadius:6 }}>
               {error}
             </div>
           )}
@@ -447,14 +441,16 @@ function CheckoutView({ initialTechId, onBack }) {
 
 /* ── Main POS dashboard ─────────────────────────────────────── */
 export default function POSPage({ onNavigate }) {
-  const { user, technicians, appointments } = useApp()
-  const [mode, setMode]               = useState('main')  // 'main' | 'checkout' | 'closed'
+  const { user, technicians, appointments, clients } = useApp()
+  const [mode, setMode]                   = useState('main')
   const [selectedTechId, setSelectedTechId] = useState(null)
-  const [ticketSearch, setTicketSearch] = useState('')
-  const [techSearch, setTechSearch]   = useState('')
+  const [checkoutApt, setCheckoutApt]     = useState(null)
+  const [checkedIn, setCheckedIn]         = useState(new Set())
+  const [aptSearch, setAptSearch]         = useState('')
+  const [techSearch, setTechSearch]       = useState('')
 
-  const today = new Date().toLocaleDateString('en-CA')
-  const now   = new Date()
+  const today   = new Date().toLocaleDateString('en-CA')
+  const now     = new Date()
   const nowMins = now.getHours() * 60 + now.getMinutes()
 
   const todayApts = useMemo(() =>
@@ -462,10 +458,7 @@ export default function POSPage({ onNavigate }) {
     [appointments, today]
   )
 
-  function toMins(timeStr) {
-    const [h, m] = timeStr.split(':').map(Number)
-    return h * 60 + m
-  }
+  function toMins(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m }
 
   const workingTechIds = useMemo(() => new Set(
     todayApts
@@ -477,18 +470,11 @@ export default function POSPage({ onNavigate }) {
     return todayApts.filter(a => a.technicianId === techId).length
   }
 
-  function getCurrentApt(techId) {
-    return todayApts.find(a => {
-      const s = toMins(a.startTime)
-      return a.technicianId === techId && nowMins >= s && nowMins < s + (a.duration || 60)
-    })
-  }
-
-  const filteredTickets = useMemo(() =>
-    todayApts.filter(a => !ticketSearch ||
-      a.clientName.toLowerCase().includes(ticketSearch.toLowerCase()) ||
-      a.startTime.includes(ticketSearch)
-    ), [todayApts, ticketSearch]
+  const filteredApts = useMemo(() =>
+    todayApts.filter(a => !aptSearch ||
+      a.clientName.toLowerCase().includes(aptSearch.toLowerCase()) ||
+      a.startTime.includes(aptSearch)
+    ), [todayApts, aptSearch]
   )
 
   const availableTechs = useMemo(() =>
@@ -497,72 +483,99 @@ export default function POSPage({ onNavigate }) {
     ), [technicians, workingTechIds, techSearch]
   )
 
-  const workingTechs = useMemo(() =>
-    technicians.filter(t => workingTechIds.has(t.id)),
-    [technicians, workingTechIds]
-  )
+  function checkIn(aptId) {
+    setCheckedIn(prev => new Set([...prev, aptId]))
+  }
 
-  function openCheckout(techId) {
+  function openCheckout(techId, apt) {
     setSelectedTechId(techId || null)
+    setCheckoutApt(apt || null)
     setMode('checkout')
   }
 
-  if (mode === 'closed') {
-    return <ClosedTicketsView onBack={() => setMode('main')} />
-  }
+  const checkoutInitialClient = checkoutApt
+    ? (clients.find(c =>
+        c.name === checkoutApt.clientName ||
+        (checkoutApt.clientPhone && c.phone === checkoutApt.clientPhone)
+      ) || { name: checkoutApt.clientName, phone: checkoutApt.clientPhone || '' })
+    : null
+
+  const checkoutInitialCart = useMemo(() => {
+    if (!checkoutApt) return []
+    const svc = SERVICES.find(s => s.name === checkoutApt.service)
+    if (!svc) return []
+    return [{ _id: Date.now(), service: svc.name, price: svc.price, technicianId: checkoutApt.technicianId, quantity: 1 }]
+  }, [checkoutApt])
+
+  if (mode === 'closed') return <ClosedTicketsView onBack={() => setMode('main')} />
 
   if (mode === 'checkout') {
     return (
       <div className="pos-shell">
-        <CheckoutView initialTechId={selectedTechId} onBack={() => setMode('main')} />
+        <CheckoutView
+          initialTechId={selectedTechId}
+          initialClient={checkoutInitialClient}
+          initialCartItems={checkoutInitialCart}
+          onBack={() => setMode('main')}
+        />
       </div>
     )
   }
 
   return (
     <div className="pos-shell">
-      {/* ── Three panels ── */}
       <div className="pos-panels">
 
-        {/* Waiting List */}
+        {/* ── Appointments ── */}
         <div className="pos-panel">
           <div className="pos-panel-head">
-            <span>WAITING LIST</span>
-            <input className="pos-panel-search" placeholder="Name/Phone/Ticket"
-              value={ticketSearch} onChange={e => setTicketSearch(e.target.value)} />
+            <span>APPOINTMENTS</span>
+            <input className="pos-panel-search" placeholder="Name / time"
+              value={aptSearch} onChange={e => setAptSearch(e.target.value)} />
+            <button className="pos-new-ticket-btn" onClick={() => openCheckout(null, null)}>+ New Ticket</button>
           </div>
           <div className="pos-panel-body">
-            {filteredTickets.length === 0 ? (
+            {filteredApts.length === 0 ? (
               <div className="pos-panel-empty">No appointments today</div>
-            ) : filteredTickets.map((apt, i) => {
-              const tech    = technicians.find(t => t.id === apt.technicianId)
-              const working = workingTechIds.has(apt.technicianId)
+            ) : filteredApts.map(apt => {
+              const tech        = technicians.find(t => t.id === apt.technicianId)
+              const isCheckedIn = checkedIn.has(apt.id)
               return (
-                <div key={apt.id} className={`pos-ticket${working ? ' working' : ''}`}
-                  onClick={() => openCheckout(apt.technicianId)}>
+                <div key={apt.id} className={`pos-ticket${isCheckedIn ? ' checked-in' : ''}`}>
                   <div className="pos-ticket-top">
-                    <span className="pos-ticket-num">#{String(i + 1).padStart(2, '0')} {apt.clientName}</span>
-                    {working && <span className="pos-ticket-badge">IN SERVICE</span>}
-                    <span className="pos-ticket-print">🖨</span>
+                    <span className="pos-ticket-time">⏰ {apt.startTime}</span>
+                    <span className="pos-ticket-num">{apt.clientName}</span>
                   </div>
                   <div className="pos-ticket-row">
-                    <span className="pos-ticket-time">⏰ {apt.startTime}</span>
                     <span className="pos-ticket-service">{apt.service}</span>
+                    {tech && <span className="pos-ticket-tech" style={{ color: tech.color }}>{tech.name.toUpperCase()}</span>}
                   </div>
-                  {tech && <div className="pos-ticket-tech" style={{ color: tech.color }}>{tech.name.toUpperCase()}</div>}
+                  <div className="pos-ticket-actions">
+                    {isCheckedIn ? (
+                      <>
+                        <span className="pos-apt-badge-checked">✓ CHECKED IN</span>
+                        <button className="pos-cashout-btn" onClick={() => openCheckout(apt.technicianId, apt)}>
+                          Cash Out
+                        </button>
+                      </>
+                    ) : (
+                      <button className="pos-checkin-btn" onClick={() => checkIn(apt.id)}>
+                        Check In
+                      </button>
+                    )}
+                  </div>
                 </div>
               )
             })}
           </div>
         </div>
 
-        {/* Available Techs */}
+        {/* ── Available Techs ── */}
         <div className="pos-panel">
           <div className="pos-panel-head">
             <span>AVAILABLE TECHS</span>
             <input className="pos-panel-search" placeholder="Name"
               value={techSearch} onChange={e => setTechSearch(e.target.value)} />
-            <button className="pos-new-ticket-btn" onClick={() => openCheckout(null)}>+ New Ticket</button>
           </div>
           <div className="pos-panel-body">
             {availableTechs.length === 0 ? (
@@ -570,7 +583,7 @@ export default function POSPage({ onNavigate }) {
             ) : (
               <div className="pos-tech-grid">
                 {availableTechs.map(tech => (
-                  <div key={tech.id} className="pos-tech-card" onClick={() => openCheckout(tech.id)}>
+                  <div key={tech.id} className="pos-tech-card" onClick={() => openCheckout(tech.id, null)}>
                     <span className="pos-tech-card-badge">{techAptCount(tech.id)}</span>
                     <div className="pos-tech-card-avatar" style={{ background: tech.color }}>
                       {tech.initials}
@@ -582,40 +595,9 @@ export default function POSPage({ onNavigate }) {
             )}
           </div>
         </div>
-
-        {/* Working Techs */}
-        <div className="pos-panel">
-          <div className="pos-panel-head">
-            <span>WORKING TECHS</span>
-            <input className="pos-panel-search" placeholder="Name/Phone/Ticket" readOnly />
-          </div>
-          <div className="pos-panel-body">
-            {workingTechs.length === 0 ? (
-              <div className="pos-panel-empty">No techs currently in service</div>
-            ) : workingTechs.map(tech => {
-              const apt = getCurrentApt(tech.id)
-              return (
-                <div key={tech.id} className="pos-working-card">
-                  <div className="pos-working-avatar" style={{ background: tech.color }}>{tech.initials}</div>
-                  <div className="pos-working-info">
-                    <div className="pos-working-name">{tech.name}</div>
-                    {apt && (
-                      <>
-                        <div className="pos-working-client">{apt.clientName}</div>
-                        <div className="pos-working-service">{apt.service}</div>
-                        <div className="pos-working-time">Started {apt.startTime}</div>
-                      </>
-                    )}
-                  </div>
-                  <span className="pos-working-status">BUSY</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
       </div>
 
-      {/* ── Bottom action bar — 4 buttons ── */}
+      {/* ── Bottom action bar ── */}
       <div className="pos-bar">
         <button className="pos-bar-btn pos-bar-primary" onClick={() => setMode('closed')}>
           <span className="pos-bar-icon">📋</span>
