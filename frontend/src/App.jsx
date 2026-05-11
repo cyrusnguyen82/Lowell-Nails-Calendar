@@ -99,7 +99,7 @@ function Shell() {
         {safePage === 'calendar'  && <CalendarPage initDateStr={calDateStr} initView={calView} onDateChange={setCalDateStr} onViewChange={setCalView} />}
         {safePage === 'clients'   && <ClientsPage />}
         {safePage === 'giftcards' && <GiftCardsPage />}
-        {safePage === 'pos'       && <POSPage />}
+        {safePage === 'pos'       && <POSPage onNavigate={navigate} />}
         {safePage === 'admin'     && <AdminPage />}
       </main>
     </div>
