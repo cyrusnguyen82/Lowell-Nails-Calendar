@@ -6,6 +6,7 @@ const NAV = [
   { id: 'calendar',  label: 'Calendar',   icon: '📅', roles: ['admin','receptionist','technician'] },
   { id: 'clients',   label: 'Clients',    icon: '👥', roles: ['admin','receptionist'] },
   { id: 'giftcards', label: 'Gift Cards', icon: '🎁', roles: ['admin','receptionist'] },
+  { id: 'pos',       label: 'POS',        icon: '💲', roles: ['admin','receptionist'] },
   { id: 'admin',     label: 'Admin',      icon: '⚙️', roles: ['admin'] },
 ]
 

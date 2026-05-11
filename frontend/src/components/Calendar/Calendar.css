@@ -94,7 +94,7 @@
 .cal-header-techs {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  overflow: hidden; /* JS-synced scroll — do not add overflow-x:auto here */
 }
 
 .tech-header-cell {
@@ -535,10 +535,16 @@
 
 /* ── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .cal-toolbar { padding: 8px 12px; gap: 4px; }
-  .cal-toolbar-date { font-size: 13px; }
-  .view-btn { padding: 5px 8px; font-size: 12px; }
+  /* Toolbar: stack date on top, controls below */
+  .cal-toolbar { padding: 8px 10px; gap: 4px; }
+  .cal-toolbar-date { font-size: 12px; text-align: center; }
+  .cal-toolbar-controls { flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .cal-toolbar-nav { justify-content: center; }
+  .cal-toolbar-views { margin-left: 0; }
+  .view-btn { padding: 5px 10px; font-size: 12px; }
+  .nav-btn { padding: 5px 10px; font-size: 12px; }
 
+  /* Appointment modal slides up from bottom */
   .modal-overlay { align-items: flex-end; padding: 0; }
   .modal {
     width: 100%;
@@ -547,7 +553,22 @@
     border-radius: 16px 16px 0 0;
   }
 
-  .tech-header-cell { padding: 8px 6px; gap: 6px; }
-  .tech-name { font-size: 11px; }
+  /* Smaller tech header on mobile */
+  .tech-header-cell { padding: 6px 4px; gap: 4px; }
+  .tech-name { font-size: 10px; }
   .tech-apt-count { display: none; }
+  .tech-avatar { width: 24px; height: 24px; font-size: 9px; }
+
+  /* Each column needs a minimum width so names are readable on scroll */
+  .tech-col { min-width: 100px; }
+  .cal-header-gutter { width: 52px; }
+  .time-gutter { width: 52px; }
+  .time-label-hour { font-size: 9px; }
+  .time-label-half { font-size: 8px; }
+  .time-label-quarter { font-size: 7px; }
+
+  /* Appointment block text tighter on mobile */
+  .apt-client { font-size: 10px; }
+  .apt-service { font-size: 9px; }
+  .apt-time { display: none; }
 }

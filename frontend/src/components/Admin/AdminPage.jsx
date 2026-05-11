@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { useApp } from '../../context/AppContext'
+import * as api from '../../api'
 import './Admin.css'
 import '../Calendar/Calendar.css'
 
@@ -321,6 +322,157 @@ function CompanySettings() {
   )
 }
 
+// ── Default schedule template ─────────────────────────────────
+const DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+const DAY_LABELS = { monday:'Mon', tuesday:'Tue', wednesday:'Wed', thursday:'Thu', friday:'Fri', saturday:'Sat', sunday:'Sun' }
+
+function defaultSchedule() {
+  const sched = {}
+  for (const d of DAYS) {
+    sched[d] = d === 'sunday'
+      ? { working: false, start: '09:30', end: '19:00' }
+      : { working: true,  start: '09:30', end: '19:00' }
+  }
+  return sched
+}
+
+/* ── Availability panel ────────────────────────────────────── */
+function AvailabilityPanel({ technicians, updateTechnician }) {
+  const [selectedTechId, setSelectedTechId] = useState(technicians[0]?.id || null)
+  const [saving, setSaving]   = useState(false)
+  const [saved,  setSaved]    = useState(false)
+  const [error,  setError]    = useState('')
+
+  const tech = technicians.find(t => t.id === selectedTechId)
+  const [schedule, setSchedule] = useState(() => {
+    return tech?.workSchedule ? { ...defaultSchedule(), ...tech.workSchedule } : defaultSchedule()
+  })
+
+  function selectTech(id) {
+    setSelectedTechId(id)
+    const t = technicians.find(x => x.id === id)
+    setSchedule(t?.workSchedule ? { ...defaultSchedule(), ...t.workSchedule } : defaultSchedule())
+    setSaved(false)
+    setError('')
+  }
+
+  function setDay(day, field, value) {
+    setSchedule(prev => ({ ...prev, [day]: { ...prev[day], [field]: value } }))
+    setSaved(false)
+  }
+
+  async function handleSave() {
+    if (!selectedTechId) return
+    setSaving(true)
+    setError('')
+    try {
+      const saved = await api.put(`/technicians/${selectedTechId}/schedule`, { workSchedule: schedule })
+      updateTechnician(selectedTechId, { workSchedule: schedule })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!technicians.length) return (
+    <div style={{ padding: 32, color: '#94a3b8', textAlign: 'center' }}>No technicians yet — add one in the Technicians tab first.</div>
+  )
+
+  return (
+    <div>
+      <div className="panel-header" style={{ marginBottom: 20 }}>
+        <span>Set each technician's weekly working hours. Michael uses these for availability checks.</span>
+      </div>
+
+      {/* Tech selector row */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+        {technicians.map(t => (
+          <button
+            key={t.id}
+            onClick={() => selectTech(t.id)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '8px 14px', borderRadius: 8, cursor: 'pointer',
+              border: selectedTechId === t.id ? `2px solid ${t.color}` : '2px solid #e2e8f0',
+              background: selectedTechId === t.id ? t.color + '18' : '#fff',
+              fontWeight: selectedTechId === t.id ? 700 : 500,
+              fontSize: 13, color: '#1e293b',
+            }}
+          >
+            <div className="tech-avatar" style={{ background: t.color, width: 28, height: 28, fontSize: 10 }}>{t.initials}</div>
+            {t.name}
+          </button>
+        ))}
+      </div>
+
+      {tech && (
+        <div className="admin-card" style={{ maxWidth: 560 }}>
+          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div className="tech-avatar" style={{ background: tech.color, width: 32, height: 32, fontSize: 11 }}>{tech.initials}</div>
+            {tech.name}'s Weekly Schedule
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {DAYS.map(day => {
+              const dayData = schedule[day] || { working: false, start: '09:30', end: '19:00' }
+              return (
+                <div key={day} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {/* Working toggle */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', userSelect: 'none' }}>
+                    <input
+                      type="checkbox"
+                      checked={dayData.working}
+                      onChange={e => setDay(day, 'working', e.target.checked)}
+                      style={{ width: 16, height: 16, cursor: 'pointer' }}
+                    />
+                    <span style={{ width: 32, fontSize: 13, fontWeight: 600, color: dayData.working ? '#1e293b' : '#94a3b8' }}>
+                      {DAY_LABELS[day]}
+                    </span>
+                  </label>
+
+                  {dayData.working ? (
+                    <>
+                      <input
+                        type="time"
+                        value={dayData.start}
+                        onChange={e => setDay(day, 'start', e.target.value)}
+                        className="form-input"
+                        style={{ width: 110, padding: '5px 8px', fontSize: 13 }}
+                      />
+                      <span style={{ fontSize: 13, color: '#94a3b8' }}>to</span>
+                      <input
+                        type="time"
+                        value={dayData.end}
+                        onChange={e => setDay(day, 'end', e.target.value)}
+                        className="form-input"
+                        style={{ width: 110, padding: '5px 8px', fontSize: 13 }}
+                      />
+                    </>
+                  ) : (
+                    <span style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic' }}>Day off</span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {error && <div style={{ marginTop: 12, fontSize: 12, color: '#dc2626' }}>{error}</div>}
+
+          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving…' : 'Save Schedule'}
+            </button>
+            {saved && <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>✓ Saved</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ── Page ─────────────────────────────────────────────────── */
 export default function AdminPage() {
   const { user, users, addUser, updateUser, deleteUser, technicians, addTechnician, updateTechnician, deleteTechnician } = useApp()
@@ -340,9 +492,10 @@ export default function AdminPage() {
   }
 
   const TABS = [
-    ['technicians', 'Technicians'],
-    ['staff',       'Staff Accounts'],
-    ['company',     'Company Settings'],
+    ['technicians',  'Technicians'],
+    ['availability', 'Availability'],
+    ['staff',        'Staff Accounts'],
+    ['company',      'Company Settings'],
   ]
 
   return (
@@ -360,6 +513,11 @@ export default function AdminPage() {
       </div>
 
       <div className="admin-body">
+
+        {/* ── Availability ── */}
+        {tab === 'availability' && (
+          <AvailabilityPanel technicians={technicians} updateTechnician={updateTechnician} />
+        )}
 
         {/* ── Technicians ── */}
         {tab === 'technicians' && (

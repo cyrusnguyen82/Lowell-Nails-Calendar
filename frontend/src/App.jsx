@@ -6,12 +6,14 @@ import CalendarPage from './components/Calendar/CalendarPage'
 import ClientsPage from './components/Clients/ClientsPage'
 import GiftCardsPage from './components/GiftCards/GiftCardsPage'
 import AdminPage from './components/Admin/AdminPage'
+import POSPage from './components/POS/POSPage'
 import './components/Layout/Layout.css'
 
 const ACCESS = {
   calendar:  ['admin','receptionist','technician'],
   clients:   ['admin','receptionist'],
   giftcards: ['admin','receptionist'],
+  pos:       ['admin','receptionist'],
   admin:     ['admin'],
 }
 
@@ -97,6 +99,7 @@ function Shell() {
         {safePage === 'calendar'  && <CalendarPage initDateStr={calDateStr} initView={calView} onDateChange={setCalDateStr} onViewChange={setCalView} />}
         {safePage === 'clients'   && <ClientsPage />}
         {safePage === 'giftcards' && <GiftCardsPage />}
+        {safePage === 'pos'       && <POSPage />}
         {safePage === 'admin'     && <AdminPage />}
       </main>
     </div>

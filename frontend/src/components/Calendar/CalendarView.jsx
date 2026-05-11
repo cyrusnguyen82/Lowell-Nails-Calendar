@@ -28,7 +28,8 @@ export default function CalendarView({ currentDate }) {
   const [selectedApt, setSelectedApt] = useState(null)
   const [newAptData, setNewAptData]   = useState(null)
   const [timeOffset, setTimeOffset]   = useState(getTimeOffset())
-  const bodyRef = useRef(null)
+  const bodyRef   = useRef(null)
+  const headerRef = useRef(null)  // ref for the tech header row (horizontal sync)
 
   const isToday = currentDate.isSame(dayjs(), 'day')
 
@@ -37,10 +38,21 @@ export default function CalendarView({ currentDate }) {
     return () => clearInterval(id)
   }, [])
 
+  // Auto-scroll to current time on mount
   useEffect(() => {
     if (bodyRef.current && timeOffset !== null) {
       bodyRef.current.scrollTop = Math.max(0, timeOffset - 180)
     }
+  }, [])
+
+  // Sync horizontal scroll: body → header
+  useEffect(() => {
+    const body = bodyRef.current
+    const header = headerRef.current
+    if (!body || !header) return
+    function syncHeader() { header.scrollLeft = body.scrollLeft }
+    body.addEventListener('scroll', syncHeader, { passive: true })
+    return () => body.removeEventListener('scroll', syncHeader)
   }, [])
 
   const dateStr = currentDate.format('YYYY-MM-DD')
@@ -69,10 +81,10 @@ export default function CalendarView({ currentDate }) {
 
   return (
     <div className="cal-wrapper">
-      {/* Sticky tech header */}
+      {/* Sticky tech header — scrollLeft mirrors the body via JS */}
       <div className="cal-header-row">
         <div className="cal-header-gutter" />
-        <div className="cal-header-techs">
+        <div className="cal-header-techs" ref={headerRef} style={{ overflowX: 'hidden' }}>
           {visibleTechs.map(tech => (
             <div key={tech.id} className="tech-header-cell">
               <div className="tech-avatar" style={{ background: tech.color }}>{tech.initials}</div>
