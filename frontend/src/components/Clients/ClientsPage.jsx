@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import XLSX from 'xlsx'
 import { useApp } from '../../context/AppContext'
 import { SERVICES } from '../../data/mockData'
+import * as api from '../../api'
 import './Clients.css'
 import '../Calendar/Calendar.css'
 
@@ -237,6 +238,7 @@ export default function ClientsPage() {
   const [sortKey, setSortKey]   = useState('name')
   const [sortAsc, setSortAsc]   = useState(true)
   const [importMsg, setImportMsg] = useState('')
+  const [deduping, setDeduping]   = useState(false)
   const importRef = useRef(null)
 
   async function importRows(rows) {
@@ -302,6 +304,21 @@ export default function ClientsPage() {
       console.error('Bulk import error:', err)
     }
     setTimeout(() => setImportMsg(''), 5000)
+  }
+
+  async function handleDedupe() {
+    if (!window.confirm('Remove duplicate clients (same phone number)? This cannot be undone.')) return
+    setDeduping(true)
+    try {
+      const result = await api.post('/clients/dedupe')
+      setImportMsg(result.message || 'Deduplication complete.')
+      if (fetchClients) await fetchClients()
+    } catch (err) {
+      setImportMsg(`Error: ${err.message}`)
+    } finally {
+      setDeduping(false)
+      setTimeout(() => setImportMsg(''), 5000)
+    }
   }
 
   function handleImportCSV(e) {
@@ -385,6 +402,9 @@ export default function ClientsPage() {
               Import CSV
             </button>
             <input ref={importRef} type="file" accept=".csv,.xlsx,.xls,text/csv" style={{ display:'none' }} onChange={handleImportCSV} />
+            <button className="btn btn-ghost" style={{ fontSize:13, color:'#ef4444' }} onClick={handleDedupe} disabled={deduping}>
+              {deduping ? 'Removing...' : 'Remove Duplicates'}
+            </button>
             <button className="btn btn-primary" onClick={() => setSelected('new')}>+ New Client</button>
           </>
         )}

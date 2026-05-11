@@ -28,8 +28,7 @@ export default function CalendarView({ currentDate }) {
   const [selectedApt, setSelectedApt] = useState(null)
   const [newAptData, setNewAptData]   = useState(null)
   const [timeOffset, setTimeOffset]   = useState(getTimeOffset())
-  const bodyRef   = useRef(null)
-  const headerRef = useRef(null)  // ref for the tech header row (horizontal sync)
+  const scrollRef = useRef(null)  // single scroll container for header + body
 
   const isToday = currentDate.isSame(dayjs(), 'day')
 
@@ -40,19 +39,9 @@ export default function CalendarView({ currentDate }) {
 
   // Auto-scroll to current time on mount
   useEffect(() => {
-    if (bodyRef.current && timeOffset !== null) {
-      bodyRef.current.scrollTop = Math.max(0, timeOffset - 180)
+    if (scrollRef.current && timeOffset !== null) {
+      scrollRef.current.scrollTop = Math.max(0, timeOffset - 180)
     }
-  }, [])
-
-  // Sync horizontal scroll: body → header
-  useEffect(() => {
-    const body = bodyRef.current
-    const header = headerRef.current
-    if (!body || !header) return
-    function syncHeader() { header.scrollLeft = body.scrollLeft }
-    body.addEventListener('scroll', syncHeader, { passive: true })
-    return () => body.removeEventListener('scroll', syncHeader)
   }, [])
 
   const dateStr = currentDate.format('YYYY-MM-DD')
@@ -81,50 +70,59 @@ export default function CalendarView({ currentDate }) {
 
   return (
     <div className="cal-wrapper">
-      {/* Sticky tech header — scrollLeft mirrors the body via JS */}
-      <div className="cal-header-row">
-        <div className="cal-header-gutter" />
-        <div className="cal-header-techs" ref={headerRef} style={{ overflowX: 'hidden' }}>
-          {visibleTechs.map(tech => (
-            <div key={tech.id} className="tech-header-cell">
-              <div className="tech-avatar" style={{ background: tech.color }}>{tech.initials}</div>
-              <span className="tech-name">{tech.name}</span>
-              <span className="tech-apt-count">{aptsByTech(tech.id).length} appts</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/*
+        Single scroll container — header row is INSIDE here so horizontal
+        scroll naturally carries the tech names with the columns. No JS needed.
+        position:sticky on .cal-header-row keeps it pinned to the top.
+        position:sticky on .cal-header-gutter / .time-gutter keeps the left
+        time column pinned while scrolling horizontally.
+      */}
+      <div className="cal-scroll-area" ref={scrollRef}>
+        <div className="cal-inner">
 
-      {/* Scrollable grid */}
-      <div className="cal-body" ref={bodyRef}>
-        <div className="cal-grid">
-          <div className="time-gutter">
-            {hours.map(h => (
-              <div key={h} className="time-slot-label">
-                <span className="time-label-hour">{formatHour(h)}</span>
-                <span className="time-label-quarter">:15</span>
-                <span className="time-label-half">:30</span>
-                <span className="time-label-quarter">:45</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="tech-cols-wrapper">
-            {isToday && timeOffset !== null && (
-              <div className="current-time-line" style={{ top: timeOffset }}>
-                <div className="current-time-dot" />
-              </div>
-            )}
+          {/* ── Sticky header row ── */}
+          <div className="cal-header-row">
+            <div className="cal-header-gutter" />
             {visibleTechs.map(tech => (
-              <TechnicianColumn
-                key={tech.id}
-                technician={tech}
-                appointments={aptsByTech(tech.id)}
-                onSlotClick={time => setNewAptData({ technicianId: tech.id, time, date: dateStr })}
-                onAppointmentClick={setSelectedApt}
-              />
+              <div key={tech.id} className="tech-header-cell">
+                <div className="tech-avatar" style={{ background: tech.color }}>{tech.initials}</div>
+                <span className="tech-name">{tech.name}</span>
+                <span className="tech-apt-count">{aptsByTech(tech.id).length} appts</span>
+              </div>
             ))}
           </div>
+
+          {/* ── Body grid ── */}
+          <div className="cal-body-grid">
+            <div className="time-gutter">
+              {hours.map(h => (
+                <div key={h} className="time-slot-label">
+                  <span className="time-label-hour">{formatHour(h)}</span>
+                  <span className="time-label-quarter">:15</span>
+                  <span className="time-label-half">:30</span>
+                  <span className="time-label-quarter">:45</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="tech-cols-wrapper">
+              {isToday && timeOffset !== null && (
+                <div className="current-time-line" style={{ top: timeOffset }}>
+                  <div className="current-time-dot" />
+                </div>
+              )}
+              {visibleTechs.map(tech => (
+                <TechnicianColumn
+                  key={tech.id}
+                  technician={tech}
+                  appointments={aptsByTech(tech.id)}
+                  onSlotClick={time => setNewAptData({ technicianId: tech.id, time, date: dateStr })}
+                  onAppointmentClick={setSelectedApt}
+                />
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
 

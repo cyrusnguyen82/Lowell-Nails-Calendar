@@ -74,37 +74,62 @@
 .add-tech-btn:hover,
 .add-tech-btn:active { background: #059669; }
 
-/* ── Sticky Tech Header ─────────────────────────────────── */
+/* ── Single scroll container ────────────────────────────── */
+/*
+  Everything lives inside .cal-scroll-area — one element that scrolls
+  both X and Y.  The header row sticks to the top via position:sticky,
+  and the time/header gutters stick to the left via position:sticky.
+  No JavaScript sync is required.
+*/
+.cal-scroll-area {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior: contain;
+  background: #f8fafc;
+}
+
+.cal-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  /* wide enough so all tech columns are rendered without wrapping */
+  min-width: max-content;
+}
+
+/* ── Sticky header row ──────────────────────────────────── */
 .cal-header-row {
   display: flex;
-  flex-shrink: 0;
-  background: #0f172a;
-  border-bottom: 2px solid #1e293b;
   position: sticky;
   top: 0;
   z-index: 20;
+  background: #0f172a;
+  border-bottom: 2px solid #1e293b;
+  /* Must match the width of .cal-body-grid rows */
+  min-width: max-content;
 }
 
 .cal-header-gutter {
   width: 72px;
   flex-shrink: 0;
+  /* Sticks to the LEFT edge while scrolling horizontally */
+  position: sticky;
+  left: 0;
+  z-index: 21;
+  background: #0f172a;
   border-right: 1px solid #1e293b;
 }
 
-.cal-header-techs {
-  display: flex;
-  flex: 1;
-  overflow: hidden; /* JS-synced scroll — do not add overflow-x:auto here */
-}
-
+/* Tech header cells are now direct children of .cal-header-row */
 .tech-header-cell {
-  flex: 1;
+  width: 160px;        /* fixed width so header and body columns align exactly */
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
   border-right: 1px solid #1e293b;
-  min-width: 0;
 }
 .tech-header-cell:last-child { border-right: none; }
 
@@ -137,21 +162,11 @@
   flex-shrink: 0;
 }
 
-/* ── Scrollable Body ────────────────────────────────────── */
-.cal-body {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: auto;
-  background: #f8fafc;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y pan-x;
-  overscroll-behavior: contain; /* prevents Android pull-to-refresh while scrolling calendar */
-}
-
-.cal-grid {
+/* ── Body grid (time gutter + technician columns) ────────── */
+.cal-body-grid {
   display: flex;
-  min-height: 100%;
-  position: relative;
+  flex: 1;
+  min-width: max-content;
 }
 
 /* ── Time Gutter ────────────────────────────────────────── */
@@ -233,10 +248,10 @@
 
 /* ── Single Tech Column ─────────────────────────────────── */
 .tech-col {
-  flex: 1;
+  width: 160px;        /* matches .tech-header-cell width exactly */
+  flex-shrink: 0;
   position: relative;
   border-right: 1px solid #e2e8f0;
-  min-width: 140px;
 }
 .tech-col:last-child { border-right: none; }
 
@@ -553,14 +568,14 @@
     border-radius: 16px 16px 0 0;
   }
 
-  /* Smaller tech header on mobile */
-  .tech-header-cell { padding: 6px 4px; gap: 4px; }
+  /* Smaller tech header cells and columns on mobile */
+  .tech-header-cell { width: 110px; padding: 6px 6px; gap: 4px; }
+  .tech-col { width: 110px; }
   .tech-name { font-size: 10px; }
   .tech-apt-count { display: none; }
   .tech-avatar { width: 24px; height: 24px; font-size: 9px; }
 
-  /* Each column needs a minimum width so names are readable on scroll */
-  .tech-col { min-width: 100px; }
+  /* Narrower time gutter on mobile to save space */
   .cal-header-gutter { width: 52px; }
   .time-gutter { width: 52px; }
   .time-label-hour { font-size: 9px; }
