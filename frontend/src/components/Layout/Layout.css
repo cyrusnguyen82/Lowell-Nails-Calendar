@@ -7,6 +7,86 @@
   background: linear-gradient(145deg, #0a2a1e 0%, #0a1830 100%);
 }
 
+/* ── Page header (logo + company info + back button) ─────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: rgba(2, 13, 24, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(58,181,146,0.18);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.page-header-back {
+  flex-shrink: 0;
+  width: 120px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #94a3b8;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  text-align: center;
+}
+.page-header-back:hover {
+  background: rgba(58,181,146,0.15);
+  color: #3ab592;
+  border-color: rgba(58,181,146,0.4);
+}
+
+.page-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  outline: none;
+}
+.page-header-center:hover .page-header-logo { transform: scale(1.05); opacity: 0.9; }
+
+.page-header-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.page-header-text { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+
+.page-header-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #e2e8f0;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.page-header-address {
+  font-size: 11px;
+  color: #64748b;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 768px) {
+  .page-header { padding: 8px 12px; }
+  .page-header-logo { width: 40px; height: 40px; }
+  .page-header-name { font-size: 11px; }
+  .page-header-address { display: none; }
+  .page-header-back { width: auto; padding: 6px 10px; font-size: 11px; }
+}
+
 /* ── Top navigation bar ───────────────────────────────────── */
 .topbar {
   display: flex;
