@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useApp } from '../../context/AppContext'
 import * as api from '../../api'
+import GiftCardsPage from '../GiftCards/GiftCardsPage'
 import './Admin.css'
 import '../Calendar/Calendar.css'
 
@@ -473,30 +474,157 @@ function AvailabilityPanel({ technicians, updateTechnician }) {
   )
 }
 
+/* ── Transactions Panel (admin: edit tech; receptionist: view-only) ── */
+function TransactionsPanel() {
+  const { user, technicians } = useApp()
+  const [txns, setTxns]       = useState([])
+  const [loading, setLoading] = useState(true)
+  const [expanded, setExpanded] = useState(null)
+  const [editingLine, setEditingLine] = useState(null)  // { txnId, lineId }
+  const [newTechId, setNewTechId]     = useState(null)
+  const [saving, setSaving]           = useState(false)
+  const [msg, setMsg]                 = useState('')
+
+  const canEdit = user.role === 'admin'
+
+  useEffect(() => {
+    api.get('/pos/transactions')
+      .then(data => { setTxns(data.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id)); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  function techName(id)  { return technicians.find(t => t.id === id)?.name  || '—' }
+  function techColor(id) { return technicians.find(t => t.id === id)?.color || '#94a3b8' }
+
+  async function saveTech(txnId, lineId) {
+    if (!newTechId) return
+    setSaving(true)
+    try {
+      await api.put(`/pos/line-items/${lineId}`, { technicianId: newTechId })
+      setTxns(prev => prev.map(t => {
+        if (t.id !== txnId) return t
+        return { ...t, lineItems: t.lineItems.map(li => li.id === lineId ? { ...li, technicianId: newTechId } : li) }
+      }))
+      setEditingLine(null)
+      setMsg('Tech updated.')
+      setTimeout(() => setMsg(''), 2500)
+    } catch (err) {
+      setMsg('Error: ' + err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) return <div style={{ padding:32, color:'#94a3b8', textAlign:'center' }}>Loading transactions…</div>
+
+  return (
+    <div>
+      <div className="panel-header" style={{ marginBottom:16 }}>
+        <span>{txns.length} closed ticket{txns.length !== 1 ? 's' : ''}</span>
+        {msg && <span style={{ fontSize:13, color:'#10b981', fontWeight:600 }}>{msg}</span>}
+      </div>
+
+      {txns.length === 0 && (
+        <div style={{ textAlign:'center', padding:40, color:'#94a3b8' }}>No transactions yet.</div>
+      )}
+
+      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+        {txns.map(txn => (
+          <div key={txn.id} className="admin-card" style={{ padding:0, overflow:'hidden' }}>
+            {/* Header row */}
+            <div
+              style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 16px', cursor:'pointer', background:'#fff' }}
+              onClick={() => setExpanded(expanded === txn.id ? null : txn.id)}>
+              <span style={{ fontSize:12, fontWeight:700, color:'#64748b', whiteSpace:'nowrap' }}>#{txn.id}</span>
+              <span style={{ flex:1, fontWeight:700, fontSize:14 }}>{txn.clientName || 'Walk-in'}</span>
+              <span style={{ fontSize:12, color:'#94a3b8' }}>{txn.date}</span>
+              <span style={{ fontSize:11, fontWeight:700, background:'#f0fdf9', color:'#3ab592', padding:'2px 8px', borderRadius:8 }}>
+                {(txn.paymentMethod || '').toUpperCase()}
+              </span>
+              <span style={{ fontSize:15, fontWeight:800 }}>${(txn.total || 0).toFixed(2)}</span>
+              <span style={{ fontSize:10, color:'#94a3b8' }}>{expanded === txn.id ? '▲' : '▼'}</span>
+            </div>
+
+            {expanded === txn.id && (
+              <div style={{ borderTop:'1px solid #f1f5f9', padding:'10px 16px', background:'#f8fafc' }}>
+                {/* Line items */}
+                {(txn.lineItems || []).map(li => (
+                  <div key={li.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'6px 0', borderBottom:'1px dotted #e2e8f0' }}>
+                    <div style={{ width:8, height:8, borderRadius:'50%', background:techColor(li.technicianId), flexShrink:0 }} />
+                    <span style={{ flex:1, fontSize:13, fontWeight:600 }}>{li.service}</span>
+                    <span style={{ fontSize:12, color:'#64748b', minWidth:80 }}>
+                      {editingLine?.lineId === li.id ? (
+                        <select
+                          className="form-select" style={{ fontSize:12, padding:'2px 6px', height:'auto' }}
+                          value={newTechId || li.technicianId}
+                          onChange={e => setNewTechId(Number(e.target.value))}>
+                          {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </select>
+                      ) : techName(li.technicianId)}
+                    </span>
+                    <span style={{ fontSize:13, fontWeight:700, minWidth:52, textAlign:'right' }}>${(li.price || 0).toFixed(2)}</span>
+                    {canEdit && (
+                      editingLine?.lineId === li.id ? (
+                        <div style={{ display:'flex', gap:4 }}>
+                          <button className="btn btn-ghost" style={{ fontSize:11, padding:'2px 8px' }}
+                            onClick={() => setEditingLine(null)}>Cancel</button>
+                          <button className="btn btn-primary" style={{ fontSize:11, padding:'2px 8px' }} disabled={saving}
+                            onClick={() => saveTech(txn.id, li.id)}>Save</button>
+                        </div>
+                      ) : (
+                        <button className="btn btn-ghost" style={{ fontSize:11, padding:'2px 8px' }}
+                          onClick={() => { setEditingLine({ txnId: txn.id, lineId: li.id }); setNewTechId(li.technicianId) }}>
+                          Edit Tech
+                        </button>
+                      )
+                    )}
+                  </div>
+                ))}
+                {/* Totals */}
+                <div style={{ display:'flex', gap:16, flexWrap:'wrap', paddingTop:8, fontSize:12, color:'#64748b' }}>
+                  <span>Subtotal ${(txn.subtotal||0).toFixed(2)}</span>
+                  <span>Tax ${(txn.tax||0).toFixed(2)}</span>
+                  {txn.tip > 0 && <span>Tip ${(txn.tip||0).toFixed(2)}</span>}
+                  {txn.giftCardAmount > 0 && <span style={{color:'#3ab592'}}>Gift Card -${(txn.giftCardAmount||0).toFixed(2)}</span>}
+                  <strong>Total ${(txn.total||0).toFixed(2)}</strong>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ── Page ─────────────────────────────────────────────────── */
 export default function AdminPage() {
   const { user, users, addUser, updateUser, deleteUser, technicians, addTechnician, updateTechnician, deleteTechnician } = useApp()
 
-  const [tab, setTab]             = useState('technicians')
-  const [techModal, setTechModal] = useState(null)   // null | 'new' | tech object
+  const isAdmin = user.role === 'admin'
+  const [tab, setTab]             = useState(isAdmin ? 'technicians' : 'giftcards')
+  const [techModal, setTechModal] = useState(null)
   const [addingStaff, setAddingStaff] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
 
-  if (user.role !== 'admin') {
+  if (user.role !== 'admin' && user.role !== 'receptionist') {
     return (
       <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', flexDirection:'column', gap:12, color:'#94a3b8' }}>
         <span style={{ fontSize:48 }}>🔒</span>
-        <p style={{ fontSize:16, fontWeight:600 }}>Admin access required</p>
+        <p style={{ fontSize:16, fontWeight:600 }}>Access required</p>
       </div>
     )
   }
 
-  const TABS = [
-    ['technicians',  'Technicians'],
-    ['availability', 'Availability'],
-    ['staff',        'Staff Accounts'],
-    ['company',      'Company Settings'],
+  const ALL_TABS = [
+    ['technicians',   'Technicians',       true ],
+    ['availability',  'Availability',      true ],
+    ['staff',         'Staff Accounts',    true ],
+    ['company',       'Company Settings',  true ],
+    ['transactions',  'Transactions',      true ],
+    ['giftcards',     'Gift Cards',        false],  // false = also receptionist
   ]
+  const TABS = ALL_TABS.filter(([,, adminOnly]) => isAdmin || !adminOnly)
 
   return (
     <div className="admin-page">
@@ -587,6 +715,12 @@ export default function AdminPage() {
 
         {/* ── Company Settings ── */}
         {tab === 'company' && <CompanySettings />}
+
+        {/* ── Transactions ── */}
+        {tab === 'transactions' && <TransactionsPanel />}
+
+        {/* ── Gift Cards ── */}
+        {tab === 'giftcards' && <GiftCardsPage />}
       </div>
 
       {/* Tech add / edit modal popup */}

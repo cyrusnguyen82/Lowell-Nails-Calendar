@@ -4,6 +4,93 @@ import { SERVICES } from '../../data/mockData'
 import * as api from '../../api'
 import './POS.css'
 
+/* ── Closed Tickets (read-only) ─────────────────────────────── */
+function ClosedTicketsView({ onBack }) {
+  const { technicians } = useApp()
+  const [txns, setTxns]       = useState([])
+  const [loading, setLoading] = useState(true)
+  const [expanded, setExpanded] = useState(null)
+  const [search, setSearch]   = useState('')
+
+  useEffect(() => {
+    api.get('/pos/transactions')
+      .then(data => { setTxns(data.sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id)); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  function techName(id) { return technicians.find(t => t.id === id)?.name || '—' }
+  function techColor(id) { return technicians.find(t => t.id === id)?.color || '#94a3b8' }
+
+  const filtered = txns.filter(t =>
+    !search ||
+    (t.clientName || '').toLowerCase().includes(search.toLowerCase()) ||
+    String(t.id).includes(search) ||
+    (t.date || '').includes(search)
+  )
+
+  return (
+    <div className="pos-shell">
+      <div className="pos-closed-view">
+        <div className="pos-closed-header">
+          <button className="pos-back-btn" onClick={onBack}>← Back</button>
+          <span className="pos-checkout-title">Closed Tickets</span>
+          <input className="pos-panel-search"
+            style={{ background:'rgba(255,255,255,0.15)', maxWidth:220 }}
+            placeholder="Search client, date, #ticket…"
+            value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+
+        <div className="pos-closed-list">
+          {loading && (
+            <div style={{ textAlign:'center', padding:40, color:'#94a3b8' }}>Loading…</div>
+          )}
+          {!loading && filtered.length === 0 && (
+            <div style={{ textAlign:'center', padding:40, color:'#94a3b8' }}>No closed tickets found</div>
+          )}
+          {filtered.map(txn => (
+            <div key={txn.id}
+              className={`pos-closed-card${expanded === txn.id ? ' expanded' : ''}`}
+              onClick={() => setExpanded(expanded === txn.id ? null : txn.id)}>
+              <div className="pos-closed-card-row">
+                <span className="pos-closed-num">#{txn.id}</span>
+                <span className="pos-closed-client">{txn.clientName || 'Walk-in'}</span>
+                <span className="pos-closed-date">{txn.date}</span>
+                <span className="pos-closed-method">{(txn.paymentMethod || '').toUpperCase()}</span>
+                <span className="pos-closed-total">${(txn.total || 0).toFixed(2)}</span>
+                <span className="pos-closed-chevron">{expanded === txn.id ? '▲' : '▼'}</span>
+              </div>
+
+              {expanded === txn.id && (
+                <div className="pos-closed-details">
+                  {(txn.lineItems || []).map((li, i) => (
+                    <div key={i} className="pos-closed-line">
+                      <div className="pos-closed-line-dot" style={{ background: techColor(li.technicianId) }} />
+                      <span className="pos-closed-line-svc">{li.service}</span>
+                      <span className="pos-closed-line-tech">{techName(li.technicianId)}</span>
+                      <span className="pos-closed-line-price">${(li.price || 0).toFixed(2)}</span>
+                    </div>
+                  ))}
+                  <div className="pos-closed-totals-row">
+                    <span>Subtotal ${(txn.subtotal || 0).toFixed(2)}</span>
+                    <span>Tax ${(txn.tax || 0).toFixed(2)}</span>
+                    {txn.tip > 0 && <span>Tip ${(txn.tip || 0).toFixed(2)}</span>}
+                    {txn.giftCardAmount > 0 && <span style={{color:'#3ab592'}}>Gift Card -${(txn.giftCardAmount || 0).toFixed(2)}</span>}
+                    <strong>Total ${(txn.total || 0).toFixed(2)}</strong>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="pos-bar">
+        <button className="pos-bar-btn pos-bar-primary" onClick={onBack}>← BACK</button>
+      </div>
+    </div>
+  )
+}
+
 const TAX_RATE    = 0.06
 const TIP_PRESETS = [15, 18, 20, 25]
 
@@ -361,7 +448,7 @@ function CheckoutView({ initialTechId, onBack }) {
 /* ── Main POS dashboard ─────────────────────────────────────── */
 export default function POSPage({ onNavigate }) {
   const { user, technicians, appointments } = useApp()
-  const [mode, setMode]               = useState('main')
+  const [mode, setMode]               = useState('main')  // 'main' | 'checkout' | 'closed'
   const [selectedTechId, setSelectedTechId] = useState(null)
   const [ticketSearch, setTicketSearch] = useState('')
   const [techSearch, setTechSearch]   = useState('')
@@ -420,6 +507,10 @@ export default function POSPage({ onNavigate }) {
     setMode('checkout')
   }
 
+  if (mode === 'closed') {
+    return <ClosedTicketsView onBack={() => setMode('main')} />
+  }
+
   if (mode === 'checkout') {
     return (
       <div className="pos-shell">
@@ -471,6 +562,7 @@ export default function POSPage({ onNavigate }) {
             <span>AVAILABLE TECHS</span>
             <input className="pos-panel-search" placeholder="Name"
               value={techSearch} onChange={e => setTechSearch(e.target.value)} />
+            <button className="pos-new-ticket-btn" onClick={() => openCheckout(null)}>+ New Ticket</button>
           </div>
           <div className="pos-panel-body">
             {availableTechs.length === 0 ? (
@@ -523,13 +615,9 @@ export default function POSPage({ onNavigate }) {
         </div>
       </div>
 
-      {/* ── Bottom action bar ── */}
+      {/* ── Bottom action bar — 4 buttons ── */}
       <div className="pos-bar">
-        <button className="pos-bar-btn pos-bar-primary" onClick={() => openCheckout(null)}>
-          <span className="pos-bar-icon">🎫</span>
-          <span>OPEN TICKET</span>
-        </button>
-        <button className="pos-bar-btn" onClick={() => {}}>
+        <button className="pos-bar-btn pos-bar-primary" onClick={() => setMode('closed')}>
           <span className="pos-bar-icon">📋</span>
           <span>CLOSED TICKET</span>
         </button>
@@ -541,16 +629,10 @@ export default function POSPage({ onNavigate }) {
           <span className="pos-bar-icon">👥</span>
           <span>CLIENTS</span>
         </button>
-        <button className="pos-bar-btn" onClick={() => onNavigate?.('giftcards')}>
-          <span className="pos-bar-icon">🎁</span>
-          <span>GIFT CARDS</span>
+        <button className="pos-bar-btn" onClick={() => onNavigate?.('admin')}>
+          <span className="pos-bar-icon">⚙️</span>
+          <span>ADMIN</span>
         </button>
-        {user.role === 'admin' && (
-          <button className="pos-bar-btn" onClick={() => onNavigate?.('admin')}>
-            <span className="pos-bar-icon">⚙️</span>
-            <span>ADMIN</span>
-          </button>
-        )}
       </div>
     </div>
   )

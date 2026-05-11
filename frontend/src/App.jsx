@@ -12,9 +12,8 @@ import './components/Layout/Layout.css'
 const ACCESS = {
   calendar:  ['admin','receptionist','technician'],
   clients:   ['admin','receptionist'],
-  giftcards: ['admin','receptionist'],
   pos:       ['admin','receptionist'],
-  admin:     ['admin'],
+  admin:     ['admin','receptionist'],
 }
 
 const PAGE_KEY     = 'lowell_nails_page'

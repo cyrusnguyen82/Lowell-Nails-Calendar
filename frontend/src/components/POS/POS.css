@@ -802,6 +802,118 @@
 
 .pos-receipt-actions .pos-btn { flex: 1; text-align: center; }
 
+/* ── New Ticket button (in panel header) ────────────────────── */
+.pos-new-ticket-btn {
+  padding: 4px 12px;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.pos-new-ticket-btn:hover { background: rgba(255,255,255,0.28); }
+
+/* ═══════════════════════════════════════════════════════════════
+   Closed Tickets view (read-only)
+   ═══════════════════════════════════════════════════════════════ */
+.pos-closed-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.pos-closed-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: rgba(2, 13, 24, 0.6);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.pos-closed-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.pos-closed-card {
+  background: rgba(255,255,255,0.96);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+  flex-shrink: 0;
+}
+.pos-closed-card:hover { box-shadow: 0 2px 12px rgba(58,181,146,0.25); }
+.pos-closed-card.expanded { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+
+.pos-closed-card-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+}
+
+.pos-closed-num    { font-size:12px; font-weight:700; color:#64748b; white-space:nowrap; }
+.pos-closed-client { flex:1; font-size:14px; font-weight:700; color:#1e293b; }
+.pos-closed-date   { font-size:12px; color:#94a3b8; white-space:nowrap; }
+.pos-closed-method { font-size:10px; font-weight:700; color:#fff; background:#3ab592; padding:2px 7px; border-radius:8px; white-space:nowrap; }
+.pos-closed-total  { font-size:15px; font-weight:800; color:#1e293b; white-space:nowrap; }
+.pos-closed-chevron { font-size:10px; color:#94a3b8; }
+
+.pos-closed-details {
+  border-top: 1px solid #f1f5f9;
+  padding: 10px 14px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pos-closed-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.pos-closed-line-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pos-closed-line-svc   { flex:1; font-weight:600; color:#1e293b; }
+.pos-closed-line-tech  { font-size:12px; color:#64748b; white-space:nowrap; }
+.pos-closed-line-price { font-size:13px; font-weight:700; color:#475569; white-space:nowrap; }
+
+.pos-closed-totals-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
 /* ── Mobile ─────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .pos-panels {

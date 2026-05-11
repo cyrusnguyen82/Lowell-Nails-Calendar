@@ -92,8 +92,18 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
 }
 
 /* ── View existing appointment ─────────────────────────────── */
-function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete }) {
+function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onReschedule }) {
+  const [rescheduling, setRescheduling] = useState(false)
+  const [reschedDate, setReschedDate]   = useState(appointment.date)
+  const [reschedTime, setReschedTime]   = useState(appointment.startTime)
+
   const end = addMinutes(appointment.startTime, appointment.duration)
+
+  function handleRescheduleSubmit() {
+    if (!reschedDate || !reschedTime) return
+    onReschedule({ date: reschedDate, startTime: reschedTime })
+  }
+
   return (
     <>
       <div className="modal-header">
@@ -130,8 +140,45 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete }) {
           </div>
         )}
       </div>
+
+      {/* ── Reschedule panel (inline) ── */}
+      {rescheduling && (
+        <div style={{ padding:'14px 20px', borderTop:'2px solid #e0e7ff', background:'#f5f7ff' }}>
+          <div style={{ fontSize:13, fontWeight:700, color:'#4f46e5', marginBottom:12 }}>
+            📅 Reschedule Appointment
+          </div>
+          <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignItems:'flex-end' }}>
+            <div className="form-group" style={{ margin:0, flex:1, minWidth:130 }}>
+              <label className="form-label">New Date</label>
+              <input className="form-input" type="date" value={reschedDate}
+                onChange={e => setReschedDate(e.target.value)} />
+            </div>
+            <div className="form-group" style={{ margin:0, flex:1, minWidth:120 }}>
+              <label className="form-label">New Time</label>
+              <input className="form-input" type="time" value={reschedTime}
+                onChange={e => setReschedTime(e.target.value)} />
+            </div>
+            <button className="btn btn-ghost" style={{ flexShrink:0 }}
+              onClick={() => setRescheduling(false)}>Cancel</button>
+            <button className="btn btn-primary" style={{ flexShrink:0 }}
+              onClick={handleRescheduleSubmit}>Save</button>
+          </div>
+          {reschedDate && reschedTime && (
+            <div style={{ marginTop:8, fontSize:12, color:'#6366f1' }}>
+              Moving to {reschedDate} at {formatTime(reschedTime)}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="modal-footer">
         <button className="btn btn-danger" onClick={() => onDelete(appointment.id)}>Remove</button>
+        {canEdit && !rescheduling && (
+          <button className="btn btn-ghost" style={{ color:'#4f46e5', borderColor:'#c7d2fe' }}
+            onClick={() => setRescheduling(true)}>
+            Reschedule
+          </button>
+        )}
         {canEdit && <button className="btn btn-ghost" onClick={onEdit}>Edit</button>}
         <button className="btn btn-ghost" onClick={onClose}>Close</button>
       </div>
@@ -148,6 +195,11 @@ export default function AppointmentModal({ appointment, newData, technicians, on
 
   function handleUpdate(form) {
     updateAppointment(appointment.id, form)
+    onClose()
+  }
+
+  function handleReschedule({ date, startTime }) {
+    updateAppointment(appointment.id, { ...appointment, date, startTime })
     onClose()
   }
 
@@ -180,6 +232,7 @@ export default function AppointmentModal({ appointment, newData, technicians, on
             onClose={onClose}
             onEdit={() => setEditing(true)}
             onDelete={onDelete}
+            onReschedule={handleReschedule}
           />
         )}
 
