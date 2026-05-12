@@ -1,15 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════
-   Calendar
+   Calendar — Dark Theme (POS Palette)
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Wrapper ──────────────────────────────────────────────────── */
 .cal-wrapper {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--bg);
+  background: var(--pos-bg);
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  color: var(--slate-900);
+  color: var(--pos-text);
 }
 
 /* ── Toolbar ──────────────────────────────────────────────────── */
@@ -19,8 +18,8 @@
   gap: 12px;
   padding: 0 20px;
   height: 56px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--slate-200);
+  background: var(--pos-sidebar);
+  border-bottom: 1px solid var(--pos-border);
   flex-shrink: 0;
   z-index: 10;
 }
@@ -28,7 +27,7 @@
 .cal-toolbar-date {
   font-size: 15px;
   font-weight: 700;
-  color: var(--slate-900);
+  color: var(--pos-text);
   letter-spacing: -0.2px;
   flex: 1;
 }
@@ -42,11 +41,10 @@
 
 .cal-toolbar-nav { display: flex; gap: 4px; }
 
-/* Nav buttons */
 .nav-btn {
-  background: var(--slate-50);
-  border: 1.5px solid var(--slate-200);
-  color: var(--slate-600);
+  background: var(--pos-card);
+  border: 1px solid var(--pos-border);
+  color: var(--pos-muted);
   padding: 6px 14px;
   border-radius: var(--r);
   cursor: pointer;
@@ -55,20 +53,19 @@
   transition: background 0.15s, border-color 0.15s, color 0.15s;
   font-family: inherit;
 }
-.nav-btn:hover  { background: var(--slate-100); color: var(--slate-900); border-color: var(--slate-300); }
-.nav-btn:active { background: var(--slate-200); }
+.nav-btn:hover  { background: var(--pos-hover); color: var(--pos-text); border-color: rgba(255,255,255,0.1); }
+.nav-btn:active { background: var(--pos-hover); }
 .nav-btn.today  {
-  background: var(--accent-50);
-  border-color: var(--accent-100);
-  color: var(--accent);
+  background: rgba(197,160,89,0.1);
+  border-color: rgba(197,160,89,0.3);
+  color: var(--pos-gold);
 }
-.nav-btn.today:hover  { background: var(--accent-100); }
+.nav-btn.today:hover { background: rgba(197,160,89,0.2); }
 
-/* View switcher */
 .cal-toolbar-views {
   display: flex;
   gap: 2px;
-  background: var(--slate-100);
+  background: rgba(0,0,0,0.35);
   padding: 3px;
   border-radius: var(--r);
 }
@@ -82,24 +79,20 @@
   cursor: pointer;
   font-family: inherit;
   background: transparent;
-  color: var(--slate-500);
+  color: var(--pos-muted);
   transition: background 0.15s, color 0.15s;
 }
-.view-btn:hover { background: var(--surface); color: var(--slate-700); }
-.view-btn.active {
-  background: var(--surface);
-  color: var(--accent);
-  box-shadow: var(--shadow-sm);
-}
+.view-btn:hover  { background: var(--pos-card); color: var(--pos-text); }
+.view-btn.active { background: var(--pos-card); color: var(--pos-gold); box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
 
-/* ── Scroll Container ─────────────────────────────────────────── */
+/* ── Scroll Area ──────────────────────────────────────────────── */
 .cal-scroll-area {
   flex: 1;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
   overscroll-behavior: contain;
-  background: var(--slate-50);
+  background: var(--pos-bg);
 }
 
 .cal-inner {
@@ -109,16 +102,15 @@
   min-width: max-content;
 }
 
-/* ── Sticky Header Row ────────────────────────────────────────── */
+/* ── Header Row ───────────────────────────────────────────────── */
 .cal-header-row {
   display: flex;
   position: sticky;
   top: 0;
   z-index: 20;
-  background: var(--surface);
-  border-bottom: 2px solid var(--slate-100);
+  background: var(--pos-sidebar);
+  border-bottom: 2px solid var(--pos-border);
   min-width: max-content;
-  box-shadow: 0 1px 0 var(--slate-100);
 }
 
 .cal-header-gutter {
@@ -127,11 +119,10 @@
   position: sticky;
   left: 0;
   z-index: 21;
-  background: var(--surface);
-  border-right: 1px solid var(--slate-100);
+  background: var(--pos-sidebar);
+  border-right: 1px solid var(--pos-border);
 }
 
-/* Tech header cells */
 .tech-header-cell {
   width: 160px;
   flex-shrink: 0;
@@ -139,7 +130,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-right: 1px solid var(--slate-100);
+  border-right: 1px solid var(--pos-border);
 }
 .tech-header-cell:last-child { border-right: none; }
 
@@ -154,13 +145,13 @@
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
 .tech-name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--slate-800);
+  color: var(--pos-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -168,18 +159,14 @@
 
 .tech-apt-count {
   font-size: 11px;
-  color: var(--slate-400);
+  color: var(--pos-muted);
   margin-left: auto;
   flex-shrink: 0;
   font-weight: 500;
 }
 
 /* ── Body Grid ────────────────────────────────────────────────── */
-.cal-body-grid {
-  display: flex;
-  flex: 1;
-  min-width: max-content;
-}
+.cal-body-grid { display: flex; flex: 1; min-width: max-content; }
 
 /* ── Time Gutter ──────────────────────────────────────────────── */
 .time-gutter {
@@ -187,155 +174,95 @@
   flex-shrink: 0;
   position: sticky;
   left: 0;
-  background: var(--surface);
+  background: var(--pos-sidebar);
   z-index: 10;
-  border-right: 1px solid var(--slate-100);
+  border-right: 1px solid var(--pos-border);
 }
 
-.time-slot-label {
-  height: 120px;
-  display: flex;
-  flex-direction: column;
-  padding-right: 8px;
-}
+.time-slot-label { height: 120px; display: flex; flex-direction: column; padding-right: 8px; }
 
 .time-label-hour {
   height: 30px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
+  display: flex; align-items: flex-start; justify-content: flex-end;
   padding-top: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--slate-500);
+  font-size: 11px; font-weight: 600;
+  color: var(--pos-muted);
 }
 
 .time-label-half {
   height: 30px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
+  display: flex; align-items: flex-start; justify-content: flex-end;
   padding-top: 4px;
   font-size: 10px;
-  color: var(--slate-300);
+  color: rgba(255,255,255,0.12);
 }
 
 .time-label-quarter {
   height: 30px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
+  display: flex; align-items: flex-start; justify-content: flex-end;
   padding-top: 4px;
   font-size: 9px;
-  color: var(--slate-200);
+  color: rgba(255,255,255,0.06);
 }
 
-/* ── Tech Columns ─────────────────────────────────────────────── */
-.tech-cols-wrapper {
-  display: flex;
-  flex: 1;
-  position: relative;
-}
+/* ── Tech Cols ────────────────────────────────────────────────── */
+.tech-cols-wrapper { display: flex; flex: 1; position: relative; }
 
-/* ── Current Time Line ────────────────────────────────────────── */
 .current-time-line {
-  position: absolute;
-  left: 0; right: 0;
-  height: 2px;
-  background: var(--red);
-  z-index: 15;
-  pointer-events: none;
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: var(--pos-red); z-index: 15; pointer-events: none;
 }
-
 .current-time-dot {
-  position: absolute;
-  left: -5px; top: -4px;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--red);
+  position: absolute; left: -5px; top: -4px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--pos-red);
   box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
 }
 
-/* ── Single Tech Column ───────────────────────────────────────── */
 .tech-col {
-  width: 160px;
-  flex-shrink: 0;
-  position: relative;
-  border-right: 1px solid var(--slate-100);
+  width: 160px; flex-shrink: 0; position: relative;
+  border-right: 1px solid var(--pos-border);
 }
 .tech-col:last-child { border-right: none; }
 
-/* ── Time Slot Click Targets ──────────────────────────────────── */
-.time-slots {
-  position: absolute;
-  inset: 0;
-}
+.time-slots { position: absolute; inset: 0; }
 
 .slot {
   height: 30px;
-  border-bottom: 1px dashed var(--slate-100);
+  border-bottom: 1px dashed rgba(255,255,255,0.04);
   cursor: pointer;
   transition: background 0.1s;
 }
-.slot:nth-child(2n)  { border-bottom: 1px solid var(--slate-100); }
-.slot:nth-child(4n)  { border-bottom: 1px solid var(--slate-200); }
-.slot:hover { background: var(--accent-50); }
-.slot:active { background: var(--accent-100); }
+.slot:nth-child(2n) { border-bottom: 1px solid rgba(255,255,255,0.05); }
+.slot:nth-child(4n) { border-bottom: 1px solid rgba(255,255,255,0.08); }
+.slot:hover  { background: rgba(197,160,89,0.05); }
+.slot:active { background: rgba(197,160,89,0.1);  }
 
 /* ── Appointment Block ────────────────────────────────────────── */
 .apt-block {
-  position: absolute;
-  left: 4px; right: 4px;
-  border-radius: var(--r-sm);
-  padding: 5px 8px;
-  cursor: pointer;
-  overflow: hidden;
-  z-index: 5;
+  position: absolute; left: 4px; right: 4px;
+  border-radius: var(--r-sm); padding: 5px 8px;
+  cursor: pointer; overflow: hidden; z-index: 5;
   border-left: 3px solid;
   transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
 }
-
 .apt-block:hover {
-  filter: brightness(1.04);
-  transform: scaleX(1.015) translateY(-1px);
-  z-index: 6;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  filter: brightness(1.08); transform: scaleX(1.015) translateY(-1px);
+  z-index: 6; box-shadow: 0 6px 20px rgba(0,0,0,0.45);
 }
 
-.apt-client {
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.apt-service {
-  font-size: 11px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  opacity: 0.8;
-  margin-top: 2px;
-}
-
-.apt-time {
-  font-size: 10px;
-  opacity: 0.65;
-  margin-top: 3px;
-}
+.apt-client  { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.apt-service { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8; margin-top: 2px; }
+.apt-time    { font-size: 10px; opacity: 0.65; margin-top: 3px; }
 
 /* ═══════════════════════════════════════════════════════════════
-   Modal
+   Modal — Dark Theme
    ═══════════════════════════════════════════════════════════════ */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15,23,42,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
   z-index: 100;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -343,13 +270,12 @@
 }
 
 .modal {
-  background: var(--surface);
+  background: var(--pos-sidebar);
+  border: 1px solid var(--pos-border);
   border-radius: var(--r-xl);
-  width: 440px;
-  max-width: 100%;
-  max-height: 90vh;
+  width: 440px; max-width: 100%; max-height: 90vh;
   overflow-y: auto;
-  box-shadow: var(--shadow-2xl);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
   animation: modalIn 0.18s ease-out;
 }
 
@@ -359,459 +285,266 @@
 }
 
 .modal-header {
-  display: flex;
-  align-items: center;
+  display: flex; align-items: center;
   padding: 20px 22px 16px;
-  border-bottom: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--pos-border);
   gap: 10px;
 }
 
-.modal-header-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.modal-header-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
-.modal-title {
-  font-size: 16px;
-  font-weight: 700;
-  flex: 1;
-  color: var(--slate-900);
-}
+.modal-title { font-size: 16px; font-weight: 700; flex: 1; color: var(--pos-gold); }
 
 .modal-close {
-  background: var(--slate-100);
-  border: none;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  font-size: 16px;
-  cursor: pointer;
-  color: var(--slate-500);
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s;
-  flex-shrink: 0;
+  background: var(--pos-card); border: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 16px; cursor: pointer; color: var(--pos-muted); line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s; flex-shrink: 0;
 }
-.modal-close:hover { background: var(--slate-200); color: var(--slate-800); }
+.modal-close:hover { background: var(--pos-hover); color: var(--pos-text); }
 
 .modal-body {
   padding: 20px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: flex; flex-direction: column; gap: 14px;
 }
 
-.modal-detail-row {
-  display: flex;
-  gap: 10px;
-  font-size: 14px;
-  align-items: flex-start;
-}
-
+.modal-detail-row { display: flex; gap: 10px; font-size: 14px; align-items: flex-start; }
 .modal-detail-label {
-  width: 90px;
-  font-weight: 600;
-  color: var(--slate-400);
-  flex-shrink: 0;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding-top: 1px;
+  width: 90px; font-weight: 600; color: var(--pos-muted);
+  flex-shrink: 0; font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.04em; padding-top: 1px;
 }
-
-.modal-detail-value {
-  color: var(--slate-800);
-  font-size: 14px;
-  font-weight: 500;
-}
+.modal-detail-value { color: var(--pos-text); font-size: 14px; font-weight: 500; }
 
 .modal-notes {
-  background: var(--slate-50);
-  border-radius: var(--r);
-  padding: 10px 12px;
-  font-size: 13px;
-  color: var(--slate-600);
-  font-style: italic;
-  border-left: 3px solid var(--slate-200);
+  background: var(--pos-card); border-radius: var(--r);
+  padding: 10px 12px; font-size: 13px; color: var(--pos-muted);
+  font-style: italic; border-left: 3px solid rgba(197,160,89,0.4);
 }
 
-/* ── Form groups ──────────────────────────────────────────────── */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+/* ── Form ─────────────────────────────────────────────────────── */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
 
 .form-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--slate-500);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 11.5px; font-weight: 700; color: var(--pos-muted);
+  text-transform: uppercase; letter-spacing: 0.05em;
 }
 
 .form-input, .form-select, .form-textarea {
-  border: 1.5px solid var(--slate-200);
-  border-radius: var(--r);
-  padding: 9px 12px;
-  font-size: 14px;
-  color: var(--slate-900);
-  outline: none;
+  border: 1px solid var(--pos-border);
+  border-radius: var(--r); padding: 9px 12px;
+  font-size: 14px; color: var(--pos-text); outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
-  font-family: inherit;
-  background: var(--slate-50);
+  font-family: inherit; background: var(--pos-card);
 }
-
 .form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-100);
-  background: var(--surface);
+  border-color: var(--pos-gold);
+  box-shadow: 0 0 0 3px rgba(197,160,89,0.15);
 }
-
+.form-input::placeholder { color: var(--pos-muted); opacity: 0.5; }
 .form-textarea { resize: vertical; min-height: 70px; }
+.form-select option { background: var(--pos-card); color: var(--pos-text); }
 
 /* ── Modal Footer ─────────────────────────────────────────────── */
 .modal-footer {
   padding: 14px 22px 20px;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  border-top: 1px solid var(--slate-100);
+  display: flex; gap: 8px; justify-content: flex-end;
+  border-top: 1px solid var(--pos-border);
 }
 
-/* ── Buttons ──────────────────────────────────────────────────── */
+/* ── Buttons (shared across pages) ───────────────────────────── */
 .btn {
-  padding: 8px 18px;
-  border-radius: var(--r);
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  font-family: inherit;
-  letter-spacing: 0.01em;
+  padding: 8px 18px; border-radius: var(--r);
+  font-size: 13.5px; font-weight: 600; cursor: pointer; border: none;
+  transition: background 0.15s, transform 0.1s;
+  font-family: inherit; letter-spacing: 0.01em;
 }
-
 .btn-ghost {
-  background: var(--slate-100);
-  color: var(--slate-600);
-  border: 1.5px solid var(--slate-200);
+  background: var(--pos-card); color: var(--pos-muted);
+  border: 1px solid var(--pos-border);
 }
-.btn-ghost:hover { background: var(--slate-200); color: var(--slate-800); }
+.btn-ghost:hover { background: var(--pos-hover); color: var(--pos-text); }
 
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(99,102,241,0.25);
-}
-.btn-primary:hover { background: var(--accent-600); box-shadow: 0 4px 12px rgba(99,102,241,0.35); }
+.btn-primary { background: var(--pos-gold); color: var(--pos-bg); font-weight: 700; }
+.btn-primary:hover { background: #b08a47; }
 
 .btn-danger {
-  background: var(--red-50);
-  color: var(--red);
-  border: 1.5px solid #fecaca;
-  margin-right: auto;
+  background: rgba(239,68,68,0.1); color: var(--pos-red);
+  border: 1px solid rgba(239,68,68,0.3); margin-right: auto;
 }
-.btn-danger:hover { background: #fecaca; }
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
 
 /* ── Color swatches ───────────────────────────────────────────── */
-.color-swatches {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
+.color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
 .color-swatch {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 3px solid transparent;
-  transition: transform 0.12s, box-shadow 0.12s;
+  width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+  border: 3px solid transparent; transition: transform 0.12s, box-shadow 0.12s;
 }
 .color-swatch:hover { transform: scale(1.15); }
 .color-swatch.selected {
-  border-color: var(--slate-900);
-  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--slate-900);
+  border-color: var(--pos-text);
+  box-shadow: 0 0 0 2px var(--pos-sidebar), 0 0 0 4px var(--pos-text);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    Week View
    ═══════════════════════════════════════════════════════════════ */
 .week-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: var(--bg);
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  display: flex; flex-direction: column; height: 100%;
+  background: var(--pos-bg); font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 .week-header-row {
-  display: flex;
-  background: var(--surface);
-  border-bottom: 2px solid var(--slate-100);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  min-width: max-content;
+  display: flex; background: var(--pos-sidebar);
+  border-bottom: 2px solid var(--pos-border);
+  position: sticky; top: 0; z-index: 20; min-width: max-content;
 }
 
 .week-scroll-area {
-  flex: 1;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  flex: 1; overflow: auto;
+  -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
 }
 
 .week-inner { min-width: max-content; }
 
 .week-gutter {
-  width: 60px;
-  flex-shrink: 0;
-  position: sticky;
-  left: 0;
-  background: var(--surface);
-  z-index: 10;
-  border-right: 1px solid var(--slate-100);
+  width: 60px; flex-shrink: 0; position: sticky; left: 0;
+  background: var(--pos-sidebar); z-index: 10; border-right: 1px solid var(--pos-border);
 }
 
 .week-header-gutter {
-  width: 60px;
-  flex-shrink: 0;
-  position: sticky;
-  left: 0;
-  z-index: 21;
-  background: var(--surface);
-  border-right: 1px solid var(--slate-100);
+  width: 60px; flex-shrink: 0; position: sticky; left: 0;
+  z-index: 21; background: var(--pos-sidebar); border-right: 1px solid var(--pos-border);
 }
 
 .week-day-header {
-  flex: 1;
-  min-width: 100px;
-  text-align: center;
-  padding: 10px 8px;
-  border-right: 1px solid var(--slate-100);
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.12s;
+  flex: 1; min-width: 100px; text-align: center; padding: 10px 8px;
+  border-right: 1px solid var(--pos-border); cursor: pointer;
+  user-select: none; transition: background 0.12s;
 }
 .week-day-header:last-child { border-right: none; }
-.week-day-header:hover { background: var(--slate-50); }
-.week-day-header.today { background: var(--accent-50); }
+.week-day-header:hover { background: var(--pos-hover); }
+.week-day-header.today { background: rgba(197,160,89,0.08); }
 
-.week-day-name {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--slate-400);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.week-day-num {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--slate-700);
-  margin-top: 2px;
-  line-height: 1;
-}
-.week-day-header.today .week-day-num {
-  color: var(--accent);
-}
-.week-day-header.today .week-day-name { color: var(--accent); }
+.week-day-name { font-size: 11px; font-weight: 700; color: var(--pos-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.week-day-num  { font-size: 18px; font-weight: 700; color: var(--pos-text); margin-top: 2px; line-height: 1; }
+.week-day-header.today .week-day-num  { color: var(--pos-gold); }
+.week-day-header.today .week-day-name { color: var(--pos-gold); }
 
 .week-body { display: flex; }
 
 .week-time-label {
-  height: 60px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 4px 8px 0 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--slate-400);
+  height: 60px; display: flex; align-items: flex-start; justify-content: flex-end;
+  padding: 4px 8px 0 0; font-size: 11px; font-weight: 600; color: var(--pos-muted);
 }
 
 .week-col {
-  flex: 1;
-  min-width: 100px;
-  position: relative;
-  border-right: 1px solid var(--slate-100);
+  flex: 1; min-width: 100px; position: relative; border-right: 1px solid var(--pos-border);
 }
 .week-col:last-child { border-right: none; }
 
 .week-slot {
-  height: 60px;
-  border-bottom: 1px solid var(--slate-100);
-  cursor: pointer;
-  transition: background 0.1s;
+  height: 60px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer; transition: background 0.1s;
 }
 .week-slot:nth-child(odd) { border-bottom-style: dashed; }
-.week-slot:hover { background: var(--accent-50); }
+.week-slot:hover { background: rgba(197,160,89,0.05); }
 
 .week-apt {
-  position: absolute;
-  left: 3px; right: 3px;
-  border-radius: var(--r-sm);
-  padding: 4px 7px;
-  cursor: pointer;
-  overflow: hidden;
-  z-index: 5;
-  border-left: 3px solid;
-  font-size: 11px;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: absolute; left: 3px; right: 3px; border-radius: var(--r-sm);
+  padding: 4px 7px; cursor: pointer; overflow: hidden; z-index: 5;
+  border-left: 3px solid; font-size: 11px; font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
   transition: filter 0.15s, box-shadow 0.15s;
 }
-.week-apt:hover { filter: brightness(1.05); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+.week-apt:hover { filter: brightness(1.08); box-shadow: 0 4px 14px rgba(0,0,0,0.45); }
 
 .week-current-line {
-  position: absolute;
-  left: 0; right: 0;
-  height: 2px;
-  background: var(--red);
-  z-index: 15;
-  pointer-events: none;
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: var(--pos-red); z-index: 15; pointer-events: none;
 }
 .week-current-dot {
-  position: absolute;
-  left: -4px; top: -4px;
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: var(--red);
+  position: absolute; left: -4px; top: -4px;
+  width: 9px; height: 9px; border-radius: 50%; background: var(--pos-red);
 }
 
 /* ═══════════════════════════════════════════════════════════════
    Month View
    ═══════════════════════════════════════════════════════════════ */
 .month-wrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: var(--bg);
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  display: flex; flex-direction: column; height: 100%;
+  background: var(--pos-bg); font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 .month-day-names {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  background: var(--surface);
-  border-bottom: 1px solid var(--slate-100);
-  flex-shrink: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  background: var(--pos-sidebar); border-bottom: 1px solid var(--pos-border); flex-shrink: 0;
 }
 
 .month-day-name-cell {
-  padding: 10px 0;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--slate-400);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  padding: 10px 0; text-align: center;
+  font-size: 11px; font-weight: 700; color: var(--pos-muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
 }
 
 .month-grid {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr);
-  background: var(--slate-200);
-  gap: 1px;
-  overflow: hidden;
+  display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(6, 1fr);
+  background: var(--pos-border); gap: 1px; overflow: hidden;
 }
 
 .month-cell {
-  background: var(--surface);
-  padding: 6px 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: background 0.1s;
-  min-height: 80px;
+  background: var(--pos-card); padding: 6px 8px;
+  overflow: hidden; cursor: pointer; transition: background 0.1s; min-height: 80px;
 }
-.month-cell:hover { background: var(--slate-50); }
-.month-cell.other-month { background: var(--slate-50); }
-.month-cell.today { background: var(--accent-50); }
+.month-cell:hover { background: var(--pos-hover); }
+.month-cell.other-month { background: rgba(12, 17, 26, 0.6); }
+.month-cell.today { background: rgba(197,160,89,0.08); }
 
 .month-cell-num {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--slate-700);
-  margin-bottom: 4px;
-  width: 26px; height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  font-size: 13px; font-weight: 600; color: var(--pos-muted);
+  margin-bottom: 4px; width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center; border-radius: 50%;
 }
-.month-cell.today .month-cell-num {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 700;
-}
-.month-cell.other-month .month-cell-num { color: var(--slate-300); }
+.month-cell.today .month-cell-num { background: var(--pos-gold); color: var(--pos-bg); font-weight: 700; }
+.month-cell.other-month .month-cell-num { color: rgba(255,255,255,0.12); }
 
 .month-apt-pill {
-  font-size: 10.5px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 4px;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  transition: opacity 0.1s;
+  font-size: 10.5px; font-weight: 600; padding: 2px 7px;
+  border-radius: 4px; margin-bottom: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer; transition: opacity 0.1s;
 }
 .month-apt-pill:hover { opacity: 0.85; }
 
-.month-more {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--slate-400);
-  padding: 1px 4px;
-  margin-top: 1px;
-}
+.month-more { font-size: 10px; font-weight: 600; color: var(--pos-muted); padding: 1px 4px; margin-top: 1px; }
 
 /* ═══════════════════════════════════════════════════════════════
    Mobile
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .cal-toolbar {
-    height: auto;
-    padding: 10px 12px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
+  .cal-toolbar { height: auto; padding: 10px 12px; flex-direction: column; align-items: flex-start; gap: 8px; }
   .cal-toolbar-date { font-size: 13px; }
   .cal-toolbar-controls { width: 100%; justify-content: space-between; }
-  .cal-toolbar-nav { gap: 4px; }
   .nav-btn { padding: 5px 10px; font-size: 12px; }
   .view-btn { padding: 5px 10px; font-size: 12px; }
-
   .modal-overlay { align-items: flex-end; padding: 0; }
-  .modal {
-    width: 100%; max-width: 100%;
-    border-radius: var(--r-xl) var(--r-xl) 0 0;
-    max-height: 92vh;
-  }
+  .modal { width: 100%; max-width: 100%; border-radius: var(--r-xl) var(--r-xl) 0 0; max-height: 92vh; }
   @keyframes modalIn {
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-
   .tech-header-cell { width: 110px; padding: 6px 8px; gap: 6px; }
   .tech-col { width: 110px; }
   .tech-name { font-size: 11px; }
   .tech-apt-count { display: none; }
   .tech-avatar { width: 26px; height: 26px; font-size: 9px; }
-
   .cal-header-gutter { width: 52px; }
   .time-gutter { width: 52px; }
   .time-label-hour { font-size: 9px; }
   .time-label-half { font-size: 8px; }
   .time-label-quarter { font-size: 7px; }
-
   .apt-client { font-size: 10px; }
   .apt-service { font-size: 9px; }
   .apt-time { display: none; }

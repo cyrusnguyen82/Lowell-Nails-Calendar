@@ -4,7 +4,6 @@ import LoginScreen from './components/Auth/LoginScreen'
 import Sidebar from './components/Layout/Sidebar'
 import CalendarPage from './components/Calendar/CalendarPage'
 import ClientsPage from './components/Clients/ClientsPage'
-import GiftCardsPage from './components/GiftCards/GiftCardsPage'
 import AdminPage from './components/Admin/AdminPage'
 import POSPage from './components/POS/POSPage'
 import './components/Layout/Layout.css'
@@ -12,7 +11,6 @@ import './components/Layout/Layout.css'
 const ACCESS = {
   calendar:  ['admin','receptionist','technician'],
   clients:   ['admin','receptionist'],
-  giftcards: ['admin','receptionist'],
   pos:       ['admin','receptionist'],
   admin:     ['admin','receptionist'],
 }
@@ -136,7 +134,6 @@ function Shell() {
           />
         )}
         {safePage === 'clients'   && <ClientsPage />}
-        {safePage === 'giftcards' && <GiftCardsPage />}
         {safePage === 'admin'     && <AdminPage />}
       </main>
     </div>

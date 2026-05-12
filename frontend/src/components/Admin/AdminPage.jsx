@@ -2,8 +2,58 @@ import { useState, useRef, useEffect } from 'react'
 import { useApp } from '../../context/AppContext'
 import * as api from '../../api'
 import GiftCardsPage from '../GiftCards/GiftCardsPage'
+import { Lock } from 'lucide-react'
 import './Admin.css'
 import '../Calendar/Calendar.css'
+
+/* ── PIN Gate ─────────────────────────────────────────────── */
+const ADMIN_PIN = '1234'
+
+function PinGate({ onUnlock }) {
+  const [digits, setDigits]   = useState([])
+  const [shaking, setShaking] = useState(false)
+  const [error, setError]     = useState(false)
+
+  function press(d) {
+    if (digits.length >= 4 || shaking) return
+    const next = [...digits, d]
+    setDigits(next)
+    if (next.length === 4) {
+      if (next.join('') === ADMIN_PIN) {
+        onUnlock()
+      } else {
+        setShaking(true); setError(true)
+        setTimeout(() => { setDigits([]); setShaking(false); setError(false) }, 700)
+      }
+    }
+  }
+
+  function back() { if (!shaking) setDigits(d => d.slice(0, -1)) }
+
+  return (
+    <div className="admin-pin-gate">
+      <div className="admin-pin-card">
+        <div className="admin-pin-lock"><Lock size={22} /></div>
+        <h2 className="admin-pin-title">Admin Access</h2>
+        <p className="admin-pin-subtitle">Enter the admin PIN to continue</p>
+        <div className={`admin-pin-dots${shaking ? ' shake' : ''}`}>
+          {[0,1,2,3].map(i => (
+            <div key={i} className={`admin-pin-dot${digits[i] !== undefined ? ' filled' : ''}`} />
+          ))}
+        </div>
+        {error && <p className="admin-pin-error">Incorrect PIN</p>}
+        <div className="admin-pin-pad">
+          {[1,2,3,4,5,6,7,8,9].map(n => (
+            <button key={n} className="admin-pin-key" onClick={() => press(String(n))}>{n}</button>
+          ))}
+          <button className="admin-pin-key empty" disabled />
+          <button className="admin-pin-key" onClick={() => press('0')}>0</button>
+          <button className="admin-pin-key backspace" onClick={back}>⌫</button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 /* ── Edit / reset-password modal for an existing user ─────── */
 function EditUserModal({ targetUser, technicians, onSave, onClose }) {
@@ -602,29 +652,42 @@ export default function AdminPage() {
   const { user, users, addUser, updateUser, deleteUser, technicians, addTechnician, updateTechnician, deleteTechnician } = useApp()
 
   const isAdmin = user.role === 'admin'
-  const [tab, setTab]             = useState(isAdmin ? 'technicians' : 'giftcards')
+
+  const [pinUnlocked, setPinUnlocked] = useState(() => {
+    try { return isAdmin || sessionStorage.getItem('lowell_admin_unlocked') === '1' }
+    catch { return isAdmin }
+  })
+
+  function handleUnlock() {
+    setPinUnlocked(true)
+    try { sessionStorage.setItem('lowell_admin_unlocked', '1') } catch {}
+  }
+
+  const [tab, setTab]             = useState('technicians')
   const [techModal, setTechModal] = useState(null)
   const [addingStaff, setAddingStaff] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
 
   if (user.role !== 'admin' && user.role !== 'receptionist') {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', flexDirection:'column', gap:12, color:'#94a3b8' }}>
-        <span style={{ fontSize:48 }}>🔒</span>
-        <p style={{ fontSize:16, fontWeight:600 }}>Access required</p>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100%', flexDirection:'column', gap:12, color:'var(--pos-muted)' }}>
+        <Lock size={40} color="var(--pos-muted)" />
+        <p style={{ fontSize:16, fontWeight:600 }}>Access denied</p>
       </div>
     )
   }
 
+  if (!pinUnlocked) return <PinGate onUnlock={handleUnlock} />
+
   const ALL_TABS = [
-    ['technicians',   'Technicians',       true ],
-    ['availability',  'Availability',      true ],
-    ['staff',         'Staff Accounts',    true ],
-    ['company',       'Company Settings',  true ],
-    ['transactions',  'Transactions',      true ],
-    ['giftcards',     'Gift Cards',        false],  // false = also receptionist
+    ['technicians',  'Technicians'    ],
+    ['availability', 'Availability'   ],
+    ['staff',        'Staff Accounts' ],
+    ['company',      'Company'        ],
+    ['transactions', 'Transactions'   ],
+    ['giftcards',    'Gift Cards'     ],
   ]
-  const TABS = ALL_TABS.filter(([,, adminOnly]) => isAdmin || !adminOnly)
+  const TABS = ALL_TABS
 
   return (
     <div className="admin-page">

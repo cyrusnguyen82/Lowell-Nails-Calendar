@@ -369,22 +369,23 @@
 
 .pos-grid {
   flex: 1;
-  padding: 1.5rem;
+  padding: 1rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 0.625rem;
   align-content: start;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .pos-card {
   background: var(--pos-card);
   border: 1px solid var(--pos-border);
-  padding: 1.25rem;
-  border-radius: 12px;
+  padding: 0.75rem;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.4rem;
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
@@ -393,19 +394,19 @@
 .pos-card:hover {
   background: var(--pos-hover);
   border-color: var(--pos-gold);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25);
 }
 
 .pos-card-name {
-  font-size: 0.9rem;
+  font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.3;
 }
 
 .pos-card-price {
   margin-top: auto;
-  font-size: 0.85rem;
+  font-size: 0.68rem;
   font-weight: 800;
   color: var(--pos-gold);
 }
@@ -627,4 +628,243 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Check-In Screen
+   ═══════════════════════════════════════════════════════════════ */
+
+.pos-checkin {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--pos-bg);
+  color: var(--pos-text);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+.pos-checkin-header {
+  background: var(--pos-sidebar);
+  padding: 0 1.5rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--pos-border);
+  flex-shrink: 0;
+}
+
+.pos-checkin-date {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--pos-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pos-clock-label-btn {
+  background: var(--pos-card);
+  border: 1px solid var(--pos-border);
+  color: var(--pos-gold);
+  padding: 0.5rem 0.875rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.pos-clock-label-btn:hover {
+  background: var(--pos-hover);
+  border-color: var(--pos-gold);
+}
+
+.pos-checkin-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+.pos-waiting-panel,
+.pos-techs-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pos-waiting-panel {
+  border-right: 1px solid var(--pos-border);
+}
+
+.pos-panel-header {
+  padding: 0.875rem 1.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--pos-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.15);
+  border-bottom: 1px solid var(--pos-border);
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pos-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.pos-waiting-scroll,
+.pos-techs-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.pos-walkin-btn {
+  width: 100%;
+  background: rgba(197, 160, 89, 0.08);
+  border: 1.5px dashed rgba(197, 160, 89, 0.35);
+  color: var(--pos-gold);
+  padding: 0.875rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  margin-bottom: 1rem;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+.pos-walkin-btn:hover {
+  background: rgba(197, 160, 89, 0.16);
+  border-color: var(--pos-gold);
+}
+
+.pos-waiting-card {
+  background: var(--pos-card);
+  border: 1px solid var(--pos-border);
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  margin-bottom: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.pos-waiting-card:hover {
+  background: var(--pos-hover);
+  border-color: var(--pos-gold);
+  transform: translateY(-1px);
+}
+
+.pos-waiting-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.pos-waiting-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--pos-text);
+}
+
+.pos-waiting-time {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--pos-gold);
+}
+
+.pos-waiting-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pos-waiting-service {
+  font-size: 0.75rem;
+  color: var(--pos-muted);
+}
+
+.pos-waiting-tech {
+  font-size: 0.68rem;
+  color: var(--pos-teal);
+  font-weight: 500;
+}
+
+.pos-tech-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1rem;
+}
+
+.pos-tech-card {
+  background: var(--pos-card);
+  border: 1px solid var(--pos-border);
+  border-radius: 14px;
+  padding: 1.5rem 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.pos-tech-card:hover {
+  background: var(--pos-hover);
+  border-color: var(--pos-teal);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.pos-tech-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+.pos-tech-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--pos-text);
+}
+
+.pos-tech-status {
+  font-size: 0.62rem;
+  color: var(--pos-teal);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pos-checkin-footer {
+  background: var(--pos-sidebar);
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--pos-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
 }

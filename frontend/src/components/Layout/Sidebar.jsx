@@ -49,7 +49,6 @@ const NAV = [
   { id: 'calendar',  label: 'Calendar',     Icon: CalendarIcon, roles: ['admin','receptionist','technician'] },
   { id: 'clients',   label: 'Clients',      Icon: ClientsIcon,  roles: ['admin','receptionist'] },
   { id: 'pos',       label: 'Point of Sale',Icon: POSIcon,      roles: ['admin','receptionist'] },
-  { id: 'giftcards', label: 'Gift Cards',   Icon: GiftIcon,     roles: ['admin','receptionist'] },
   { id: 'admin',     label: 'Settings',     Icon: AdminIcon,    roles: ['admin','receptionist'] },
 ]
 
