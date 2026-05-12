@@ -633,8 +633,9 @@
 @media (max-width: 768px) {
   .cal-toolbar { height: auto; padding: 10px 12px; flex-direction: column; align-items: flex-start; gap: 8px; }
   .cal-brand { position: static; transform: none; order: -1; pointer-events: auto; }
-  .cal-toolbar-left { flex-wrap: wrap; }
+  .cal-toolbar-left { flex: none; width: 100%; flex-wrap: wrap; gap: 8px; }
   .cal-toolbar-date { font-size: 13px; }
+  .checkin-btn { font-size: 12px; padding: 6px 12px; }
   .cal-toolbar-controls { width: 100%; justify-content: space-between; }
   .nav-btn { padding: 5px 10px; font-size: 12px; }
   .view-btn { padding: 5px 10px; font-size: 12px; }

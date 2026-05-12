@@ -8,6 +8,8 @@
   flex-direction: row;
   height: 100vh;
   height: 100dvh;
+  /* Android Chrome polyfill: --vh is set by main.jsx and tracks innerHeight */
+  height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
   background: var(--bg);
 }

@@ -72,6 +72,9 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent Android Chrome from inflating font sizes on narrow screens */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   color: var(--slate-900);
   background: var(--bg);
 }
