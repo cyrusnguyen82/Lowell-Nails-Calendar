@@ -23,7 +23,8 @@
       "Bash(Out-String)",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('lucide-react' in d.get\\('dependencies',{}\\)\\)\")",
       "Bash(Get-Content \"C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Cyrus-Desktop-Personal-2026-Calendar\\\\bf7102ec-2d1f-477f-92f3-d9490e0ce1e8\\\\tasks\\\\bslym0wsm.output\")",
-      "Bash(Select-Object -Last 20)"
+      "Bash(Select-Object -Last 20)",
+      "Bash(npx vite *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Cyrus\\Desktop\\Personal\\2026\\Calendar"
