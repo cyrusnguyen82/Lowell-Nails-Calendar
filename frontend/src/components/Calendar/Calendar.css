@@ -25,12 +25,19 @@
   position: relative;
 }
 
+.cal-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
 .cal-toolbar-date {
   font-size: 15px;
   font-weight: 700;
   color: var(--pos-text);
   letter-spacing: -0.2px;
-  flex: 1;
+  white-space: nowrap;
 }
 
 .cal-toolbar-controls {
@@ -626,6 +633,7 @@
 @media (max-width: 768px) {
   .cal-toolbar { height: auto; padding: 10px 12px; flex-direction: column; align-items: flex-start; gap: 8px; }
   .cal-brand { position: static; transform: none; order: -1; pointer-events: auto; }
+  .cal-toolbar-left { flex-wrap: wrap; }
   .cal-toolbar-date { font-size: 13px; }
   .cal-toolbar-controls { width: 100%; justify-content: space-between; }
   .nav-btn { padding: 5px 10px; font-size: 12px; }

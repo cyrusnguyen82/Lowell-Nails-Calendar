@@ -28,7 +28,7 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
   const isToday = currentDate.isSame(dayjs(), 'day')
 
   function navLabel() {
-    if (view === 'day')   return currentDate.format('dddd, MMMM D, YYYY')
+    if (view === 'day')   return currentDate.format('ddd, MMM D, YYYY')
     if (view === 'month') return currentDate.format('MMMM YYYY')
     const start = currentDate.startOf('week')
     const end   = currentDate.endOf('week')
@@ -67,10 +67,15 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
       {/* Toolbar */}
       <div className="cal-toolbar">
 
-        {/* Date – left */}
-        <span className="cal-toolbar-date">
-          {isToday && view === 'day' ? 'Today · ' : ''}{navLabel()}
-        </span>
+        {/* Date + Check In – left group */}
+        <div className="cal-toolbar-left">
+          <span className="cal-toolbar-date">
+            {isToday && view === 'day' ? 'Today · ' : ''}{navLabel()}
+          </span>
+          <button className="checkin-btn" onClick={() => setShowCheckIn(true)}>
+            + Check In
+          </button>
+        </div>
 
         {/* Brand mark – centered absolutely */}
         <div className="cal-brand">
@@ -83,13 +88,8 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
           <span className="cal-brand-name">{name}</span>
         </div>
 
-        {/* Controls – right */}
+        {/* Nav + Views – right */}
         <div className="cal-toolbar-controls">
-          {/* Check-In button */}
-          <button className="checkin-btn" onClick={() => setShowCheckIn(true)}>
-            + Check In
-          </button>
-
           <div className="cal-toolbar-nav">
             <button className="nav-btn" onClick={() => nav(-1, navUnit())}>‹ Prev</button>
             <button className="nav-btn today" onClick={goToday}>Today</button>
