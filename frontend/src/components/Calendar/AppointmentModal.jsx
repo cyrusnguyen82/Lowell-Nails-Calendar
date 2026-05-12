@@ -92,7 +92,7 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
 }
 
 /* ── View existing appointment ─────────────────────────────── */
-function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onReschedule }) {
+function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onReschedule, onCashOut }) {
   const [rescheduling, setRescheduling] = useState(false)
   const [reschedDate, setReschedDate]   = useState(appointment.date)
   const [reschedTime, setReschedTime]   = useState(appointment.startTime)
@@ -107,8 +107,13 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onRe
   return (
     <>
       <div className="modal-header">
-        <div className="modal-header-dot" style={{ background: tech?.color }} />
+        <div className="modal-header-dot" style={{ background: appointment.status === 'checkedin' ? '#10b981' : tech?.color }} />
         <div className="modal-title">{appointment.clientName}</div>
+        {appointment.status === 'checkedin' && (
+          <span style={{ fontSize:10, fontWeight:800, letterSpacing:'0.06em', padding:'2px 8px', borderRadius:12, background:'rgba(16,185,129,0.15)', color:'#10b981', marginLeft:'auto', marginRight:8, whiteSpace:'nowrap' }}>
+            ● CHECKED IN
+          </span>
+        )}
         <button className="modal-close" onClick={onClose}>×</button>
       </div>
       <div className="modal-body">
@@ -180,6 +185,15 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onRe
           </button>
         )}
         {canEdit && <button className="btn btn-ghost" onClick={onEdit}>Edit</button>}
+        {appointment.status === 'checkedin' && onCashOut && (
+          <button
+            className="btn btn-primary"
+            style={{ background:'#10b981', marginLeft:'auto' }}
+            onClick={() => onCashOut(appointment)}
+          >
+            Cash Out →
+          </button>
+        )}
         <button className="btn btn-ghost" onClick={onClose}>Close</button>
       </div>
     </>
@@ -187,7 +201,7 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onRe
 }
 
 /* ── Wrapper ──────────────────────────────────────────────── */
-export default function AppointmentModal({ appointment, newData, technicians, onClose, onSave, onDelete }) {
+export default function AppointmentModal({ appointment, newData, technicians, onClose, onSave, onDelete, onCashOut }) {
   const { user, updateAppointment } = useApp()
   const [editing, setEditing] = useState(false)
   const canEdit = user.role === 'admin' || user.role === 'receptionist'
@@ -233,6 +247,7 @@ export default function AppointmentModal({ appointment, newData, technicians, on
             onEdit={() => setEditing(true)}
             onDelete={onDelete}
             onReschedule={handleReschedule}
+            onCashOut={onCashOut}
           />
         )}
 

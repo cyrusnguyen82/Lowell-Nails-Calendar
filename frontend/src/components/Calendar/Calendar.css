@@ -252,9 +252,105 @@
   z-index: 6; box-shadow: 0 6px 20px rgba(0,0,0,0.45);
 }
 
-.apt-client  { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.apt-service { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8; margin-top: 2px; }
-.apt-time    { font-size: 10px; opacity: 0.65; margin-top: 3px; }
+.apt-client  { font-size: 12px; font-weight: 700; color: var(--pos-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.apt-service { font-size: 11px; color: var(--pos-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.75; margin-top: 2px; }
+.apt-time    { font-size: 10px; color: var(--pos-text); opacity: 0.55; margin-top: 3px; }
+
+/* ── Checked-in appointment block ────────────────────────────── */
+.apt-block.checkedin {
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.4), 0 2px 10px rgba(16,185,129,0.18);
+}
+.apt-checkedin-badge {
+  display: flex; align-items: center; gap: 4px; margin-bottom: 2px;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.08em; color: #10b981; text-transform: uppercase;
+}
+.apt-checkedin-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #10b981; flex-shrink: 0;
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.45; transform: scale(0.65); }
+}
+
+/* ── Toolbar brand ────────────────────────────────────────────── */
+.cal-brand {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  padding-right: 16px; margin-right: 4px;
+  border-right: 1px solid var(--pos-border);
+}
+.cal-brand-logo {
+  width: 30px; height: 30px; border-radius: 8px; object-fit: contain;
+}
+.cal-brand-name {
+  font-size: 10.5px; font-weight: 700; color: var(--pos-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── Check-In button ──────────────────────────────────────────── */
+.checkin-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px;
+  background: var(--pos-gold); color: var(--pos-bg);
+  border: none; border-radius: var(--r);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; white-space: nowrap;
+  transition: filter 0.15s;
+}
+.checkin-btn:hover { filter: brightness(1.1); }
+
+/* ── Check-in modal ───────────────────────────────────────────── */
+.checkin-modal { max-width: 500px; }
+
+.checkin-client-list {
+  margin-top: 6px;
+  border: 1px solid var(--pos-border);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--pos-card);
+}
+.checkin-client-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 10px 14px;
+  border: none; background: none; cursor: pointer; text-align: left;
+  border-bottom: 1px solid var(--pos-border);
+  transition: background 0.1s; font-family: inherit;
+}
+.checkin-client-row:last-child { border-bottom: none; }
+.checkin-client-row:hover { background: var(--pos-hover); }
+.checkin-client-name {
+  font-size: 13.5px; font-weight: 600; color: var(--pos-text); flex: 1;
+}
+.checkin-client-phone { font-size: 12px; color: var(--pos-muted); }
+.checkin-new-row { color: var(--pos-gold); font-size: 13px; font-weight: 600; }
+
+.checkin-selected-client {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.25);
+  border-radius: var(--r);
+}
+.checkin-change-btn {
+  margin-left: auto; flex-shrink: 0;
+  background: none; border: 1px solid var(--pos-border);
+  color: var(--pos-muted); font-size: 11.5px; font-weight: 600;
+  padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: inherit;
+  transition: color 0.15s, border-color 0.15s;
+}
+.checkin-change-btn:hover { color: var(--pos-text); border-color: rgba(255,255,255,0.2); }
+
+.checkin-tech-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.checkin-tech-pill {
+  padding: 6px 15px; border-radius: 20px;
+  border: 1.5px solid var(--pos-border);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  background: none; color: var(--pos-muted); font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.checkin-tech-pill:hover { border-color: rgba(255,255,255,0.2); color: var(--pos-text); }
+.checkin-tech-pill.active { font-weight: 700; }
 
 /* ═══════════════════════════════════════════════════════════════
    Modal — Dark Theme

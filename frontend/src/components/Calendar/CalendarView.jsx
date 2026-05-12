@@ -23,7 +23,7 @@ function getTimeOffset() {
   return ((h - START_HOUR) * 60 + m) / SLOT_MINS * SLOT_HEIGHT
 }
 
-export default function CalendarView({ currentDate }) {
+export default function CalendarView({ currentDate, onCashOut }) {
   const { user, technicians, appointments, addAppointment, deleteAppointment } = useApp()
   const [selectedApt, setSelectedApt] = useState(null)
   const [newAptData, setNewAptData]   = useState(null)
@@ -134,6 +134,7 @@ export default function CalendarView({ currentDate }) {
           onClose={() => { setSelectedApt(null); setNewAptData(null) }}
           onSave={handleSave}
           onDelete={handleDelete}
+          onCashOut={onCashOut ? apt => { setSelectedApt(null); onCashOut(apt) } : undefined}
         />
       )}
     </div>

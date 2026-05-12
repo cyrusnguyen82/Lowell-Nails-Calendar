@@ -155,6 +155,7 @@ function Shell() {
           <CalendarPage
             initDateStr={calDateStr} initView={calView}
             onDateChange={setCalDateStr} onViewChange={setCalView}
+            onNavigate={navigate}
           />
         )}
         {safePage === 'clients'   && <ClientsPage />}

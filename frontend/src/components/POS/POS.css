@@ -1,20 +1,20 @@
-/* ── Theme: Carbon (default) ─── anthracite + emerald ────────── */
+/* ── Theme: Carbon (default) ─── deep slate + emerald ────────── */
 :root,
 [data-theme="carbon"] {
-  --pos-bg: #0f1117;
-  --pos-sidebar: #151a26;
-  --pos-card: #1d2334;
-  --pos-hover: #252d40;
+  --pos-bg: #131920;
+  --pos-sidebar: #1a2232;
+  --pos-card: #222d40;
+  --pos-hover: #2c3852;
   --pos-gold: #10b981;
   --pos-teal: #06b6d4;
   --pos-red: #f43f5e;
-  --pos-text: #f0f4ff;
-  --pos-muted: #6b7a99;
-  --pos-border: rgba(255,255,255,0.07);
+  --pos-text: #e8f0ff;
+  --pos-muted: #7a8baa;
+  --pos-border: rgba(255,255,255,0.09);
   --r: 8px; --r-sm: 6px; --r-lg: 12px; --r-xl: 16px;
   /* sidebar */
-  --sidebar-bg: #0c1020;
-  --bg: #0f1117;
+  --sidebar-bg: #0e1420;
+  --bg: #131920;
   --sidebar-active-bg: rgba(16,185,129,0.15);
   --sidebar-active-color: #34d399;
   --sidebar-hover-bg: rgba(255,255,255,0.06);
