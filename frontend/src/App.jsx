@@ -85,12 +85,21 @@ function ErrorScreen() {
   )
 }
 
+const THEME_KEY = 'lowell_theme'
+
 /* ── Shell ────────────────────────────────────────────────────── */
 function Shell() {
   const { user, loading, apiError } = useApp()
   const [page, setPage] = useState(() => {
     try { return sessionStorage.getItem(PAGE_KEY) || 'calendar' } catch { return 'calendar' }
   })
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(THEME_KEY) || 'midnight'
+      document.documentElement.setAttribute('data-theme', saved)
+    } catch {}
+  }, [])
 
   const [calDateStr, setCalDateStr] = useState(() => {
     try { return localStorage.getItem(CAL_DATE_KEY) || '' } catch { return '' }

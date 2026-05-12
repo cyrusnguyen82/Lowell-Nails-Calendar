@@ -219,8 +219,8 @@ function TechCard({ tech, onEdit, onDelete }) {
       <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:14 }}>
         {rows.map(([label, val]) => (
           <div key={label} style={{ display:'flex', gap:8, fontSize:12 }}>
-            <span style={{ color:'#94a3b8', width:72, flexShrink:0, fontWeight:600 }}>{label}</span>
-            <span style={{ color:'#334155', wordBreak:'break-word' }}>{val}</span>
+            <span style={{ color:'var(--pos-muted)', width:72, flexShrink:0, fontWeight:600 }}>{label}</span>
+            <span style={{ color:'var(--pos-text)', wordBreak:'break-word' }}>{val}</span>
           </div>
         ))}
       </div>
@@ -285,6 +285,13 @@ function NewStaffForm({ technicians, onSave, onCancel }) {
 }
 
 /* ── Company Settings tab ─────────────────────────────────── */
+const THEMES = [
+  { id: 'midnight', label: 'Midnight', desc: 'Deep navy + gold (default)',  dot: '#c5a059', bg: '#0a0c14' },
+  { id: 'slate',    label: 'Slate',    desc: 'Medium-dark cool blue-gray', dot: '#7b9cce', bg: '#1a1f2e' },
+  { id: 'dusk',     label: 'Dusk',     desc: 'Warm charcoal + rose gold',  dot: '#c9956c', bg: '#1c1714' },
+  { id: 'cloud',    label: 'Cloud',    desc: 'Soft light — clean & airy',  dot: '#7c6f42', bg: '#f0f2f5' },
+]
+
 function CompanySettings() {
   const { companyInfo, updateCompanyInfo } = useApp()
   const [form, setForm] = useState({ ...companyInfo })
@@ -292,6 +299,15 @@ function CompanySettings() {
   const [logoErr, setLogoErr] = useState(false)
   const fileRef = useRef(null)
   const set = (k,v) => { setForm(f => ({ ...f, [k]: v })); setSaved(false) }
+
+  const [activeTheme, setActiveTheme] = useState(() => {
+    try { return localStorage.getItem('lowell_theme') || 'midnight' } catch { return 'midnight' }
+  })
+  function applyTheme(id) {
+    setActiveTheme(id)
+    try { localStorage.setItem('lowell_theme', id) } catch {}
+    document.documentElement.setAttribute('data-theme', id)
+  }
 
   function handleLogoUpload(e) {
     const file = e.target.files?.[0]
@@ -367,7 +383,34 @@ function CompanySettings() {
 
       <div style={{ marginTop:20, display:'flex', alignItems:'center', gap:12 }}>
         <button className="btn btn-primary" onClick={handleSave}>Save Company Info</button>
-        {saved && <span style={{ fontSize:13, color:'#10b981', fontWeight:600 }}>✓ Saved successfully</span>}
+        {saved && <span style={{ fontSize:13, color:'var(--pos-teal)', fontWeight:600 }}>✓ Saved successfully</span>}
+      </div>
+
+      {/* ── Theme Picker ── */}
+      <div className="admin-card" style={{ marginTop:24 }}>
+        <div style={{ fontWeight:700, fontSize:14, marginBottom:4, color:'var(--pos-text)' }}>Color Theme</div>
+        <div style={{ fontSize:12, color:'var(--pos-muted)', marginBottom:16 }}>Choose the look and feel for the entire app.</div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+          {THEMES.map(t => (
+            <button
+              key={t.id}
+              onClick={() => applyTheme(t.id)}
+              style={{
+                display:'flex', flexDirection:'column', gap:8,
+                padding:'14px', borderRadius:10, cursor:'pointer', textAlign:'left',
+                border: activeTheme === t.id ? `2px solid ${t.dot}` : '2px solid var(--pos-border)',
+                background: activeTheme === t.id ? t.dot + '18' : 'var(--pos-sidebar)',
+                transition:'border-color 0.15s, background 0.15s',
+              }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <div style={{ width:32, height:20, borderRadius:5, background:t.bg, border:'1px solid rgba(255,255,255,0.1)', flexShrink:0 }} />
+                <div style={{ width:10, height:10, borderRadius:'50%', background:t.dot, flexShrink:0 }} />
+              </div>
+              <div style={{ fontSize:13, fontWeight:700, color:'var(--pos-text)' }}>{t.label}</div>
+              <div style={{ fontSize:11, color:'var(--pos-muted)', lineHeight:1.4 }}>{t.desc}</div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -447,10 +490,10 @@ function AvailabilityPanel({ technicians, updateTechnician }) {
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '8px 14px', borderRadius: 8, cursor: 'pointer',
-              border: selectedTechId === t.id ? `2px solid ${t.color}` : '2px solid #e2e8f0',
-              background: selectedTechId === t.id ? t.color + '18' : '#fff',
+              border: selectedTechId === t.id ? `2px solid ${t.color}` : '2px solid var(--pos-border)',
+              background: selectedTechId === t.id ? t.color + '22' : 'var(--pos-card)',
               fontWeight: selectedTechId === t.id ? 700 : 500,
-              fontSize: 13, color: '#1e293b',
+              fontSize: 13, color: 'var(--pos-text)',
             }}
           >
             <div className="tech-avatar" style={{ background: t.color, width: 28, height: 28, fontSize: 10 }}>{t.initials}</div>
@@ -479,7 +522,7 @@ function AvailabilityPanel({ technicians, updateTechnician }) {
                       onChange={e => setDay(day, 'working', e.target.checked)}
                       style={{ width: 16, height: 16, cursor: 'pointer' }}
                     />
-                    <span style={{ width: 32, fontSize: 13, fontWeight: 600, color: dayData.working ? '#1e293b' : '#94a3b8' }}>
+                    <span style={{ width: 32, fontSize: 13, fontWeight: 600, color: dayData.working ? 'var(--pos-text)' : 'var(--pos-muted)' }}>
                       {DAY_LABELS[day]}
                     </span>
                   </label>
@@ -583,26 +626,26 @@ function TransactionsPanel() {
           <div key={txn.id} className="admin-card" style={{ padding:0, overflow:'hidden' }}>
             {/* Header row */}
             <div
-              style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 16px', cursor:'pointer', background:'#fff' }}
+              style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 16px', cursor:'pointer', background:'var(--pos-card)' }}
               onClick={() => setExpanded(expanded === txn.id ? null : txn.id)}>
-              <span style={{ fontSize:12, fontWeight:700, color:'#64748b', whiteSpace:'nowrap' }}>#{txn.id}</span>
-              <span style={{ flex:1, fontWeight:700, fontSize:14 }}>{txn.clientName || 'Walk-in'}</span>
-              <span style={{ fontSize:12, color:'#94a3b8' }}>{txn.date}</span>
-              <span style={{ fontSize:11, fontWeight:700, background:'#f0fdf9', color:'#3ab592', padding:'2px 8px', borderRadius:8 }}>
+              <span style={{ fontSize:12, fontWeight:700, color:'var(--pos-muted)', whiteSpace:'nowrap' }}>#{txn.id}</span>
+              <span style={{ flex:1, fontWeight:700, fontSize:14, color:'var(--pos-text)' }}>{txn.clientName || 'Walk-in'}</span>
+              <span style={{ fontSize:12, color:'var(--pos-muted)' }}>{txn.date}</span>
+              <span style={{ fontSize:11, fontWeight:700, background:'rgba(67,142,142,0.15)', color:'var(--pos-teal)', padding:'2px 8px', borderRadius:8 }}>
                 {(txn.paymentMethod || '').toUpperCase()}
               </span>
-              <span style={{ fontSize:15, fontWeight:800 }}>${(txn.total || 0).toFixed(2)}</span>
-              <span style={{ fontSize:10, color:'#94a3b8' }}>{expanded === txn.id ? '▲' : '▼'}</span>
+              <span style={{ fontSize:15, fontWeight:800, color:'var(--pos-gold)' }}>${(txn.total || 0).toFixed(2)}</span>
+              <span style={{ fontSize:10, color:'var(--pos-muted)' }}>{expanded === txn.id ? '▲' : '▼'}</span>
             </div>
 
             {expanded === txn.id && (
-              <div style={{ borderTop:'1px solid #f1f5f9', padding:'10px 16px', background:'#f8fafc' }}>
+              <div style={{ borderTop:'1px solid var(--pos-border)', padding:'10px 16px', background:'var(--pos-sidebar)' }}>
                 {/* Line items */}
                 {(txn.lineItems || []).map(li => (
-                  <div key={li.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'6px 0', borderBottom:'1px dotted #e2e8f0' }}>
+                  <div key={li.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'6px 0', borderBottom:'1px dotted var(--pos-border)' }}>
                     <div style={{ width:8, height:8, borderRadius:'50%', background:techColor(li.technicianId), flexShrink:0 }} />
-                    <span style={{ flex:1, fontSize:13, fontWeight:600 }}>{li.service}</span>
-                    <span style={{ fontSize:12, color:'#64748b', minWidth:80 }}>
+                    <span style={{ flex:1, fontSize:13, fontWeight:600, color:'var(--pos-text)' }}>{li.service}</span>
+                    <span style={{ fontSize:12, color:'var(--pos-muted)', minWidth:80 }}>
                       {editingLine?.lineId === li.id ? (
                         <select
                           className="form-select" style={{ fontSize:12, padding:'2px 6px', height:'auto' }}
@@ -612,7 +655,7 @@ function TransactionsPanel() {
                         </select>
                       ) : techName(li.technicianId)}
                     </span>
-                    <span style={{ fontSize:13, fontWeight:700, minWidth:52, textAlign:'right' }}>${(li.price || 0).toFixed(2)}</span>
+                    <span style={{ fontSize:13, fontWeight:700, minWidth:52, textAlign:'right', color:'var(--pos-gold)' }}>${(li.price || 0).toFixed(2)}</span>
                     {canEdit && (
                       editingLine?.lineId === li.id ? (
                         <div style={{ display:'flex', gap:4 }}>
@@ -631,7 +674,7 @@ function TransactionsPanel() {
                   </div>
                 ))}
                 {/* Totals */}
-                <div style={{ display:'flex', gap:16, flexWrap:'wrap', paddingTop:8, fontSize:12, color:'#64748b' }}>
+                <div style={{ display:'flex', gap:16, flexWrap:'wrap', paddingTop:8, fontSize:12, color:'var(--pos-muted)' }}>
                   <span>Subtotal ${(txn.subtotal||0).toFixed(2)}</span>
                   <span>Tax ${(txn.tax||0).toFixed(2)}</span>
                   {txn.tip > 0 && <span>Tip ${(txn.tip||0).toFixed(2)}</span>}
@@ -744,11 +787,11 @@ export default function AdminPage() {
                 onCancel={() => setAddingStaff(false)}
               />
             )}
-            <div style={{ background:'#fff', borderRadius:12, overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
+            <div style={{ background:'var(--pos-card)', borderRadius:12, overflow:'hidden', border:'1px solid var(--pos-border)' }}>
               {users.map((u, i) => (
                 <div key={u.id} style={{
                   display:'flex', alignItems:'center', gap:14, padding:'14px 20px',
-                  borderBottom: i < users.length-1 ? '1px solid #f1f5f9' : 'none',
+                  borderBottom: i < users.length-1 ? '1px solid var(--pos-border)' : 'none',
                 }}>
                   <div className="tech-avatar" style={{ background: ROLE_COLOR[u.role] ?? '#64748b', width:36, height:36, fontSize:12 }}>{u.initials}</div>
                   <div style={{ flex:1 }}>
