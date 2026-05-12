@@ -67,7 +67,12 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
       {/* Toolbar */}
       <div className="cal-toolbar">
 
-        {/* Brand mark */}
+        {/* Date – left */}
+        <span className="cal-toolbar-date">
+          {isToday && view === 'day' ? 'Today · ' : ''}{navLabel()}
+        </span>
+
+        {/* Brand mark – centered absolutely */}
         <div className="cal-brand">
           <img
             src={logo}
@@ -78,12 +83,7 @@ export default function CalendarPage({ initDateStr, initView, onDateChange, onVi
           <span className="cal-brand-name">{name}</span>
         </div>
 
-        {/* Date */}
-        <span className="cal-toolbar-date">
-          {isToday && view === 'day' ? 'Today · ' : ''}{navLabel()}
-        </span>
-
-        {/* Controls */}
+        {/* Controls – right */}
         <div className="cal-toolbar-controls">
           {/* Check-In button */}
           <button className="checkin-btn" onClick={() => setShowCheckIn(true)}>

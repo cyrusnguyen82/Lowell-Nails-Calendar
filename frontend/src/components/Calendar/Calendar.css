@@ -22,6 +22,7 @@
   border-bottom: 1px solid var(--pos-border);
   flex-shrink: 0;
   z-index: 10;
+  position: relative;
 }
 
 .cal-toolbar-date {
@@ -275,9 +276,11 @@
 
 /* ── Toolbar brand ────────────────────────────────────────────── */
 .cal-brand {
-  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-  padding-right: 16px; margin-right: 4px;
-  border-right: 1px solid var(--pos-border);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  pointer-events: none;
 }
 .cal-brand-logo {
   width: 30px; height: 30px; border-radius: 8px; object-fit: contain;
@@ -285,7 +288,7 @@
 .cal-brand-name {
   font-size: 10.5px; font-weight: 700; color: var(--pos-muted);
   text-transform: uppercase; letter-spacing: 0.08em;
-  white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis;
 }
 
 /* ── Check-In button ──────────────────────────────────────────── */
@@ -621,6 +624,7 @@
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .cal-toolbar { height: auto; padding: 10px 12px; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .cal-brand { position: static; transform: none; order: -1; pointer-events: auto; }
   .cal-toolbar-date { font-size: 13px; }
   .cal-toolbar-controls { width: 100%; justify-content: space-between; }
   .nav-btn { padding: 5px 10px; font-size: 12px; }

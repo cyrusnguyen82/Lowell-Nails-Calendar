@@ -92,7 +92,7 @@ function BookingForm({ initial, technicians, dateLabel, onSave, onCancel }) {
 }
 
 /* ── View existing appointment ─────────────────────────────── */
-function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onReschedule, onCashOut }) {
+function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onReschedule, onCashOut, onCheckIn }) {
   const [rescheduling, setRescheduling] = useState(false)
   const [reschedDate, setReschedDate]   = useState(appointment.date)
   const [reschedTime, setReschedTime]   = useState(appointment.startTime)
@@ -185,6 +185,15 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onRe
           </button>
         )}
         {canEdit && <button className="btn btn-ghost" onClick={onEdit}>Edit</button>}
+        {canEdit && appointment.status !== 'checkedin' && onCheckIn && (
+          <button
+            className="btn btn-primary"
+            style={{ background:'#10b981' }}
+            onClick={onCheckIn}
+          >
+            ✓ Check In
+          </button>
+        )}
         {appointment.status === 'checkedin' && onCashOut && (
           <button
             className="btn btn-primary"
@@ -201,7 +210,7 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onRe
 }
 
 /* ── Wrapper ──────────────────────────────────────────────── */
-export default function AppointmentModal({ appointment, newData, technicians, onClose, onSave, onDelete, onCashOut }) {
+export default function AppointmentModal({ appointment, newData, technicians, onClose, onSave, onDelete, onCashOut, onCheckIn }) {
   const { user, updateAppointment } = useApp()
   const [editing, setEditing] = useState(false)
   const canEdit = user.role === 'admin' || user.role === 'receptionist'
@@ -248,6 +257,7 @@ export default function AppointmentModal({ appointment, newData, technicians, on
             onDelete={onDelete}
             onReschedule={handleReschedule}
             onCashOut={onCashOut}
+            onCheckIn={onCheckIn ? () => onCheckIn(appointment.id) : undefined}
           />
         )}
 

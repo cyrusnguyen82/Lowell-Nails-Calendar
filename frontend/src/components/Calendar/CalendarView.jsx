@@ -24,7 +24,7 @@ function getTimeOffset() {
 }
 
 export default function CalendarView({ currentDate, onCashOut }) {
-  const { user, technicians, appointments, addAppointment, deleteAppointment } = useApp()
+  const { user, technicians, appointments, addAppointment, updateAppointment, deleteAppointment } = useApp()
   const [selectedApt, setSelectedApt] = useState(null)
   const [newAptData, setNewAptData]   = useState(null)
   const [timeOffset, setTimeOffset]   = useState(getTimeOffset())
@@ -135,6 +135,10 @@ export default function CalendarView({ currentDate, onCashOut }) {
           onSave={handleSave}
           onDelete={handleDelete}
           onCashOut={onCashOut ? apt => { setSelectedApt(null); onCashOut(apt) } : undefined}
+          onCheckIn={id => {
+            updateAppointment(id, { status: 'checkedin' })
+            setSelectedApt(prev => prev ? { ...prev, status: 'checkedin' } : null)
+          }}
         />
       )}
     </div>
