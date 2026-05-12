@@ -264,16 +264,16 @@ export default function GiftCardsPage() {
   return (
     <div className="gc-page">
       {/* Toolbar */}
-      <div className="clients-toolbar">
-        <h2 className="clients-title">Gift Cards</h2>
-        <input className="clients-search" placeholder="Search by card #, buyer, or recipient..." value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="gc-toolbar">
+        <h2 className="gc-title">Gift Cards</h2>
+        <input className="gc-search" placeholder="Search by card #, buyer, or recipient..." value={search} onChange={e => setSearch(e.target.value)} />
         {canEdit && (
           <>
-            <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={() => importRef.current?.click()}>
+            <button className="gc-btn gc-btn-ghost" onClick={() => importRef.current?.click()}>
               Import CSV
             </button>
             <input ref={importRef} type="file" accept=".csv,text/csv" style={{ display:'none' }} onChange={handleImportCSV} />
-            <button className="btn btn-primary" onClick={() => setAddingNew(true)}>+ Issue Gift Card</button>
+            <button className="gc-btn gc-btn-primary" onClick={() => setAddingNew(true)}>+ Issue Gift Card</button>
           </>
         )}
       </div>
@@ -297,18 +297,12 @@ export default function GiftCardsPage() {
       </div>
 
       {/* Filter pills */}
-      <div style={{ display:'flex', gap:6, padding:'0 24px 12px' }}>
+      <div className="gc-filters">
         {['all','active','redeemed','expired'].map(s => (
           <button
             key={s}
+            className={`gc-filter-pill${filterStatus === s ? ' active' : ''}`}
             onClick={() => setFilterStatus(s)}
-            style={{
-              padding:'4px 14px', borderRadius:20, border:'1.5px solid',
-              fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit',
-              background: filterStatus===s ? '#4f46e5' : 'transparent',
-              color:       filterStatus===s ? '#fff'    : '#64748b',
-              borderColor: filterStatus===s ? '#4f46e5' : '#e2e8f0',
-            }}
           >
             {s.charAt(0).toUpperCase()+s.slice(1)}
           </button>
@@ -316,18 +310,18 @@ export default function GiftCardsPage() {
       </div>
 
       {/* Table */}
-      <div className="clients-table-wrap" style={{ paddingTop:0 }}>
-        <table className="clients-table">
+      <div className="gc-table-wrap">
+        <table className="gc-table">
           <thead>
             <tr>
-              <th className="clients-th">Card #</th>
-              <th className="clients-th">Purchased By</th>
-              <th className="clients-th">Recipient</th>
-              <th className="clients-th">Purchase Date</th>
-              <th className="clients-th">Expiry Date</th>
-              <th className="clients-th">Amount</th>
-              <th className="clients-th">Balance</th>
-              <th className="clients-th">Status</th>
+              <th className="gc-th">Card #</th>
+              <th className="gc-th">Purchased By</th>
+              <th className="gc-th">Recipient</th>
+              <th className="gc-th">Purchase Date</th>
+              <th className="gc-th">Expiry Date</th>
+              <th className="gc-th">Amount</th>
+              <th className="gc-th">Balance</th>
+              <th className="gc-th">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -335,16 +329,19 @@ export default function GiftCardsPage() {
               const status = gcStatus(gc)
               const s = STATUS_STYLE[status]
               return (
-                <tr key={gc.id} className="clients-row" onClick={() => setSelected(gc)}>
-                  <td className="clients-td"><span style={{ fontFamily:'monospace', fontSize:12, fontWeight:700, color:'#4f46e5' }}>{gc.cardNumber}</span></td>
-                  <td className="clients-td name">{gc.purchasedBy}</td>
-                  <td className="clients-td">{gc.recipientName || gc.purchasedBy}</td>
-                  <td className="clients-td">{gc.purchaseDate}</td>
-                  <td className="clients-td">{gc.expiryDate}</td>
-                  <td className="clients-td">${gc.amount.toFixed(2)}</td>
-                  <td className="clients-td" style={{ fontWeight:700, color: status==='active' ? '#16a34a' : '#94a3b8' }}>${gc.balance.toFixed(2)}</td>
-                  <td className="clients-td">
-                    <span style={{ fontSize:11, fontWeight:700, padding:'3px 9px', borderRadius:10, background:s.bg, color:s.color }}>{s.label}</span>
+                <tr key={gc.id} className="gc-row" onClick={() => setSelected(gc)}>
+                  <td className="gc-td mono"><span style={{ fontWeight:700, color:'#4f46e5' }}>{gc.cardNumber}</span></td>
+                  <td className="gc-td bold">{gc.purchasedBy}</td>
+                  <td className="gc-td">{gc.recipientName || gc.purchasedBy}</td>
+                  <td className="gc-td">{gc.purchaseDate}</td>
+                  <td className="gc-td">{gc.expiryDate}</td>
+                  <td className="gc-td">${gc.amount.toFixed(2)}</td>
+                  <td className="gc-td bold" style={{ color: status==='active' ? '#16a34a' : '#94a3b8' }}>${gc.balance.toFixed(2)}</td>
+                  <td className="gc-td">
+                    <span className={`gc-status ${status}`}>
+                      <span className="gc-status-dot" />
+                      {s.label}
+                    </span>
                   </td>
                 </tr>
               )

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AppProvider, useApp } from './context/AppContext'
 import LoginScreen from './components/Auth/LoginScreen'
-import PageHeader from './components/Layout/PageHeader'
+import Sidebar from './components/Layout/Sidebar'
 import CalendarPage from './components/Calendar/CalendarPage'
 import ClientsPage from './components/Clients/ClientsPage'
 import GiftCardsPage from './components/GiftCards/GiftCardsPage'
@@ -12,6 +12,7 @@ import './components/Layout/Layout.css'
 const ACCESS = {
   calendar:  ['admin','receptionist','technician'],
   clients:   ['admin','receptionist'],
+  giftcards: ['admin','receptionist'],
   pos:       ['admin','receptionist'],
   admin:     ['admin','receptionist'],
 }
@@ -20,14 +21,79 @@ const PAGE_KEY     = 'lowell_nails_page'
 const CAL_DATE_KEY = 'lowell_cal_date'
 const CAL_VIEW_KEY = 'lowell_cal_view'
 
+/* ── Loading screen ───────────────────────────────────────────── */
+function Loader() {
+  return (
+    <div style={{
+      height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'var(--slate-900)', flexDirection: 'column', gap: 16,
+    }}>
+      <div style={{
+        width: 36, height: 36,
+        border: '3px solid rgba(255,255,255,0.08)',
+        borderTopColor: 'var(--brand)',
+        borderRadius: '50%',
+        animation: 'spin 0.8s linear infinite',
+      }} />
+      <p style={{ color: 'var(--slate-500)', fontSize: 13 }}>Connecting…</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  )
+}
+
+/* ── Error screen ─────────────────────────────────────────────── */
+function ErrorScreen() {
+  return (
+    <div style={{
+      height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'var(--slate-900)', flexDirection: 'column', gap: 12, padding: 24, textAlign: 'center',
+    }}>
+      <div style={{
+        width: 48, height: 48, borderRadius: '50%', background: 'rgba(239,68,68,0.1)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4,
+      }}>
+        <svg width="22" height="22" viewBox="0 0 20 20" fill="none" stroke="#ef4444" strokeWidth="1.8">
+          <circle cx="10" cy="10" r="8"/>
+          <path d="M10 6v4M10 14h.01" strokeLinecap="round"/>
+        </svg>
+      </div>
+      <p style={{ color: '#f87171', fontSize: 15, fontWeight: 700 }}>Cannot connect to server</p>
+      {import.meta.env.DEV ? (
+        <>
+          <p style={{ color: 'var(--slate-500)', fontSize: 13 }}>Make sure the backend is running on port 3000</p>
+          <code style={{ color: 'var(--slate-400)', fontSize: 12, background: 'var(--slate-800)', padding: '6px 14px', borderRadius: 6 }}>
+            cd michael-receptionist &amp;&amp; npm start
+          </code>
+        </>
+      ) : (
+        <p style={{ color: 'var(--slate-500)', fontSize: 13 }}>
+          {import.meta.env.VITE_API_URL
+            ? <>Trying to reach: <code style={{ color: 'var(--slate-400)' }}>{import.meta.env.VITE_API_URL}</code></>
+            : <><code style={{ color: 'var(--amber)' }}>VITE_API_URL</code> is not set — add it to your environment variables.</>
+          }
+        </p>
+      )}
+      <button
+        onClick={() => window.location.reload()}
+        style={{
+          marginTop: 8, padding: '9px 24px', background: 'var(--accent)',
+          color: '#fff', border: 'none', borderRadius: 'var(--r)',
+          cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+        }}
+      >
+        Retry
+      </button>
+    </div>
+  )
+}
+
+/* ── Shell ────────────────────────────────────────────────────── */
 function Shell() {
   const { user, loading, apiError } = useApp()
   const [page, setPage] = useState(() => {
     try { return sessionStorage.getItem(PAGE_KEY) || 'calendar' } catch { return 'calendar' }
   })
 
-  // Calendar state lives here so localStorage is read at Shell mount,
-  // before loading/auth checks — CalendarPage only mounts later.
   const [calDateStr, setCalDateStr] = useState(() => {
     try { return localStorage.getItem(CAL_DATE_KEY) || '' } catch { return '' }
   })
@@ -41,46 +107,9 @@ function Shell() {
     try { localStorage.setItem(CAL_VIEW_KEY, calView) } catch {}
   }, [calView])
 
-  if (loading) return (
-    <div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
-                  background:'#0f172a', flexDirection:'column', gap:16 }}>
-      <div style={{ width:40, height:40, border:'4px solid #334155', borderTopColor:'#6366f1',
-                    borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
-      <p style={{ color:'#64748b', fontSize:14 }}>Connecting to database…</p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-    </div>
-  )
-
-  if (apiError) return (
-    <div style={{ height:'100vh', display:'flex', alignItems:'center', justifyContent:'center',
-                  background:'#0f172a', flexDirection:'column', gap:12, padding:24, textAlign:'center' }}>
-      <p style={{ color:'#ef4444', fontSize:16, fontWeight:700 }}>Cannot connect to server</p>
-      {import.meta.env.DEV ? (
-        <>
-          <p style={{ color:'#64748b', fontSize:13 }}>Make sure the backend is running on port 3000</p>
-          <code style={{ color:'#94a3b8', fontSize:12, background:'#1e293b', padding:'6px 12px', borderRadius:6 }}>
-            cd michael-receptionist &amp;&amp; npm start
-          </code>
-        </>
-      ) : (
-        <>
-          <p style={{ color:'#64748b', fontSize:13 }}>
-            {import.meta.env.VITE_API_URL
-              ? <>Trying to reach: <code style={{ color:'#94a3b8' }}>{import.meta.env.VITE_API_URL}</code></>
-              : <><code style={{ color:'#f59e0b' }}>VITE_API_URL</code> is not set — add it to your Render Static Site environment variables and redeploy.</>
-            }
-          </p>
-        </>
-      )}
-      <button onClick={() => window.location.reload()}
-        style={{ marginTop:8, padding:'8px 20px', background:'#4f46e5', color:'#fff',
-                 border:'none', borderRadius:6, cursor:'pointer', fontSize:13, fontWeight:600 }}>
-        Retry
-      </button>
-    </div>
-  )
-
-  if (!user) return <LoginScreen />
+  if (loading)   return <Loader />
+  if (apiError)  return <ErrorScreen />
+  if (!user)     return <LoginScreen />
 
   function navigate(p) {
     if (ACCESS[p]?.includes(user.role)) {
@@ -91,14 +120,23 @@ function Shell() {
 
   const safePage = ACCESS[page]?.includes(user.role) ? page : 'calendar'
 
+  /* POS is full-screen — no sidebar */
+  if (safePage === 'pos') {
+    return <POSPage onNavigate={navigate} />
+  }
+
   return (
     <div className="app-shell">
-      {safePage !== 'pos' && <PageHeader onNavigate={navigate} />}
+      <Sidebar page={safePage} onNavigate={navigate} />
       <main className="app-main">
-        {safePage === 'calendar'  && <CalendarPage initDateStr={calDateStr} initView={calView} onDateChange={setCalDateStr} onViewChange={setCalView} />}
+        {safePage === 'calendar'  && (
+          <CalendarPage
+            initDateStr={calDateStr} initView={calView}
+            onDateChange={setCalDateStr} onViewChange={setCalView}
+          />
+        )}
         {safePage === 'clients'   && <ClientsPage />}
         {safePage === 'giftcards' && <GiftCardsPage />}
-        {safePage === 'pos'       && <POSPage onNavigate={navigate} />}
         {safePage === 'admin'     && <AdminPage />}
       </main>
     </div>

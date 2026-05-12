@@ -267,6 +267,36 @@ export function AppProvider({ children }) {
     } catch (err) { console.error('redeemGiftCard failed:', err.message) }
   }
 
+  // ── Timeclock ─────────────────────────────────────────────
+  const [clockStatus, setClockStatus] = useState([])
+  
+  async function fetchClockStatus() {
+    try {
+      const data = await api.get('/timeclock/status')
+      setClockStatus(data)
+    } catch (err) { console.error('fetchClockStatus failed:', err.message) }
+  }
+
+  useEffect(() => {
+    if (user) fetchClockStatus()
+  }, [user])
+
+  async function clockIn(techId) {
+    try {
+      await api.post(`/timeclock/clockin/${techId}`)
+      await fetchClockStatus()
+      return true
+    } catch (err) { console.error('clockIn failed:', err.message); return false }
+  }
+
+  async function clockOut(techId) {
+    try {
+      const res = await api.post(`/timeclock/clockout/${techId}`)
+      await fetchClockStatus()
+      return res
+    } catch (err) { console.error('clockOut failed:', err.message); return false }
+  }
+
   return (
     <AppContext.Provider value={{
       loading, apiError,
@@ -276,6 +306,7 @@ export function AppProvider({ children }) {
       appointments, addAppointment, updateAppointment, deleteAppointment,
       clients, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry,
       giftCards, addGiftCard, updateGiftCard, deleteGiftCard, redeemGiftCard,
+      clockStatus, clockIn, clockOut, refreshClock: fetchClockStatus,
     }}>
       {children}
     </AppContext.Provider>

@@ -1,24 +1,87 @@
 :root {
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+  /* Brand — Teal */
+  --brand:       #14b8a6;
+  --brand-600:   #0d9488;
+  --brand-400:   #2dd4bf;
+  --brand-100:   #ccfbf1;
+  --brand-50:    #f0fdfa;
+
+  /* Accent — Indigo (primary actions) */
+  --accent:      #6366f1;
+  --accent-600:  #4f46e5;
+  --accent-100:  #e0e7ff;
+  --accent-50:   #eef2ff;
+
+  /* Slate scale */
+  --slate-900:   #0f172a;
+  --slate-800:   #1e293b;
+  --slate-700:   #334155;
+  --slate-600:   #475569;
+  --slate-500:   #64748b;
+  --slate-400:   #94a3b8;
+  --slate-300:   #cbd5e1;
+  --slate-200:   #e2e8f0;
+  --slate-100:   #f1f5f9;
+  --slate-50:    #f8fafc;
+
+  /* Status */
+  --green:       #10b981;
+  --green-50:    #f0fdf4;
+  --green-100:   #dcfce7;
+  --red:         #ef4444;
+  --red-50:      #fef2f2;
+  --amber:       #f59e0b;
+  --amber-50:    #fffbeb;
+
+  /* Surfaces */
+  --surface:     #ffffff;
+  --bg:          #f1f5f9;
+
+  /* Sidebar */
+  --sidebar-w:   220px;
+  --sidebar-bg:  #0f172a;
+
+  /* Shadows */
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.06);
+  --shadow:      0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:   0 4px 8px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg:   0 10px 24px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-xl:   0 20px 40px rgba(0,0,0,0.15);
+  --shadow-2xl:  0 25px 60px rgba(0,0,0,0.3);
+
+  /* Radius */
+  --r-sm:  6px;
+  --r:     8px;
+  --r-md:  10px;
+  --r-lg:  12px;
+  --r-xl:  16px;
 }
+
+/* ─── Reset ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body, #root {
   height: 100%;
-  margin: 0;
-  padding: 0;
   overflow: hidden;
-  /* Prevent Android Chrome pull-to-refresh from fighting scroll */
   overscroll-behavior: none;
 }
 
-/* Suppress Android blue tap highlight on all interactive elements */
-* {
-  -webkit-tap-highlight-color: transparent;
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--slate-900);
+  background: var(--bg);
 }
 
-/* Prevent double-tap zoom on buttons and inputs (Android Chrome) */
-button, input, select, textarea, a {
-  touch-action: manipulation;
-}
+* { -webkit-tap-highlight-color: transparent; }
+
+button, input, select, textarea, a { touch-action: manipulation; }
+
+/* ─── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--slate-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--slate-400); }
