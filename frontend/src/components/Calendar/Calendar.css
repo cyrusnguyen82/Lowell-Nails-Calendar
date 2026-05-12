@@ -454,10 +454,11 @@
 
 /* ── Buttons (shared across pages) ───────────────────────────── */
 .btn {
-  padding: 8px 18px; border-radius: var(--r);
-  font-size: 13.5px; font-weight: 600; cursor: pointer; border: none;
+  padding: 8px 14px; border-radius: var(--r);
+  font-size: 13px; font-weight: 600; cursor: pointer; border: none;
   transition: background 0.15s, transform 0.1s;
   font-family: inherit; letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 .btn-ghost {
   background: var(--pos-card); color: var(--pos-muted);

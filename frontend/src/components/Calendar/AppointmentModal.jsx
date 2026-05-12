@@ -188,7 +188,7 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onRe
         {canEdit && appointment.status !== 'checkedin' && onCheckIn && (
           <button
             className="btn btn-primary"
-            style={{ background:'#10b981' }}
+            style={{ background:'#10b981', whiteSpace:'nowrap' }}
             onClick={onCheckIn}
           >
             ✓ Check In
