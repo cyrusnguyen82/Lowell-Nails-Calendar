@@ -6,6 +6,8 @@ import CalendarPage from './components/Calendar/CalendarPage'
 import ClientsPage from './components/Clients/ClientsPage'
 import AdminPage from './components/Admin/AdminPage'
 import POSPage from './components/POS/POSPage'
+import BookingPage from './components/Booking/BookingPage'
+import BookingCancel from './components/Booking/BookingCancel'
 import './components/Layout/Layout.css'
 
 const ACCESS = {
@@ -166,6 +168,12 @@ function Shell() {
 }
 
 export default function App() {
+  const path = window.location.pathname
+  if (path === '/book' || path === '/book/') return <BookingPage />
+  if (path.startsWith('/book/cancel/')) {
+    const token = path.replace('/book/cancel/', '').replace(/\/$/, '')
+    return <BookingCancel token={token} />
+  }
   return (
     <AppProvider>
       <Shell />
