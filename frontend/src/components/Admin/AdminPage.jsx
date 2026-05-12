@@ -286,10 +286,10 @@ function NewStaffForm({ technicians, onSave, onCancel }) {
 
 /* ── Company Settings tab ─────────────────────────────────── */
 const THEMES = [
-  { id: 'midnight', label: 'Midnight', desc: 'Deep navy + gold (default)',  dot: '#c5a059', bg: '#0a0c14' },
-  { id: 'slate',    label: 'Slate',    desc: 'Medium-dark cool blue-gray', dot: '#7b9cce', bg: '#1a1f2e' },
-  { id: 'dusk',     label: 'Dusk',     desc: 'Warm charcoal + rose gold',  dot: '#c9956c', bg: '#1c1714' },
-  { id: 'cloud',    label: 'Cloud',    desc: 'Soft light — clean & airy',  dot: '#7c6f42', bg: '#f0f2f5' },
+  { id: 'carbon', label: 'Carbon', desc: 'Anthracite + emerald — crisp & modern', dot: '#10b981', bg: '#0f1117' },
+  { id: 'cobalt', label: 'Cobalt', desc: 'Deep navy + electric blue — bold',      dot: '#60a5fa', bg: '#05112a' },
+  { id: 'ember',  label: 'Ember',  desc: 'Warm charcoal + amber glow — premium',  dot: '#fb923c', bg: '#110d0a' },
+  { id: 'cloud',  label: 'Cloud',  desc: 'Clean white + indigo — light & airy',   dot: '#6366f1', bg: '#f4f7fc' },
 ]
 
 function CompanySettings() {
@@ -301,7 +301,7 @@ function CompanySettings() {
   const set = (k,v) => { setForm(f => ({ ...f, [k]: v })); setSaved(false) }
 
   const [activeTheme, setActiveTheme] = useState(() => {
-    try { return localStorage.getItem('lowell_theme') || 'midnight' } catch { return 'midnight' }
+    try { return localStorage.getItem('lowell_theme') || 'carbon' } catch { return 'carbon' }
   })
   function applyTheme(id) {
     setActiveTheme(id)

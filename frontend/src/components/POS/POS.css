@@ -1,62 +1,86 @@
-/* ── Theme: Midnight (default) ─── deep navy + gold ─────────── */
+/* ── Theme: Carbon (default) ─── anthracite + emerald ────────── */
 :root,
-[data-theme="midnight"] {
-  --pos-bg: #0a0c14;
-  --pos-sidebar: #121826;
-  --pos-card: #1c2436;
-  --pos-hover: #2d3748;
-  --pos-gold: #c5a059;
-  --pos-teal: #438e8e;
-  --pos-red: #ef4444;
-  --pos-text: #ffffff;
-  --pos-muted: #94a3b8;
-  --pos-border: rgba(255,255,255,0.06);
-  --r: 8px; --r-sm: 6px; --r-lg: 12px; --r-xl: 16px;
-}
-
-/* ── Theme: Slate ─────────────── medium-dark cool gray ──────── */
-[data-theme="slate"] {
-  --pos-bg: #1a1f2e;
-  --pos-sidebar: #232a3b;
-  --pos-card: #2c3348;
-  --pos-hover: #3a4256;
-  --pos-gold: #7b9cce;
-  --pos-teal: #5ba3a3;
-  --pos-red: #e05c5c;
-  --pos-text: #e8edf5;
-  --pos-muted: #8896ae;
+[data-theme="carbon"] {
+  --pos-bg: #0f1117;
+  --pos-sidebar: #151a26;
+  --pos-card: #1d2334;
+  --pos-hover: #252d40;
+  --pos-gold: #10b981;
+  --pos-teal: #06b6d4;
+  --pos-red: #f43f5e;
+  --pos-text: #f0f4ff;
+  --pos-muted: #6b7a99;
   --pos-border: rgba(255,255,255,0.07);
   --r: 8px; --r-sm: 6px; --r-lg: 12px; --r-xl: 16px;
+  /* sidebar */
+  --sidebar-bg: #0c1020;
+  --bg: #0f1117;
+  --sidebar-active-bg: rgba(16,185,129,0.15);
+  --sidebar-active-color: #34d399;
+  --sidebar-hover-bg: rgba(255,255,255,0.06);
 }
 
-/* ── Theme: Dusk ──────────────── warm charcoal + rose gold ──── */
-[data-theme="dusk"] {
-  --pos-bg: #1c1714;
-  --pos-sidebar: #251f1a;
-  --pos-card: #302820;
-  --pos-hover: #3d3128;
-  --pos-gold: #c9956c;
-  --pos-teal: #7aaa8a;
-  --pos-red: #e05c5c;
-  --pos-text: #f0ebe6;
-  --pos-muted: #a89880;
-  --pos-border: rgba(255,255,255,0.06);
+/* ── Theme: Cobalt ────────────── deep navy + electric blue ───── */
+[data-theme="cobalt"] {
+  --pos-bg: #05112a;
+  --pos-sidebar: #0c1e40;
+  --pos-card: #122850;
+  --pos-hover: #1a3262;
+  --pos-gold: #60a5fa;
+  --pos-teal: #34d399;
+  --pos-red: #f87171;
+  --pos-text: #dbeafe;
+  --pos-muted: #5b7fa6;
+  --pos-border: rgba(96,165,250,0.1);
   --r: 8px; --r-sm: 6px; --r-lg: 12px; --r-xl: 16px;
+  /* sidebar */
+  --sidebar-bg: #071730;
+  --bg: #05112a;
+  --sidebar-active-bg: rgba(96,165,250,0.18);
+  --sidebar-active-color: #93c5fd;
+  --sidebar-hover-bg: rgba(96,165,250,0.08);
 }
 
-/* ── Theme: Cloud ─────────────── light neutral — soft & airy ── */
+/* ── Theme: Ember ─────────────── warm charcoal + amber glow ──── */
+[data-theme="ember"] {
+  --pos-bg: #110d0a;
+  --pos-sidebar: #1a1410;
+  --pos-card: #231b14;
+  --pos-hover: #2e2218;
+  --pos-gold: #fb923c;
+  --pos-teal: #4ade80;
+  --pos-red: #f87171;
+  --pos-text: #fef3e8;
+  --pos-muted: #97826a;
+  --pos-border: rgba(251,146,60,0.08);
+  --r: 8px; --r-sm: 6px; --r-lg: 12px; --r-xl: 16px;
+  /* sidebar */
+  --sidebar-bg: #13100c;
+  --bg: #110d0a;
+  --sidebar-active-bg: rgba(251,146,60,0.18);
+  --sidebar-active-color: #fdba74;
+  --sidebar-hover-bg: rgba(251,146,60,0.07);
+}
+
+/* ── Theme: Cloud ─────────────── clean white + indigo accent ─── */
 [data-theme="cloud"] {
-  --pos-bg: #f0f2f5;
-  --pos-sidebar: #ffffff;
+  --pos-bg: #f4f7fc;
+  --pos-sidebar: #eef2f8;
   --pos-card: #ffffff;
-  --pos-hover: #e8ecf0;
-  --pos-gold: #7c6f42;
-  --pos-teal: #2e7d7d;
-  --pos-red: #d94040;
-  --pos-text: #1a2030;
-  --pos-muted: #637085;
-  --pos-border: rgba(0,0,0,0.08);
+  --pos-hover: #e8edf5;
+  --pos-gold: #6366f1;
+  --pos-teal: #0ea5e9;
+  --pos-red: #ef4444;
+  --pos-text: #0f172a;
+  --pos-muted: #64748b;
+  --pos-border: rgba(15,23,42,0.09);
   --r: 8px; --r-sm: 6px; --r-lg: 12px; --r-xl: 16px;
+  /* sidebar stays dark for elegant contrast */
+  --sidebar-bg: #1e2940;
+  --bg: #f4f7fc;
+  --sidebar-active-bg: rgba(99,102,241,0.18);
+  --sidebar-active-color: #a5b4fc;
+  --sidebar-hover-bg: rgba(255,255,255,0.07);
 }
 
 .pos-container {

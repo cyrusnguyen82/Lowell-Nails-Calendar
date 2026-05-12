@@ -85,7 +85,8 @@ function ErrorScreen() {
   )
 }
 
-const THEME_KEY = 'lowell_theme'
+const THEME_KEY   = 'lowell_theme'
+const SIDEBAR_KEY = 'lowell_sidebar'
 
 /* ── Shell ────────────────────────────────────────────────────── */
 function Shell() {
@@ -93,13 +94,24 @@ function Shell() {
   const [page, setPage] = useState(() => {
     try { return sessionStorage.getItem(PAGE_KEY) || 'calendar' } catch { return 'calendar' }
   })
+  const [sidebarHidden, setSidebarHidden] = useState(() => {
+    try { return localStorage.getItem(SIDEBAR_KEY) === 'hidden' } catch { return false }
+  })
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(THEME_KEY) || 'midnight'
+      const saved = localStorage.getItem(THEME_KEY) || 'carbon'
       document.documentElement.setAttribute('data-theme', saved)
     } catch {}
   }, [])
+
+  function toggleSidebar() {
+    setSidebarHidden(h => {
+      const next = !h
+      try { localStorage.setItem(SIDEBAR_KEY, next ? 'hidden' : 'visible') } catch {}
+      return next
+    })
+  }
 
   const [calDateStr, setCalDateStr] = useState(() => {
     try { return localStorage.getItem(CAL_DATE_KEY) || '' } catch { return '' }
@@ -134,7 +146,10 @@ function Shell() {
 
   return (
     <div className="app-shell">
-      <Sidebar page={safePage} onNavigate={navigate} />
+      {!sidebarHidden && <Sidebar page={safePage} onNavigate={navigate} onHide={toggleSidebar} />}
+      {sidebarHidden && (
+        <button className="sidebar-show-btn" onClick={toggleSidebar} title="Show sidebar">›</button>
+      )}
       <main className="app-main">
         {safePage === 'calendar'  && (
           <CalendarPage

@@ -30,6 +30,7 @@
   overflow: hidden;
   position: relative;
   z-index: 30;
+  transition: width 0.25s ease;
 }
 
 /* right edge micro-glow for depth */
@@ -103,13 +104,13 @@
 }
 
 .sidebar-nav-item:hover {
-  background: rgba(255,255,255,0.07);
+  background: var(--sidebar-hover-bg, rgba(255,255,255,0.07));
   color: var(--slate-200);
 }
 
 .sidebar-nav-item.active {
-  background: rgba(99,102,241,0.14);
-  color: #a5b4fc;
+  background: var(--sidebar-active-bg, rgba(99,102,241,0.14));
+  color: var(--sidebar-active-color, #a5b4fc);
   font-weight: 600;
 }
 
@@ -211,6 +212,32 @@
   background: rgba(239,68,68,0.1);
   color: #fca5a5;
 }
+
+/* ── Sidebar hide/show toggle ─────────────────────────────────── */
+.sidebar-hide-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px;
+  border: none; background: none;
+  color: var(--slate-500); font-size: 12.5px; font-weight: 500;
+  cursor: pointer; border-radius: var(--r);
+  font-family: inherit; width: 100%;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.01em;
+}
+.sidebar-hide-btn:hover { background: rgba(255,255,255,0.06); color: var(--slate-300); }
+
+.sidebar-show-btn {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+  width: 20px; height: 52px; z-index: 40;
+  background: var(--sidebar-bg, #0f172a);
+  border: none; border-radius: 0 8px 8px 0;
+  color: var(--slate-400, #94a3b8);
+  font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.25);
+  transition: width 0.15s, background 0.15s;
+}
+.sidebar-show-btn:hover { width: 26px; background: var(--sidebar-active-bg, rgba(99,102,241,0.2)); color: #fff; }
 
 /* ── Page Header (non-POS, above content) ─────────────────────── */
 .page-header {

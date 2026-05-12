@@ -43,6 +43,11 @@ const SignOutIcon = () => (
     <path d="M17 10H8"/>
   </svg>
 )
+const HideIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+    <path d="M13 5l-5 5 5 5"/>
+  </svg>
+)
 
 /* ── Nav Definition ───────────────────────────────────────────── */
 const NAV = [
@@ -58,7 +63,7 @@ const ROLE_BADGE = {
   technician:   { label: 'Technician',   bg: '#10b981' },
 }
 
-export default function Sidebar({ page, onNavigate }) {
+export default function Sidebar({ page, onNavigate, onHide }) {
   const { user, logout, companyInfo } = useApp()
   const badge   = ROLE_BADGE[user.role] || ROLE_BADGE.technician
   const allowed = NAV.filter(n => n.roles.includes(user.role))
@@ -101,6 +106,11 @@ export default function Sidebar({ page, onNavigate }) {
           <span className="nav-icon" style={{ width:16, height:16 }}><SignOutIcon /></span>
           Sign out
         </button>
+        {onHide && (
+          <button className="sidebar-hide-btn" onClick={onHide}>
+            <HideIcon /> Hide sidebar
+          </button>
+        )}
       </div>
     </aside>
   )
