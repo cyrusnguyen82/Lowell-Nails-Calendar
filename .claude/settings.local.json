@@ -16,7 +16,14 @@
       "Bash(node --check dedupe_clients.js)",
       "Bash(node --check startup.js)",
       "Bash(Copy-Item \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\\\\ui\\\\src\\\\assets\\\\logo_transparent.png\" -Destination \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\\\\frontend\\\\public\\\\logo.png\" -Force)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(echo \"__pycache__/\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\" -Recurse -Force)",
+      "Bash(ConvertTo-Csv -NoTypeInformation)",
+      "Bash(Out-String)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('lucide-react' in d.get\\('dependencies',{}\\)\\)\")",
+      "Bash(Get-Content \"C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Cyrus-Desktop-Personal-2026-Calendar\\\\bf7102ec-2d1f-477f-92f3-d9490e0ce1e8\\\\tasks\\\\bslym0wsm.output\")",
+      "Bash(Select-Object -Last 20)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Cyrus\\Desktop\\Personal\\2026\\Calendar"
