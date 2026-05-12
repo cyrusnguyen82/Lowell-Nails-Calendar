@@ -286,10 +286,11 @@ function NewStaffForm({ technicians, onSave, onCancel }) {
 
 /* ── Company Settings tab ─────────────────────────────────── */
 const THEMES = [
-  { id: 'carbon', label: 'Carbon', desc: 'Anthracite + emerald — crisp & modern', dot: '#10b981', bg: '#0f1117' },
-  { id: 'cobalt', label: 'Cobalt', desc: 'Deep navy + electric blue — bold',      dot: '#60a5fa', bg: '#05112a' },
-  { id: 'ember',  label: 'Ember',  desc: 'Warm charcoal + amber glow — premium',  dot: '#fb923c', bg: '#110d0a' },
-  { id: 'cloud',  label: 'Cloud',  desc: 'Clean white + indigo — light & airy',   dot: '#6366f1', bg: '#f4f7fc' },
+  { id: 'polar',   label: 'Polar',   desc: 'Crystalline white + sky blue — precision clarity', dot: '#0ea5e9', bg: '#f5f8fc' },
+  { id: 'seafoam', label: 'Seafoam', desc: 'Ocean mint + deep teal — fresh depth',             dot: '#0891b2', bg: '#eff9fb' },
+  { id: 'aurora',  label: 'Aurora',  desc: 'Soft lavender + violet — luminous',                dot: '#7c3aed', bg: '#f2f2ff' },
+  { id: 'frost',   label: 'Frost',   desc: 'Cool blue-gray + indigo — executive focus',        dot: '#6366f1', bg: '#edf1f7' },
+  { id: 'steel',   label: 'Steel',   desc: 'Polished steel + electric blue — refined edge',    dot: '#2563eb', bg: '#d4dff0' },
 ]
 
 function CompanySettings() {
@@ -301,7 +302,7 @@ function CompanySettings() {
   const set = (k,v) => { setForm(f => ({ ...f, [k]: v })); setSaved(false) }
 
   const [activeTheme, setActiveTheme] = useState(() => {
-    try { return localStorage.getItem('lowell_theme') || 'carbon' } catch { return 'carbon' }
+    try { return localStorage.getItem('lowell_theme') || 'polar' } catch { return 'polar' }
   })
   function applyTheme(id) {
     setActiveTheme(id)
@@ -403,7 +404,7 @@ function CompanySettings() {
                 transition:'border-color 0.15s, background 0.15s',
               }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <div style={{ width:32, height:20, borderRadius:5, background:t.bg, border:'1px solid rgba(255,255,255,0.1)', flexShrink:0 }} />
+                <div style={{ width:32, height:20, borderRadius:5, background:t.bg, border:'1px solid var(--pos-border)', flexShrink:0 }} />
                 <div style={{ width:10, height:10, borderRadius:'50%', background:t.dot, flexShrink:0 }} />
               </div>
               <div style={{ fontSize:13, fontWeight:700, color:'var(--pos-text)' }}>{t.label}</div>

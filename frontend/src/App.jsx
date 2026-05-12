@@ -100,7 +100,7 @@ function Shell() {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(THEME_KEY) || 'carbon'
+      const saved = localStorage.getItem(THEME_KEY) || 'polar'
       document.documentElement.setAttribute('data-theme', saved)
     } catch {}
   }, [])
