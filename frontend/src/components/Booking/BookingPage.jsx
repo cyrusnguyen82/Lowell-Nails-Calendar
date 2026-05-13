@@ -368,8 +368,10 @@ export default function BookingPage() {
         <div style={{ fontSize: 21, fontWeight: 800, color: '#0c1a2e', marginBottom: 6 }}>
           You're all set!
         </div>
-        <div style={{ fontSize: 14, color: '#5a7a9b', lineHeight: 1.6 }}>
-          A confirmation text has been sent to your phone.
+        <div style={{ fontSize: 14, color: booking?.smsOk === false ? '#ef4444' : '#5a7a9b', lineHeight: 1.6 }}>
+          {booking?.smsOk === false
+            ? 'We couldn\'t send a confirmation text. Please save your appointment details below.'
+            : 'A confirmation text has been sent to your phone.'}
         </div>
 
         <div className="booking-confirm-details">
