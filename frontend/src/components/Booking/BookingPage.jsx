@@ -327,6 +327,12 @@ export default function BookingPage() {
             inputMode="tel"
             autoComplete="tel"
           />
+          <div style={{ fontSize: 11, color: '#9dbdd8', lineHeight: 1.6, marginTop: 2 }}>
+            By entering your number you agree to receive appointment SMS from Lowell Nails &amp; Spa.
+            Msg &amp; data rates may apply. Reply STOP to opt out.{' '}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer"
+               style={{ color: '#0ea5e9', textDecoration: 'none' }}>Privacy Policy</a>
+          </div>
         </div>
         <div className="booking-form-group" style={{ marginBottom: 0 }}>
           <label className="booking-label">Notes (optional)</label>
