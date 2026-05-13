@@ -89,6 +89,10 @@ function ServiceBuilder({ services, onChange, technicians }) {
     onChange(services.map((s, idx) => idx === i ? { ...s, technicianId: techId } : s))
   }
 
+  function updateStartTime(i, time) {
+    onChange(services.map((s, idx) => idx === i ? { ...s, startTime: time || undefined } : s))
+  }
+
   return (
     <div className="form-group">
       <label className="form-label">Services *</label>
@@ -117,6 +121,19 @@ function ServiceBuilder({ services, onChange, technicians }) {
                 {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
+            {i > 0 && (
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:5 }}>
+                <span style={{ fontSize:11, color:'#94a3b8', whiteSpace:'nowrap' }}>Start time:</span>
+                <input
+                  type="time"
+                  value={s.startTime || ''}
+                  onChange={e => updateStartTime(i, e.target.value)}
+                  placeholder="After prev. service"
+                  style={{ fontSize:12, padding:'3px 6px', border:'1px solid #e2e8f0', borderRadius:6, flex:1 }}
+                />
+                {!s.startTime && <span style={{ fontSize:10, color:'#cbd5e1' }}>sequential</span>}
+              </div>
+            )}
           </div>
         ))}
         {services.length === 0 && (
@@ -390,7 +407,7 @@ export default function AppointmentModal({ appointment, newData, technicians, on
               <button className="modal-close" onClick={onClose}>×</button>
             </div>
             <BookingForm
-              initial={{ clientName:'', clientPhone:'', service: SERVICES[0].name, services: null, technicianId: newData.technicianId, date: newData.date, startTime: newData.time, duration: SERVICES[0].duration, notes:'', techRequested: false, clientConfirmed: false }}
+              initial={{ clientName:'', clientPhone:'', service: '', services: [], technicianId: newData.technicianId, date: newData.date, startTime: newData.time, duration: 0, notes:'', techRequested: false, clientConfirmed: false }}
               technicians={technicians}
               clients={clients}
               onSave={form => { onSave(form) }}

@@ -28,7 +28,7 @@ export default function TechnicianColumn({ technician, appointments, onSlotClick
 
       {appointments.map(apt => (
         <AppointmentBlock
-          key={apt.id}
+          key={apt._blockKey || apt.id}
           appointment={apt}
           techColor={technician.color}
           onClick={onAppointmentClick}

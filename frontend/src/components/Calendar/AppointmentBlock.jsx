@@ -19,22 +19,23 @@ export default function AppointmentBlock({ appointment, techColor, onClick }) {
   const isReq  = appointment.techRequested
   const isConf = appointment.clientConfirmed && !isIn
 
-  let bg, border
+  // backgroundImage sits on top of white backgroundColor — grid lines can't bleed through
+  let bgImage, border
   if (isIn) {
-    bg     = 'rgba(16,185,129,0.15)'
-    border = '#10b981'
+    bgImage = 'linear-gradient(rgba(16,185,129,0.18), rgba(16,185,129,0.18))'
+    border  = '#10b981'
   } else if (isReq && isConf) {
-    bg     = `linear-gradient(to bottom, rgba(30,64,175,0.22) 50%, rgba(239,68,68,0.09) 50%)`
-    border = '#ef4444'
+    bgImage = 'linear-gradient(to bottom, rgba(30,64,175,0.22) 50%, rgba(239,68,68,0.12) 50%)'
+    border  = '#ef4444'
   } else if (isReq) {
-    bg     = 'rgba(239,68,68,0.09)'
-    border = '#ef4444'
+    bgImage = 'linear-gradient(rgba(239,68,68,0.12), rgba(239,68,68,0.12))'
+    border  = '#ef4444'
   } else if (isConf) {
-    bg     = `linear-gradient(to bottom, rgba(30,64,175,0.22) 50%, ${techColor}22 50%)`
-    border = techColor
+    bgImage = `linear-gradient(to bottom, rgba(30,64,175,0.22) 50%, ${techColor}22 50%)`
+    border  = techColor
   } else {
-    bg     = techColor + '22'
-    border = techColor
+    bgImage = `linear-gradient(${techColor}22, ${techColor}22)`
+    border  = techColor
   }
 
   const serviceLabel = appointment.services?.length > 1
@@ -44,7 +45,13 @@ export default function AppointmentBlock({ appointment, techColor, onClick }) {
   return (
     <div
       className={`apt-block${isIn ? ' checkedin' : ''}`}
-      style={{ top: top + 2, height: height - 4, background: bg, borderLeftColor: border }}
+      style={{
+        top: top + 2,
+        height: height - 4,
+        backgroundImage: bgImage,
+        backgroundColor: '#fff',
+        borderLeftColor: border,
+      }}
       onClick={e => { e.stopPropagation(); onClick(appointment) }}
     >
       {isIn && (

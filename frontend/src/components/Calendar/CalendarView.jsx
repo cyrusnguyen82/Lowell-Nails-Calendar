@@ -52,8 +52,53 @@ export default function CalendarView({ currentDate, onCashOut }) {
     ? technicians.filter(t => t.id === user.technicianId)
     : technicians
 
+  function addMins(t, mins) {
+    const [h, m] = t.split(':').map(Number)
+    const total = h * 60 + m + mins
+    return `${String(Math.floor(total / 60)).padStart(2,'0')}:${String(total % 60).padStart(2,'0')}`
+  }
+
+  /* For multi-service appointments, each service renders in its assigned tech's column */
   function aptsByTech(techId) {
-    return todayApts.filter(a => a.technicianId === techId)
+    const blocks = []
+    for (const apt of todayApts) {
+      if (!apt.services || apt.services.length <= 1) {
+        if (apt.technicianId === techId) blocks.push({ ...apt, _blockKey: String(apt.id) })
+      } else {
+        let runningTime = apt.startTime
+        apt.services.forEach((svc, idx) => {
+          const svcTechId = svc.technicianId || apt.technicianId
+          const svcStart  = svc.startTime || runningTime
+          if (svcTechId === techId) {
+            blocks.push({
+              ...apt,
+              startTime: svcStart,
+              duration:  svc.duration,
+              service:   svc.name,
+              _blockKey: `${apt.id}-${idx}`,
+              _originalApt: apt,
+            })
+          }
+          runningTime = addMins(runningTime, svc.duration)
+        })
+      }
+    }
+    return blocks
+  }
+
+  /* Count unique appointments (not service-split blocks) for header */
+  function aptCountForTech(techId) {
+    const ids = new Set()
+    for (const apt of todayApts) {
+      if (!apt.services || apt.services.length <= 1) {
+        if (apt.technicianId === techId) ids.add(apt.id)
+      } else {
+        apt.services.forEach(svc => {
+          if ((svc.technicianId || apt.technicianId) === techId) ids.add(apt.id)
+        })
+      }
+    }
+    return ids.size
   }
 
   function handleSave(apt) {
@@ -87,7 +132,7 @@ export default function CalendarView({ currentDate, onCashOut }) {
               <div key={tech.id} className="tech-header-cell">
                 <div className="tech-avatar" style={{ background: tech.color }}>{tech.initials}</div>
                 <span className="tech-name">{tech.name}</span>
-                <span className="tech-apt-count">{aptsByTech(tech.id).length} appts</span>
+                <span className="tech-apt-count">{aptCountForTech(tech.id)} appts</span>
               </div>
             ))}
           </div>
@@ -117,7 +162,7 @@ export default function CalendarView({ currentDate, onCashOut }) {
                   technician={tech}
                   appointments={aptsByTech(tech.id)}
                   onSlotClick={time => setNewAptData({ technicianId: tech.id, time, date: dateStr })}
-                  onAppointmentClick={setSelectedApt}
+                  onAppointmentClick={apt => setSelectedApt(apt._originalApt || apt)}
                 />
               ))}
             </div>
