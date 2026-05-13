@@ -27,21 +27,37 @@ function ClientSearch({ clients, onSelect }) {
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
 
+  // Normalize phone: strip leading country code so "16165550100" → "6165550100"
+  function normPhone(p) {
+    const d = (p || '').replace(/\D/g, '')
+    return d.length === 11 && d.startsWith('1') ? d.slice(1) : d
+  }
+
   // Merge real clients with unique entries derived from appointment history
   const allClients = useMemo(() => {
-    const seen = new Set(clients.map(c => (c.phone || '').replace(/\D/g, '')).filter(Boolean))
-    const fromApts = []
+    const seenPhone = new Set(clients.map(c => normPhone(c.phone)).filter(d => d.length >= 10))
+    const seenName  = new Set(clients.map(c => (c.name || '').toLowerCase().trim()).filter(Boolean))
+    const fromApts  = []
     for (const apt of appointments) {
-      const digits = (apt.clientPhone || '').replace(/\D/g, '')
-      if (!digits || digits.length < 10 || seen.has(digits)) continue
-      seen.add(digits)
-      const parts = (apt.clientName || '').trim().split(/\s+/)
+      const name   = (apt.clientName || '').trim()
+      if (!name) continue
+      const digits = normPhone(apt.clientPhone)
+      // Dedup: by phone if available, else by name
+      if (digits.length === 10) {
+        if (seenPhone.has(digits)) continue
+        seenPhone.add(digits)
+      } else {
+        const lname = name.toLowerCase()
+        if (seenName.has(lname)) continue
+        seenName.add(lname)
+      }
+      const parts = name.split(/\s+/)
       fromApts.push({
-        id:        `apt-${digits}`,
+        id:        digits ? `apt-${digits}` : `apt-n-${name.replace(/\s+/g,'-')}`,
         firstName: parts[0] || '',
         lastName:  parts.slice(1).join(' '),
-        name:      apt.clientName || '',
-        phone:     apt.clientPhone || '',
+        name,
+        phone:     digits.length === 10 ? (apt.clientPhone || '') : '',
       })
     }
     return [...clients, ...fromApts]
@@ -91,7 +107,7 @@ function ClientSearch({ clients, onSelect }) {
 }
 
 /* ── Multi-service builder with per-service tech ────────────── */
-function ServiceBuilder({ services, onChange, technicians }) {
+function ServiceBuilder({ services, onChange, technicians, timing }) {
   const available = SERVICES   // allow same service multiple times (e.g. group pedicures)
 
   function addService(name) {
@@ -141,7 +157,7 @@ function ServiceBuilder({ services, onChange, technicians }) {
                 {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
-            {i > 0 && (
+            {i > 0 && timing !== 'sametime' && (
               <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:5 }}>
                 <span style={{ fontSize:11, color:'#94a3b8', whiteSpace:'nowrap' }}>Start time:</span>
                 <input
@@ -181,7 +197,25 @@ function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
 
   const [form,     setForm]     = useState({ ...initial, techRequested: initial.techRequested || false })
   const [services, setServices] = useState(initServices)
+  const [timing,   setTiming]   = useState('sequential')
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  function handleTimingChange(mode) {
+    setTiming(mode)
+    if (mode === 'sametime') {
+      setServices(prev => prev.map(s => ({ ...s, startTime: form.startTime || undefined })))
+    } else {
+      setServices(prev => prev.map(s => ({ ...s, startTime: undefined })))
+    }
+  }
+
+  function handleStartTimeChange(e) {
+    const t = e.target.value
+    set('startTime', t)
+    if (timing === 'sametime') {
+      setServices(prev => prev.map(s => ({ ...s, startTime: t || undefined })))
+    }
+  }
 
   const totalDuration = services.reduce((sum, s) => sum + s.duration, 0)
   const primaryTech   = technicians.find(t => t.id === (services[0]?.technicianId || form.technicianId))
@@ -221,7 +255,21 @@ function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
         </div>
       </div>
 
-      <ServiceBuilder services={services} onChange={setServices} technicians={technicians} />
+      <ServiceBuilder services={services} onChange={setServices} technicians={technicians} timing={timing} />
+
+      {services.length > 1 && (
+        <div style={{ display:'flex', gap:0, marginBottom:12, border:'1px solid #e2e8f0', borderRadius:8, overflow:'hidden', width:'fit-content' }}>
+          {['sequential', 'sametime'].map(mode => (
+            <button key={mode} type="button" onClick={() => handleTimingChange(mode)} style={{
+              padding:'6px 16px', fontSize:12, fontWeight:600, border:'none', cursor:'pointer',
+              background: timing === mode ? '#4f46e5' : '#f8fafc',
+              color: timing === mode ? '#fff' : '#94a3b8',
+            }}>
+              {mode === 'sequential' ? 'Sequential' : 'Same Time'}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{ display:'flex', gap:10 }}>
         <div className="form-group" style={{ flex:1 }}>
@@ -230,7 +278,7 @@ function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
         </div>
         <div className="form-group" style={{ flex:1 }}>
           <label className="form-label">Start Time</label>
-          <input className="form-input" type="time" value={form.startTime} onChange={e => set('startTime', e.target.value)} />
+          <input className="form-input" type="time" value={form.startTime} onChange={handleStartTimeChange} />
         </div>
       </div>
       {totalDuration > 0 && (

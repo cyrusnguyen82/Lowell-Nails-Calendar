@@ -365,19 +365,35 @@ export default function ClientsPage() {
 
   // Merge DB clients with appointment-derived entries for clients not yet in the DB
   const allClients = useMemo(() => {
-    const seen = new Set(clients.map(c => (c.phone || '').replace(/\D/g, '')).filter(Boolean))
+    function normPhone(p) {
+      const d = (p || '').replace(/\D/g, '')
+      return d.length === 11 && d.startsWith('1') ? d.slice(1) : d
+    }
+    const seenPhone = new Set(clients.map(c => normPhone(c.phone)).filter(d => d.length >= 10))
+    const seenName  = new Set(clients.map(c => {
+      const full = `${c.firstName || ''} ${c.lastName || ''}`.trim() || (c.name || '')
+      return full.toLowerCase()
+    }).filter(Boolean))
     const fromApts = []
     for (const apt of (appointments || [])) {
-      const digits = (apt.clientPhone || '').replace(/\D/g, '')
-      if (!digits || digits.length < 10 || seen.has(digits)) continue
-      seen.add(digits)
-      const parts = (apt.clientName || '').trim().split(/\s+/)
+      const name   = (apt.clientName || '').trim()
+      if (!name) continue
+      const digits = normPhone(apt.clientPhone)
+      if (digits.length === 10) {
+        if (seenPhone.has(digits)) continue
+        seenPhone.add(digits)
+      } else {
+        const lname = name.toLowerCase()
+        if (seenName.has(lname)) continue
+        seenName.add(lname)
+      }
+      const parts = name.split(/\s+/)
       fromApts.push({
-        id: `apt-${digits}`,
+        id:        digits ? `apt-${digits}` : `apt-n-${name.replace(/\s+/g,'-')}`,
         firstName: parts[0] || '',
         lastName:  parts.slice(1).join(' '),
-        name:      apt.clientName || '',
-        phone:     apt.clientPhone || '',
+        name,
+        phone:     digits.length === 10 ? (apt.clientPhone || '') : '',
         email: '', notes: '', serviceHistory: [], totalVisits: 0, lastVisit: '—',
         _fromApt: true,
       })
