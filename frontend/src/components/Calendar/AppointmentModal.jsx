@@ -69,58 +69,64 @@ function ClientSearch({ clients, onSelect }) {
   )
 }
 
-/* ── Multi-service builder ───────────────────────────────────── */
-function ServiceBuilder({ services, onChange }) {
-  const [adding, setAdding] = useState(false)
+/* ── Multi-service builder with per-service tech ────────────── */
+function ServiceBuilder({ services, onChange, technicians }) {
   const usedNames = new Set(services.map(s => s.name))
   const available = SERVICES.filter(s => !usedNames.has(s.name))
 
   function addService(name) {
     const svc = SERVICES.find(s => s.name === name)
-    if (svc) onChange([...services, { name: svc.name, duration: svc.duration }])
-    setAdding(false)
+    if (!svc) return
+    const defaultTechId = technicians[0]?.id || null
+    onChange([...services, { name: svc.name, duration: svc.duration, technicianId: defaultTechId }])
   }
 
   function remove(i) {
-    if (services.length > 1) onChange(services.filter((_, idx) => idx !== i))
+    onChange(services.filter((_, idx) => idx !== i))
+  }
+
+  function updateTech(i, techId) {
+    onChange(services.map((s, idx) => idx === i ? { ...s, technicianId: techId } : s))
   }
 
   return (
     <div className="form-group">
       <label className="form-label">Services *</label>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {services.map((s, i) => (
           <div key={i} style={{
-            display: 'flex', alignItems: 'center', gap: 8,
             background: '#f8fafc', border: '1px solid #e2e8f0',
-            borderRadius: 8, padding: '7px 10px',
+            borderRadius: 8, padding: '8px 10px',
           }}>
-            <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#1e293b' }}>{s.name}</span>
-            <span style={{ fontSize: 12, color: '#94a3b8' }}>{s.duration}m</span>
-            {services.length > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#1e293b' }}>{s.name}</span>
+              <span style={{ fontSize: 12, color: '#94a3b8' }}>{s.duration}m</span>
               <button type="button" onClick={() => remove(i)}
                 style={{ background:'none', border:'none', cursor:'pointer', color:'#cbd5e1', fontSize:18, lineHeight:1, padding:0 }}>
                 ×
               </button>
-            )}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 11, color: '#94a3b8', whiteSpace: 'nowrap' }}>Technician:</span>
+              <select
+                className="form-select"
+                value={s.technicianId || ''}
+                onChange={e => updateTech(i, Number(e.target.value))}
+                style={{ fontSize: 12, padding: '4px 8px', height: 'auto' }}
+              >
+                {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
           </div>
         ))}
-        {adding ? (
-          <select className="form-select" autoFocus defaultValue=""
-            onChange={e => e.target.value && addService(e.target.value)}
-            onBlur={() => setAdding(false)}>
-            <option value="">Pick a service…</option>
+        {services.length === 0 && (
+          <div style={{ fontSize: 13, color: '#94a3b8', padding: '6px 2px' }}>No services added yet.</div>
+        )}
+        {available.length > 0 && (
+          <select className="form-select" value="" onChange={e => e.target.value && addService(e.target.value)}>
+            <option value="">+ Add a service…</option>
             {available.map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
           </select>
-        ) : available.length > 0 && (
-          <button type="button" onClick={() => setAdding(true)}
-            style={{
-              background: 'none', border: '1.5px dashed #cbd5e1', borderRadius: 8,
-              padding: '7px 10px', cursor: 'pointer', fontSize: 12, color: '#94a3b8',
-              textAlign: 'left', fontFamily: 'inherit',
-            }}>
-            + Add another service
-          </button>
         )}
       </div>
     </div>
@@ -129,27 +135,30 @@ function ServiceBuilder({ services, onChange }) {
 
 /* ── Booking form (new + edit) ──────────────────────────────── */
 function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
+  // Existing appointments: hydrate technicianId per service from appointment's tech
   const initServices = initial.services?.length
-    ? initial.services
+    ? initial.services.map(s => ({ ...s, technicianId: s.technicianId || initial.technicianId || technicians[0]?.id }))
     : initial.service
-      ? [{ name: initial.service, duration: initial.duration || 60 }]
-      : [{ name: SERVICES[0].name, duration: SERVICES[0].duration }]
+      ? [{ name: initial.service, duration: initial.duration || 60, technicianId: initial.technicianId || technicians[0]?.id }]
+      : []   // start empty for new appointments
 
   const [form,     setForm]     = useState({ ...initial, techRequested: initial.techRequested || false })
   const [services, setServices] = useState(initServices)
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
   const totalDuration = services.reduce((sum, s) => sum + s.duration, 0)
-  const tech    = technicians.find(t => t.id === form.technicianId)
-  const endTime = addMinutes(form.startTime, totalDuration)
+  const primaryTech   = technicians.find(t => t.id === (services[0]?.technicianId || form.technicianId))
+  const endTime       = totalDuration ? addMinutes(form.startTime, totalDuration) : ''
 
   function handleSave() {
     if (!form.clientName.trim() || !form.clientPhone?.trim() || !services.length) return
+    const primaryTechId = services[0]?.technicianId || form.technicianId
     onSave({
       ...form,
-      service:  services.map(s => s.name).join(' + '),
+      technicianId: primaryTechId,
+      service:      services.map(s => s.name).join(' + '),
       services,
-      duration: totalDuration,
+      duration:     totalDuration,
     })
   }
 
@@ -175,15 +184,7 @@ function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
         </div>
       </div>
 
-      <ServiceBuilder services={services} onChange={setServices} />
-
-      <div className="form-group">
-        <label className="form-label">Technician</label>
-        <select className="form-select" value={form.technicianId}
-          onChange={e => set('technicianId', Number(e.target.value))}>
-          {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-        </select>
-      </div>
+      <ServiceBuilder services={services} onChange={setServices} technicians={technicians} />
 
       <div style={{ display:'flex', gap:10 }}>
         <div className="form-group" style={{ flex:1 }}>
@@ -195,9 +196,12 @@ function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
           <input className="form-input" type="time" value={form.startTime} onChange={e => set('startTime', e.target.value)} />
         </div>
       </div>
-      <div style={{ fontSize:12, color:'#64748b', marginBottom:12 }}>
-        {formatTime(form.startTime)} → {formatTime(endTime)} · {totalDuration} min · {tech?.name}
-      </div>
+      {totalDuration > 0 && (
+        <div style={{ fontSize:12, color:'#64748b', marginBottom:12 }}>
+          {formatTime(form.startTime)} → {formatTime(endTime)} · {totalDuration} min
+          {primaryTech && ` · Primary: ${primaryTech.name}`}
+        </div>
+      )}
 
       <div className="form-group">
         <label className="form-label">Notes</label>
