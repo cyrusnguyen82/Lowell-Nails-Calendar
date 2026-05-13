@@ -352,6 +352,11 @@ export default function BookingPage() {
   }
 
   function renderConfirmation() {
+    function handleDone() {
+      window.close()
+      setTimeout(() => { window.location.href = 'https://lowellnailsandspa.com' }, 400)
+    }
+
     return (
       <div className="booking-confirm">
         <div className="booking-confirm-icon" style={{ background: 'rgba(14,165,233,0.1)' }}>
@@ -392,13 +397,22 @@ export default function BookingPage() {
           <a href={booking?.cancelUrl}>Cancel this appointment</a>
         </div>
 
-        <button
-          className="booking-btn-next"
-          style={{ width: '100%', marginTop: 20 }}
-          onClick={() => window.location.reload()}
-        >
-          Book Another Appointment
-        </button>
+        <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
+          <button
+            className="booking-btn-back"
+            style={{ flex: 1 }}
+            onClick={handleDone}
+          >
+            Done
+          </button>
+          <button
+            className="booking-btn-next"
+            style={{ flex: 2 }}
+            onClick={() => window.location.reload()}
+          >
+            Book Another
+          </button>
+        </div>
       </div>
     )
   }
