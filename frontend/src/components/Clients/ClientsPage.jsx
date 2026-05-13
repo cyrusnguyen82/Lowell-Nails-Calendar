@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import XLSX from 'xlsx'
 import { useApp } from '../../context/AppContext'
 import { SERVICES } from '../../data/mockData'
@@ -232,7 +232,7 @@ function ClientModal({ client, canEdit, technicians, onClose, onSave, onDelete, 
 
 /* ── Page ────────────────────────────────────────────────── */
 export default function ClientsPage() {
-  const { user, clients, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry, technicians, fetchClients } = useApp()
+  const { user, clients, appointments, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry, technicians, fetchClients } = useApp()
   const [search, setSearch]     = useState('')
   const [selected, setSelected] = useState(null)
   const [sortKey, setSortKey]   = useState('name')
@@ -363,7 +363,29 @@ export default function ClientsPage() {
 
   const canEdit = user.role === 'admin' || user.role === 'receptionist'
 
-  const filtered = clients
+  // Merge DB clients with appointment-derived entries for clients not yet in the DB
+  const allClients = useMemo(() => {
+    const seen = new Set(clients.map(c => (c.phone || '').replace(/\D/g, '')).filter(Boolean))
+    const fromApts = []
+    for (const apt of (appointments || [])) {
+      const digits = (apt.clientPhone || '').replace(/\D/g, '')
+      if (!digits || digits.length < 10 || seen.has(digits)) continue
+      seen.add(digits)
+      const parts = (apt.clientName || '').trim().split(/\s+/)
+      fromApts.push({
+        id: `apt-${digits}`,
+        firstName: parts[0] || '',
+        lastName:  parts.slice(1).join(' '),
+        name:      apt.clientName || '',
+        phone:     apt.clientPhone || '',
+        email: '', notes: '', serviceHistory: [], totalVisits: 0, lastVisit: '—',
+        _fromApt: true,
+      })
+    }
+    return [...clients, ...fromApts]
+  }, [clients, appointments])
+
+  const filtered = allClients
     .filter(c => {
       const q = search.toLowerCase()
       return (c.name || '').toLowerCase().includes(q) ||
@@ -395,7 +417,7 @@ export default function ClientsPage() {
 
   function handleSave(form) {
     const payload = { ...form, phone: formatPhone(form.phone || '') }
-    if (selected === 'new') addClient({ ...payload, serviceHistory: [] })
+    if (selected === 'new' || selected?._fromApt) addClient({ ...payload, serviceHistory: [] })
     else updateClient(selected.id, payload)
     setSelected(null)
   }
@@ -403,6 +425,7 @@ export default function ClientsPage() {
   /* Re-select updated client from state so tabs refresh */
   function getSelected() {
     if (selected === 'new' || selected === null) return selected
+    if (selected?._fromApt) return selected
     return clients.find(c => c.id === selected.id) ?? selected
   }
 

@@ -46,6 +46,12 @@ export function AppProvider({ children }) {
       setGiftCards(gcs)
       setUsers(usrs)
       setLoading(false)
+      // If clients table is empty but appointments exist, auto-populate from history
+      if (apts.length > 0 && cls.length === 0) {
+        api.post('/clients/sync-from-appointments')
+          .then(() => api.get('/clients').then(newCls => setClients(newCls)))
+          .catch(() => {})
+      }
     }).catch(err => {
       console.error('API load failed:', err.message)
       setApiError(err.message)

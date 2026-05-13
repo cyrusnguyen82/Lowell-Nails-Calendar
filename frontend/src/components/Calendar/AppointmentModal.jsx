@@ -92,8 +92,7 @@ function ClientSearch({ clients, onSelect }) {
 
 /* ── Multi-service builder with per-service tech ────────────── */
 function ServiceBuilder({ services, onChange, technicians }) {
-  const usedNames = new Set(services.map(s => s.name))
-  const available = SERVICES.filter(s => !usedNames.has(s.name))
+  const available = SERVICES   // allow same service multiple times (e.g. group pedicures)
 
   function addService(name) {
     const svc = SERVICES.find(s => s.name === name)
