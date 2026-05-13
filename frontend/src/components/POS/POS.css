@@ -956,3 +956,36 @@
   align-items: center;
   flex-shrink: 0;
 }
+
+/* ── Mobile floating back button ─────────────────────────────── */
+.pos-mobile-back {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pos-mobile-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: fixed;
+    bottom: 20px;
+    left: 16px;
+    z-index: 500;
+    background: var(--pos-sidebar);
+    border: 1.5px solid var(--pos-border);
+    color: var(--pos-text);
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    transition: all 0.15s;
+  }
+
+  .pos-mobile-back:hover {
+    background: var(--pos-hover);
+    border-color: var(--pos-gold);
+  }
+}

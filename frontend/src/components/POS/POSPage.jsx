@@ -125,6 +125,9 @@ function CheckInScreen({ onSelectAppointment, onSelectTech, onNewWalkin, onNavig
 
   return (
     <div className="pos-checkin">
+      <button className="pos-mobile-back" onClick={() => onNavigate('calendar')}>
+        <ChevronLeft size={15} /> Calendar
+      </button>
       {/* Header */}
       <div className="pos-checkin-header">
         <div className="pos-brand">
@@ -335,6 +338,9 @@ export default function POSPage({ onNavigate }) {
   // ── Checkout Screen ───────────────────────────────────────────
   return (
     <div className="pos-container">
+      <button className="pos-mobile-back" onClick={() => setMode('checkin')}>
+        <ChevronLeft size={15} /> Back
+      </button>
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
 
       {/* Sidebar: Ticket */}
