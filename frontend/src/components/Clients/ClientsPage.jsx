@@ -239,6 +239,7 @@ export default function ClientsPage() {
   const [sortAsc, setSortAsc]   = useState(true)
   const [importMsg, setImportMsg] = useState('')
   const [deduping, setDeduping]   = useState(false)
+  const [syncing, setSyncing]     = useState(false)
   const importRef = useRef(null)
 
   async function importRows(rows) {
@@ -304,6 +305,20 @@ export default function ClientsPage() {
       console.error('Bulk import error:', err)
     }
     setTimeout(() => setImportMsg(''), 5000)
+  }
+
+  async function handleSyncFromAppts() {
+    setSyncing(true)
+    try {
+      const result = await api.post('/clients/sync-from-appointments')
+      setImportMsg(`Sync complete! Added ${result.added} new client${result.added !== 1 ? 's' : ''} from ${result.total} appointments.`)
+      await fetchClients()
+    } catch (err) {
+      setImportMsg(`Sync error: ${err.message}`)
+    } finally {
+      setSyncing(false)
+      setTimeout(() => setImportMsg(''), 6000)
+    }
   }
 
   async function handleDedupe() {
@@ -398,6 +413,9 @@ export default function ClientsPage() {
         <input className="clients-search" placeholder="Search by name, phone, or email..." value={search} onChange={e => setSearch(e.target.value)} />
         {canEdit && (
           <>
+            <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={handleSyncFromAppts} disabled={syncing}>
+              {syncing ? 'Syncing…' : 'Sync from Appointments'}
+            </button>
             <button className="btn btn-ghost" style={{ fontSize:13 }} onClick={() => importRef.current?.click()}>
               Import CSV
             </button>

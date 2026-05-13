@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SERVICES } from '../../data/mockData'
 
@@ -23,15 +23,36 @@ function addMinutes(t, mins) {
 
 /* ── Client search autocomplete ─────────────────────────────── */
 function ClientSearch({ clients, onSelect }) {
+  const { appointments } = useApp()
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
 
+  // Merge real clients with unique entries derived from appointment history
+  const allClients = useMemo(() => {
+    const seen = new Set(clients.map(c => (c.phone || '').replace(/\D/g, '')).filter(Boolean))
+    const fromApts = []
+    for (const apt of appointments) {
+      const digits = (apt.clientPhone || '').replace(/\D/g, '')
+      if (!digits || digits.length < 10 || seen.has(digits)) continue
+      seen.add(digits)
+      const parts = (apt.clientName || '').trim().split(/\s+/)
+      fromApts.push({
+        id:        `apt-${digits}`,
+        firstName: parts[0] || '',
+        lastName:  parts.slice(1).join(' '),
+        name:      apt.clientName || '',
+        phone:     apt.clientPhone || '',
+      })
+    }
+    return [...clients, ...fromApts]
+  }, [clients, appointments])
+
   const results = q.length >= 2
-    ? clients.filter(c => {
-        const name  = `${c.firstName} ${c.lastName}`.toLowerCase()
+    ? allClients.filter(c => {
+        const name  = `${c.name || ''} ${c.firstName || ''} ${c.lastName || ''}`.toLowerCase()
         const phone = (c.phone || '').replace(/\D/g, '')
         return name.includes(q.toLowerCase()) || phone.includes(q.replace(/\D/g, ''))
-      }).slice(0, 6)
+      }).slice(0, 8)
     : []
 
   return (

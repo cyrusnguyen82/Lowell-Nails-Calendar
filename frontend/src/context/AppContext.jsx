@@ -186,6 +186,13 @@ export function AppProvider({ children }) {
   }
 
   // ── Clients ────────────────────────────────────────────────
+  async function fetchClients() {
+    try {
+      const cls = await api.get('/clients')
+      setClients(cls)
+    } catch (err) { console.error('fetchClients failed:', err.message) }
+  }
+
   async function addClient(c) {
     const tempId = Date.now()
     const temp = { ...c, id: tempId, serviceHistory: [], totalVisits: 0, lastVisit: '—' }
@@ -304,7 +311,7 @@ export function AppProvider({ children }) {
       user, users, login, logout, addUser, updateUser, deleteUser,
       technicians, addTechnician, updateTechnician, deleteTechnician,
       appointments, addAppointment, updateAppointment, deleteAppointment,
-      clients, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry,
+      clients, addClient, updateClient, deleteClient, addServiceEntry, deleteServiceEntry, fetchClients,
       giftCards, addGiftCard, updateGiftCard, deleteGiftCard, redeemGiftCard,
       clockStatus, clockIn, clockOut, refreshClock: fetchClockStatus,
     }}>
