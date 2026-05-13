@@ -70,9 +70,31 @@
   background: #ffffff;
   border-radius: 20px;
   border: 1px solid rgba(12,26,46,0.07);
-  padding: 28px 28px 24px;
-  margin-top: 20px;
+  padding: 24px 24px 0;
+  margin-top: 16px;
   box-shadow: 0 4px 32px rgba(12,26,46,0.07), 0 1px 4px rgba(12,26,46,0.04);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 190px);
+  min-height: 0;
+}
+
+/* Scrollable step content */
+.booking-card-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(12,26,46,0.12) transparent;
+}
+
+.booking-card-body::-webkit-scrollbar { width: 4px; }
+.booking-card-body::-webkit-scrollbar-track { background: transparent; }
+.booking-card-body::-webkit-scrollbar-thumb {
+  background: rgba(12,26,46,0.14);
+  border-radius: 2px;
 }
 
 .booking-step-title {
@@ -396,7 +418,11 @@
 .booking-nav {
   display: flex;
   gap: 10px;
-  margin-top: 24px;
+  flex-shrink: 0;
+  padding: 14px 0 20px;
+  border-top: 1px solid rgba(12,26,46,0.06);
+  margin-top: 12px;
+  background: #fff;
 }
 
 .booking-btn-back {
@@ -535,7 +561,7 @@
 
 /* ── Footer ── */
 .booking-footer {
-  margin-top: 28px;
+  margin-top: 16px;
   font-size: 12px;
   color: #7a9ab8;
   text-align: center;
@@ -545,4 +571,45 @@
 .booking-footer a {
   color: #0ea5e9;
   text-decoration: none;
+}
+
+/* ── Responsive ────────────────────────────────────────────────── */
+
+/* Short screens: let page scroll naturally instead of constraining card */
+@media (max-height: 560px) {
+  .booking-card {
+    max-height: none;
+  }
+  .booking-card-body {
+    overflow-y: visible;
+    flex: unset;
+  }
+}
+
+/* Narrow phones */
+@media (max-width: 400px) {
+  .booking-root { padding: 0 10px 48px; }
+
+  .booking-header { padding: 20px 0 0; }
+  .booking-title  { font-size: 20px; }
+  .booking-steps  { margin-top: 16px; }
+
+  .booking-card {
+    padding: 18px 16px 0;
+    border-radius: 16px;
+    margin-top: 12px;
+    max-height: calc(100dvh - 160px);
+  }
+
+  .booking-service-btn { padding: 11px 10px; }
+  .booking-service-name { font-size: 12px; }
+  .booking-service-price { font-size: 13px; }
+
+  .booking-cal-day { font-size: 12px; border-radius: 6px; }
+
+  .booking-slot-btn { padding: 13px 8px; }
+  .booking-slot-time { font-size: 14px; }
+
+  .booking-nav { padding: 12px 0 16px; }
+  .booking-btn-back, .booking-btn-next { padding: 12px; font-size: 13px; }
 }

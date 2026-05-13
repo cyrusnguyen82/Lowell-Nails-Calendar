@@ -449,7 +449,9 @@ export default function BookingPage() {
           </>
         )}
 
-        {renderStep()}
+        <div className="booking-card-body">
+          {renderStep()}
+        </div>
 
         {step < 5 && (
           <div className="booking-nav">
