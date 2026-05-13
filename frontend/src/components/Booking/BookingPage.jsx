@@ -353,8 +353,7 @@ export default function BookingPage() {
 
   function renderConfirmation() {
     function handleDone() {
-      window.close()
-      setTimeout(() => { window.location.href = 'https://lowellnailsandspa.com' }, 400)
+      window.location.href = 'http://www.lowellnailsandspa.com'
     }
 
     return (
