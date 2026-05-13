@@ -65,9 +65,10 @@ function ClientSearch({ clients, onSelect }) {
 
   const results = q.length >= 2
     ? allClients.filter(c => {
-        const name  = `${c.name || ''} ${c.firstName || ''} ${c.lastName || ''}`.toLowerCase()
-        const phone = (c.phone || '').replace(/\D/g, '')
-        return name.includes(q.toLowerCase()) || phone.includes(q.replace(/\D/g, ''))
+        const name   = `${c.name || ''} ${c.firstName || ''} ${c.lastName || ''}`.toLowerCase()
+        const phone  = (c.phone || '').replace(/\D/g, '')
+        const phoneQ = q.replace(/\D/g, '')
+        return name.includes(q.toLowerCase()) || (phoneQ.length > 0 && phone.includes(phoneQ))
       }).slice(0, 8)
     : []
 
@@ -129,6 +130,10 @@ function ServiceBuilder({ services, onChange, technicians, timing }) {
     onChange(services.map((s, idx) => idx === i ? { ...s, startTime: time || undefined } : s))
   }
 
+  function updateTechRequested(i, val) {
+    onChange(services.map((s, idx) => idx === i ? { ...s, techRequested: val } : s))
+  }
+
   return (
     <div className="form-group">
       <label className="form-label">Services *</label>
@@ -156,6 +161,17 @@ function ServiceBuilder({ services, onChange, technicians, timing }) {
               >
                 {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
+              <label style={{ display:'flex', alignItems:'center', gap:4, cursor:'pointer', whiteSpace:'nowrap', marginLeft:4 }}>
+                <input
+                  type="checkbox"
+                  checked={!!s.techRequested}
+                  onChange={e => updateTechRequested(i, e.target.checked)}
+                  style={{ width:13, height:13, accentColor:'#ef4444' }}
+                />
+                <span style={{ fontSize:11, color: s.techRequested ? '#ef4444' : '#94a3b8', fontWeight: s.techRequested ? 700 : 400 }}>
+                  Requested
+                </span>
+              </label>
             </div>
             {i > 0 && timing !== 'sametime' && (
               <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:5 }}>
@@ -224,12 +240,14 @@ function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
   function handleSave() {
     if (!form.clientName.trim() || !form.clientPhone?.trim() || !services.length) return
     const primaryTechId = services[0]?.technicianId || form.technicianId
+    const anyRequested  = services.some(s => s.techRequested) || form.techRequested
     onSave({
       ...form,
-      technicianId: primaryTechId,
-      service:      services.map(s => s.name).join(' + '),
+      technicianId:  primaryTechId,
+      service:       services.map(s => s.name).join(' + '),
       services,
-      duration:     totalDuration,
+      duration:      totalDuration,
+      techRequested: anyRequested,
     })
   }
 

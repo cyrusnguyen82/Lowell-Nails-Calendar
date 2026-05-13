@@ -403,11 +403,12 @@ export default function ClientsPage() {
 
   const filtered = allClients
     .filter(c => {
-      const q = search.toLowerCase()
+      const q      = search.toLowerCase()
+      const phoneQ = search.replace(/\D/g, '')
       return (c.name || '').toLowerCase().includes(q) ||
         (c.firstName || '').toLowerCase().includes(q) ||
         (c.lastName  || '').toLowerCase().includes(q) ||
-        (c.phone || '').replace(/\D/g, '').includes(search.replace(/\D/g, '')) ||
+        (phoneQ.length > 0 && (c.phone || '').replace(/\D/g, '').includes(phoneQ)) ||
         (c.email || '').toLowerCase().includes(q)
     })
     .sort((a, b) => {
