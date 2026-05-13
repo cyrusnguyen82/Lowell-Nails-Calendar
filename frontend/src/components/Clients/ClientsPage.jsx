@@ -354,7 +354,7 @@ export default function ClientsPage() {
       return (c.name || '').toLowerCase().includes(q) ||
         (c.firstName || '').toLowerCase().includes(q) ||
         (c.lastName  || '').toLowerCase().includes(q) ||
-        (c.phone || '').includes(search) ||
+        (c.phone || '').replace(/\D/g, '').includes(search.replace(/\D/g, '')) ||
         (c.email || '').toLowerCase().includes(q)
     })
     .sort((a, b) => {

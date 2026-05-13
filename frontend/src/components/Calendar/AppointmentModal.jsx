@@ -316,39 +316,46 @@ function ViewModal({ appointment, tech, canEdit, onClose, onEdit, onDelete, onRe
         </div>
       )}
 
-      <div className="modal-footer">
-        <button className="btn btn-danger" onClick={() => onDelete(appointment.id)}>Remove</button>
-        {canEdit && !rescheduling && (
-          <button className="btn btn-ghost" style={{ color:'#4f46e5', borderColor:'#c7d2fe' }}
-            onClick={() => setRescheduling(true)}>
-            Reschedule
-          </button>
-        )}
-        {canEdit && <button className="btn btn-ghost" onClick={onEdit}>Edit</button>}
+      <div className="modal-footer" style={{ flexDirection:'column', gap:8 }}>
+        {/* Row 1 — status actions */}
         {canEdit && (
-          <button className="btn btn-ghost"
-            style={{ color: appointment.techRequested ? '#ef4444' : '#94a3b8', borderColor: appointment.techRequested ? '#fca5a5' : '#e2e8f0' }}
-            onClick={onToggleRequested}>
-            {appointment.techRequested ? '★ Requested' : '☆ Request'}
-          </button>
+          <div style={{ display:'flex', gap:8, width:'100%', flexWrap:'wrap' }}>
+            <button className="btn btn-ghost" style={{ flex:1, minWidth:90,
+              color: appointment.techRequested ? '#ef4444' : '#94a3b8',
+              borderColor: appointment.techRequested ? '#fca5a5' : '#e2e8f0' }}
+              onClick={onToggleRequested}>
+              {appointment.techRequested ? '★ Requested' : '☆ Request'}
+            </button>
+            {appointment.status !== 'checkedin' && !appointment.clientConfirmed && (
+              <button className="btn btn-ghost" style={{ flex:1, minWidth:90, color:'#1d4ed8', borderColor:'#bfdbfe' }}
+                onClick={onConfirm}>
+                ✓ Confirm
+              </button>
+            )}
+            {appointment.status !== 'checkedin' && onCheckIn && (
+              <button className="btn btn-primary" style={{ flex:1, minWidth:90, background:'#10b981' }}
+                onClick={onCheckIn}>
+                ✓ Check In
+              </button>
+            )}
+            {appointment.status === 'checkedin' && onCashOut && (
+              <button className="btn btn-primary" style={{ flex:1, minWidth:90, background:'#10b981' }}
+                onClick={() => onCashOut(appointment)}>
+                Cash Out →
+              </button>
+            )}
+          </div>
         )}
-        {canEdit && appointment.status !== 'checkedin' && !appointment.clientConfirmed && (
-          <button className="btn btn-ghost" style={{ color:'#1d4ed8', borderColor:'#bfdbfe' }} onClick={onConfirm}>
-            ✓ Confirm
-          </button>
-        )}
-        {canEdit && appointment.status !== 'checkedin' && onCheckIn && (
-          <button className="btn btn-primary" style={{ background:'#10b981', whiteSpace:'nowrap' }} onClick={onCheckIn}>
-            ✓ Check In
-          </button>
-        )}
-        {appointment.status === 'checkedin' && onCashOut && (
-          <button className="btn btn-primary" style={{ background:'#10b981', marginLeft:'auto' }}
-            onClick={() => onCashOut(appointment)}>
-            Cash Out →
-          </button>
-        )}
-        <button className="btn btn-ghost" onClick={onClose}>Close</button>
+        {/* Row 2 — management actions */}
+        <div style={{ display:'flex', gap:8, width:'100%', flexWrap:'wrap' }}>
+          <button className="btn btn-danger" onClick={() => onDelete(appointment.id)}>Remove</button>
+          {canEdit && !rescheduling && (
+            <button className="btn btn-ghost" style={{ color:'#4f46e5', borderColor:'#c7d2fe' }}
+              onClick={() => setRescheduling(true)}>Reschedule</button>
+          )}
+          {canEdit && <button className="btn btn-ghost" onClick={onEdit}>Edit</button>}
+          <button className="btn btn-ghost" style={{ marginLeft:'auto' }} onClick={onClose}>Close</button>
+        </div>
       </div>
     </>
   )

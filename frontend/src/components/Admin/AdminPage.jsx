@@ -6,9 +6,53 @@ import { Lock } from 'lucide-react'
 import './Admin.css'
 import '../Calendar/Calendar.css'
 
-/* ── PIN Gate ─────────────────────────────────────────────── */
-const ADMIN_PIN = '1234'
+/* ── PIN helpers ──────────────────────────────────────────── */
+const PIN_KEY = 'lowell_admin_pin'
+function getAdminPin() { return localStorage.getItem(PIN_KEY) || '1234' }
 
+/* ── PIN management panel (admin only) ───────────────────── */
+function SecurityPanel() {
+  const [current,  setCurrent]  = useState('')
+  const [newPin,   setNewPin]   = useState('')
+  const [confirm,  setConfirm]  = useState('')
+  const [msg,      setMsg]      = useState(null)
+
+  function handleChange() {
+    if (current !== getAdminPin())      { setMsg({ err: true,  text: 'Current PIN is incorrect' });          return }
+    if (!/^\d{4}$/.test(newPin))        { setMsg({ err: true,  text: 'New PIN must be exactly 4 digits' });  return }
+    if (newPin !== confirm)             { setMsg({ err: true,  text: 'PINs do not match' });                  return }
+    localStorage.setItem(PIN_KEY, newPin)
+    setMsg({ err: false, text: 'PIN updated successfully' })
+    setCurrent(''); setNewPin(''); setConfirm('')
+  }
+
+  return (
+    <div style={{ maxWidth: 400, padding: 32 }}>
+      <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Admin PIN</h3>
+      <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 24 }}>
+        Default PIN is <strong>1234</strong>. Change it below — stored locally on this device.
+      </p>
+      {[
+        { label: 'Current PIN',  value: current,  set: setCurrent },
+        { label: 'New PIN',      value: newPin,   set: setNewPin  },
+        { label: 'Confirm PIN',  value: confirm,  set: setConfirm },
+      ].map(({ label, value, set }) => (
+        <div key={label} className="form-group">
+          <label className="form-label">{label}</label>
+          <input className="form-input" type="password" inputMode="numeric" maxLength={4}
+            value={value} onChange={e => { set(e.target.value.replace(/\D/g,'')); setMsg(null) }}
+            placeholder="••••" style={{ letterSpacing: '0.3em', maxWidth: 120 }} />
+        </div>
+      ))}
+      {msg && (
+        <p style={{ fontSize: 13, color: msg.err ? '#ef4444' : '#10b981', margin: '4px 0 12px' }}>{msg.text}</p>
+      )}
+      <button className="btn btn-primary" onClick={handleChange}>Update PIN</button>
+    </div>
+  )
+}
+
+/* ── PIN Gate ─────────────────────────────────────────────── */
 function PinGate({ onUnlock }) {
   const [digits, setDigits]   = useState([])
   const [shaking, setShaking] = useState(false)
@@ -19,7 +63,7 @@ function PinGate({ onUnlock }) {
     const next = [...digits, d]
     setDigits(next)
     if (next.length === 4) {
-      if (next.join('') === ADMIN_PIN) {
+      if (next.join('') === getAdminPin()) {
         onUnlock()
       } else {
         setShaking(true); setError(true)
@@ -730,6 +774,7 @@ export default function AdminPage() {
     ['company',      'Company'        ],
     ['transactions', 'Transactions'   ],
     ['giftcards',    'Gift Cards'     ],
+    ...(user.role === 'admin' ? [['security', 'Security']] : []),
   ]
   const TABS = ALL_TABS
 
@@ -828,6 +873,9 @@ export default function AdminPage() {
 
         {/* ── Gift Cards ── */}
         {tab === 'giftcards' && <GiftCardsPage />}
+
+        {/* ── Security (admin only) ── */}
+        {tab === 'security' && user.role === 'admin' && <SecurityPanel />}
       </div>
 
       {/* Tech add / edit modal popup */}

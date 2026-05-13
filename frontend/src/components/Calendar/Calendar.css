@@ -237,12 +237,12 @@
 
 .slot {
   height: 30px;
-  border-bottom: 1px dashed rgba(255,255,255,0.04);
+  border-bottom: 1px dashed rgba(255,255,255,0.10);
   cursor: pointer;
   transition: background 0.1s;
 }
-.slot:nth-child(2n) { border-bottom: 1px solid rgba(255,255,255,0.05); }
-.slot:nth-child(4n) { border-bottom: 1px solid rgba(255,255,255,0.08); }
+.slot:nth-child(2n) { border-bottom: 1px solid rgba(255,255,255,0.18); }
+.slot:nth-child(4n) { border-bottom: 1px solid rgba(255,255,255,0.32); }
 .slot:hover  { background: rgba(197,160,89,0.05); }
 .slot:active { background: rgba(197,160,89,0.1);  }
 
