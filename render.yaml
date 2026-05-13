@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lowell-nails-calendar
+    name: Lowell-Nails-Calendar
     env: static
     rootDir: frontend
     buildCommand: npm install && npm run build

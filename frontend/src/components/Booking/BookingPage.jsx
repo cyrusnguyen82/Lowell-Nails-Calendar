@@ -482,7 +482,7 @@ export default function BookingPage() {
       <div className="booking-footer">
         Questions? Call us at <strong>(616) 319-7924</strong>
         <br />
-        <a href="https://lowellnails.com">lowellnails.com</a>
+        <a href="https://lowellnailsandspa.com">lowellnailsandspa.com</a>
       </div>
     </div>
   )
