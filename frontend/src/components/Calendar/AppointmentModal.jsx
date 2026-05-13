@@ -117,6 +117,7 @@ const TIME_SLOTS = (() => {
 
 function ServiceBuilder({ services, onChange, technicians, timing, defaultTechId, aptStartTime }) {
   const [openPicker, setOpenPicker] = useState(null)
+  const available = SERVICES
 
   function calcSeqTime(idx) {
     if (!aptStartTime) return ''
