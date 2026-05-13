@@ -108,18 +108,35 @@ function ClientSearch({ clients, onSelect }) {
 }
 
 /* ── Multi-service builder with per-service tech ────────────── */
-function ServiceBuilder({ services, onChange, technicians, timing }) {
-  const available = SERVICES   // allow same service multiple times (e.g. group pedicures)
+const TIME_SLOTS = (() => {
+  const s = []
+  for (let t = 8 * 60; t < 21 * 60; t += 15)
+    s.push(`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`)
+  return s
+})()
+
+function ServiceBuilder({ services, onChange, technicians, timing, defaultTechId, aptStartTime }) {
+  const [openPicker, setOpenPicker] = useState(null)
+
+  function calcSeqTime(idx) {
+    if (!aptStartTime) return ''
+    const [h, m] = aptStartTime.split(':').map(Number)
+    let mins = h * 60 + m
+    for (let j = 0; j < idx; j++) mins += (services[j].duration || 0)
+    if (mins >= 24 * 60) return ''
+    return `${String(Math.floor(mins / 60)).padStart(2,'0')}:${String(mins % 60).padStart(2,'0')}`
+  }
 
   function addService(name) {
     const svc = SERVICES.find(s => s.name === name)
     if (!svc) return
-    const defaultTechId = technicians[0]?.id || null
-    onChange([...services, { name: svc.name, duration: svc.duration, technicianId: defaultTechId }])
+    const techId = defaultTechId || technicians[0]?.id || null
+    onChange([...services, { name: svc.name, duration: svc.duration, technicianId: techId }])
   }
 
   function remove(i) {
     onChange(services.filter((_, idx) => idx !== i))
+    setOpenPicker(null)
   }
 
   function updateTech(i, techId) {
@@ -138,7 +155,10 @@ function ServiceBuilder({ services, onChange, technicians, timing }) {
     <div className="form-group">
       <label className="form-label">Services *</label>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {services.map((s, i) => (
+        {services.map((s, i) => {
+          const calcTime   = calcSeqTime(i)
+          const pickerOpen = openPicker === i
+          return (
           <div key={i} style={{
             background: '#f8fafc', border: '1px solid #e2e8f0',
             borderRadius: 8, padding: '8px 10px',
@@ -174,20 +194,65 @@ function ServiceBuilder({ services, onChange, technicians, timing }) {
               </label>
             </div>
             {i > 0 && timing !== 'sametime' && (
-              <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:5 }}>
-                <span style={{ fontSize:11, color:'#94a3b8', whiteSpace:'nowrap' }}>Start time:</span>
-                <input
-                  type="time"
-                  value={s.startTime || ''}
-                  onChange={e => updateStartTime(i, e.target.value)}
-                  placeholder="After prev. service"
-                  style={{ fontSize:12, padding:'3px 6px', border:'1px solid #e2e8f0', borderRadius:6, flex:1 }}
-                />
-                {!s.startTime && <span style={{ fontSize:10, color:'#cbd5e1' }}>sequential</span>}
+              <div style={{ position: 'relative', marginTop: 5 }}>
+                <button
+                  type="button"
+                  onClick={() => setOpenPicker(pickerOpen ? null : i)}
+                  onBlur={() => setTimeout(() => setOpenPicker(null), 150)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+                    fontSize: 12, padding: '4px 10px', border: '1px solid #e2e8f0',
+                    borderRadius: 6, background: '#fff', cursor: 'pointer', textAlign: 'left',
+                    color: s.startTime ? '#1e293b' : '#94a3b8',
+                  }}
+                >
+                  <span>⏰</span>
+                  <span style={{ flex: 1 }}>
+                    {s.startTime
+                      ? formatTime(s.startTime)
+                      : calcTime
+                        ? `${formatTime(calcTime)} — sequential`
+                        : 'Set start time…'}
+                  </span>
+                  {s.startTime && (
+                    <span
+                      onMouseDown={e => { e.stopPropagation(); updateStartTime(i, '') }}
+                      style={{ color: '#cbd5e1', fontSize: 14, lineHeight: 1, cursor: 'pointer', padding: '0 2px' }}
+                    >×</span>
+                  )}
+                </button>
+                {pickerOpen && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, zIndex: 400,
+                    background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8,
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.13)', maxHeight: 200,
+                    overflowY: 'auto', minWidth: 170,
+                  }}>
+                    {TIME_SLOTS.map(t => {
+                      const isCalc = t === calcTime
+                      const isSel  = t === (s.startTime || calcTime)
+                      return (
+                        <div key={t}
+                          onMouseDown={() => { updateStartTime(i, t); setOpenPicker(null) }}
+                          style={{
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            padding: '6px 12px', cursor: 'pointer', fontSize: 12,
+                            background: isSel ? '#e0e7ff' : 'transparent',
+                            color: isCalc ? '#4f46e5' : '#1e293b',
+                            fontWeight: isSel ? 700 : 400,
+                          }}>
+                          <span>{formatTime(t)}</span>
+                          {isCalc && <span style={{ fontSize: 10, color: '#a5b4fc' }}>sequential</span>}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        ))}
+          )
+        })}
         {services.length === 0 && (
           <div style={{ fontSize: 13, color: '#94a3b8', padding: '6px 2px' }}>No services added yet.</div>
         )}
@@ -273,7 +338,14 @@ function BookingForm({ initial, technicians, clients, onSave, onCancel }) {
         </div>
       </div>
 
-      <ServiceBuilder services={services} onChange={setServices} technicians={technicians} timing={timing} />
+      <ServiceBuilder
+        services={services}
+        onChange={setServices}
+        technicians={technicians}
+        timing={timing}
+        defaultTechId={form.technicianId}
+        aptStartTime={form.startTime}
+      />
 
       {services.length > 1 && (
         <div style={{ display:'flex', gap:0, marginBottom:12, border:'1px solid #e2e8f0', borderRadius:8, overflow:'hidden', width:'fit-content' }}>

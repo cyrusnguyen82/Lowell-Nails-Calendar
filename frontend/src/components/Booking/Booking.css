@@ -124,6 +124,7 @@
 }
 
 .booking-service-btn {
+  position: relative;
   background: #f5f9fd;
   border: 1.5px solid rgba(12,26,46,0.08);
   border-radius: 12px;

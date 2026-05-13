@@ -12,7 +12,7 @@ const apiPost  = (path, body) => fetch(`${BASE}/api${path}`, {
 const DAY_LABELS   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTH_NAMES  = ['January','February','March','April','May','June',
                       'July','August','September','October','November','December']
-const STEPS        = ['Service', 'Technician', 'Date', 'Time', 'Your Info']
+const STEPS        = ['Services', 'Technician', 'Date', 'Time', 'Your Info']
 
 function formatTime(t) {
   const [h, m] = t.split(':').map(Number)
@@ -58,14 +58,14 @@ export default function BookingPage() {
   const [techLoading,  setTechLoading]  = useState(true)
   const [slotsLoading, setSlotsLoading] = useState(false)
 
-  // Selections
-  const [selService, setSelService] = useState(null)
-  const [selTech,    setSelTech]    = useState(null)
-  const [selDate,    setSelDate]    = useState('')
-  const [selSlot,    setSelSlot]    = useState(null)
-  const [name,       setName]       = useState('')
-  const [phone,      setPhone]      = useState('')
-  const [notes,      setNotes]      = useState('')
+  // Selections — multi-service cart
+  const [selServices, setSelServices] = useState([])   // array of service objects
+  const [selTech,     setSelTech]     = useState(null)
+  const [selDate,     setSelDate]     = useState('')
+  const [selSlot,     setSelSlot]     = useState(null)
+  const [name,        setName]        = useState('')
+  const [phone,       setPhone]       = useState('')
+  const [notes,       setNotes]       = useState('')
 
   // Result
   const [booking,    setBooking]    = useState(null)
@@ -77,6 +77,9 @@ export default function BookingPage() {
   const [calYear,  setCalYear]  = useState(now.getFullYear())
   const [calMonth, setCalMonth] = useState(now.getMonth())
 
+  // Derived
+  const totalDuration = selServices.reduce((sum, s) => sum + s.duration, 0)
+
   /* ── Load services + techs on mount ── */
   useEffect(() => {
     apiFetch('/book/services')
@@ -87,14 +90,14 @@ export default function BookingPage() {
       .catch(() => setTechLoading(false))
   }, [])
 
-  /* ── Fetch slots when tech + date + service are all selected ── */
+  /* ── Fetch slots when tech + date + services are all set ── */
   useEffect(() => {
-    if (!selDate || !selTech || !selService) return
+    if (!selDate || !selTech || selServices.length === 0) return
     setSlotsLoading(true)
     setSlots([])
     setSelSlot(null)
 
-    const dur = selService.duration
+    const dur = totalDuration
 
     if (selTech.id === 'any') {
       Promise.all(
@@ -120,7 +123,7 @@ export default function BookingPage() {
         })
         .catch(() => setSlotsLoading(false))
     }
-  }, [selDate, selTech, selService])
+  }, [selDate, selTech, selServices])
 
   /* ── Calendar helpers ── */
   function buildCells() {
@@ -160,10 +163,12 @@ export default function BookingPage() {
     setError('')
     setSubmitting(true)
     try {
+      const serviceName = selServices.map(s => s.name).join(' + ')
       const result = await apiPost('/book', {
         technicianId: selSlot.techId,
-        service:      selService.name,
-        duration:     selService.duration,
+        service:      serviceName,
+        services:     selServices.map(s => ({ name: s.name, duration: s.duration, technicianId: selSlot.techId })),
+        duration:     totalDuration,
         date:         selDate,
         startTime:    selSlot.time,
         clientName:   name.trim(),
@@ -182,7 +187,7 @@ export default function BookingPage() {
 
   /* ── Can advance from each step ── */
   const canAdvance = [
-    !!selService,
+    selServices.length > 0,
     !!selTech,
     !!selDate,
     !!selSlot,
@@ -199,20 +204,60 @@ export default function BookingPage() {
       </div>
     )
     return (
-      <div className="booking-services">
-        {services.map(s => (
-          <button
-            key={s.id}
-            className={`booking-service-btn${selService?.id === s.id ? ' selected' : ''}`}
-            onClick={() => setSelService(s)}
-          >
-            <div className="booking-service-name">{s.name}</div>
-            <div className="booking-service-meta">{fmtDuration(s.duration)}</div>
-            {s.price > 0 && (
-              <div className="booking-service-price">${Number(s.price).toFixed(0)}</div>
-            )}
-          </button>
-        ))}
+      <div>
+        <div className="booking-services">
+          {services.map(s => {
+            const count = selServices.filter(ss => ss.id === s.id).length
+            return (
+              <button
+                key={s.id}
+                className={`booking-service-btn${count > 0 ? ' selected' : ''}`}
+                onClick={() => { setSelServices(prev => [...prev, s]); setSelSlot(null) }}
+              >
+                {count > 0 && (
+                  <div style={{
+                    position: 'absolute', top: 6, right: 6,
+                    background: '#0ea5e9', color: '#fff',
+                    borderRadius: '50%', width: 18, height: 18,
+                    fontSize: 11, fontWeight: 800,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>{count}</div>
+                )}
+                <div className="booking-service-name">{s.name}</div>
+                <div className="booking-service-meta">{fmtDuration(s.duration)}</div>
+                {s.price > 0 && (
+                  <div className="booking-service-price">${Number(s.price).toFixed(0)}</div>
+                )}
+              </button>
+            )
+          })}
+        </div>
+
+        {selServices.length > 0 && (
+          <div style={{
+            marginTop: 14, background: '#f0f8ff', borderRadius: 10,
+            border: '1px solid #bae0f5', padding: '10px 14px',
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#0284c7', marginBottom: 8 }}>
+              {selServices.length} service{selServices.length > 1 ? 's' : ''} selected · {fmtDuration(totalDuration)} total
+            </div>
+            {selServices.map((s, i) => (
+              <div key={i} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '5px 0', borderBottom: i < selServices.length - 1 ? '1px solid #dbeafe' : 'none',
+              }}>
+                <span style={{ fontSize: 13, color: '#0c1a2e', fontWeight: 500 }}>{s.name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontSize: 12, color: '#64a8c8' }}>{fmtDuration(s.duration)}</span>
+                  <button
+                    onClick={() => { setSelServices(prev => prev.filter((_, idx) => idx !== i)); setSelSlot(null) }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#93c5fd', fontSize: 18, padding: 0, lineHeight: 1 }}
+                  >×</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     )
   }
@@ -305,6 +350,7 @@ export default function BookingPage() {
   }
 
   function renderInfo() {
+    const serviceSummary = selServices.map(s => s.name).join(' + ')
     return (
       <>
         <div className="booking-form-group">
@@ -345,11 +391,12 @@ export default function BookingPage() {
         </div>
 
         <div className="booking-summary-box">
-          <strong style={{ color: '#0c1a2e' }}>{selService?.name}</strong>
+          <strong style={{ color: '#0c1a2e' }}>{serviceSummary}</strong>
           {' '}with{' '}
           <strong style={{ color: '#0c1a2e' }}>{selSlot?.techName}</strong>
           <br />
           {selDate && formatDate(selDate)} at {selSlot && formatTime(selSlot.time)}
+          {totalDuration > 0 && <span style={{ color: '#9dbdd8' }}> · {fmtDuration(totalDuration)}</span>}
         </div>
 
         {error && <div className="booking-error">{error}</div>}
@@ -358,6 +405,7 @@ export default function BookingPage() {
   }
 
   function renderConfirmation() {
+    const serviceSummary = selServices.map(s => s.name).join(' + ')
     function handleDone() {
       window.location.href = 'http://www.lowellnailsandspa.com'
     }
@@ -382,8 +430,12 @@ export default function BookingPage() {
 
         <div className="booking-confirm-details">
           <div className="booking-confirm-row">
-            <span className="booking-confirm-label">Service</span>
-            <span className="booking-confirm-val">{selService?.name}</span>
+            <span className="booking-confirm-label">Service{selServices.length > 1 ? 's' : ''}</span>
+            <span className="booking-confirm-val">{serviceSummary}</span>
+          </div>
+          <div className="booking-confirm-row">
+            <span className="booking-confirm-label">Duration</span>
+            <span className="booking-confirm-val">{fmtDuration(totalDuration)}</span>
           </div>
           <div className="booking-confirm-row">
             <span className="booking-confirm-label">With</span>
@@ -426,11 +478,11 @@ export default function BookingPage() {
 
   /* ── Step metadata ── */
   const stepMeta = [
-    { title: 'Choose a Service',    sub: 'What would you like today?' },
-    { title: 'Choose a Technician', sub: 'Who would you like to work with?' },
-    { title: 'Choose a Date',       sub: 'When works for you?' },
-    { title: 'Choose a Time',       sub: selDate ? `Available on ${formatDate(selDate)}` : 'Pick a time' },
-    { title: 'Your Information',    sub: "We'll text you a confirmation" },
+    { title: 'Choose Services',      sub: 'Tap to add — you can add more than one' },
+    { title: 'Choose a Technician',  sub: 'Who would you like to work with?' },
+    { title: 'Choose a Date',        sub: 'When works for you?' },
+    { title: 'Choose a Time',        sub: selDate ? `Available on ${formatDate(selDate)}` : 'Pick a time' },
+    { title: 'Your Information',     sub: "We'll text you a confirmation" },
   ]
 
   const renderStep = () => {
