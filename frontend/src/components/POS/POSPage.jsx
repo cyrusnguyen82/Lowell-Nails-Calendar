@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   User, Trash2, ShoppingCart, HandMetal, Waves, Sparkles,
   Tag, Clock, LogIn, LogOut, AlertCircle, CheckCircle2, Loader2,
-  ChevronLeft, Search, Receipt, CreditCard, Banknote, UserCheck, Plus,
+  ChevronLeft, Search, Receipt, CreditCard, Banknote, UserCheck, Plus, Users,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import * as api from '../../api';
@@ -18,6 +18,26 @@ const CATEGORIES = [
   { id: 'kids',    name: 'Kids',        icon: <User size={13} /> },
   { id: 'addons',  name: 'Add-Ons',     icon: <Tag size={13} /> },
 ];
+
+const CAT_LABELS = {
+  mani: 'Manicure', pedi: 'Pedicure', acrylic: 'Acrylic',
+  dip: 'Dipping', gel: 'Builder Gel', kids: 'Kids', addons: 'Add-On',
+};
+
+// Dung & Van cannot do advanced nail enhancements
+const LIMITED_TECHS = new Set(['Dung', 'Van']);
+
+function isAdvancedService(name) {
+  const n = name.toLowerCase();
+  return (
+    n.includes('acrylic') ||
+    n.includes('builder gel') ||
+    n.includes('dip') ||
+    n.includes('pink & white') ||
+    n.includes('pink fill') ||
+    n.includes('dual form')
+  );
+}
 
 function formatTime(t) {
   if (!t) return '';
@@ -37,7 +57,37 @@ function Toast({ message, type = 'success', onDismiss }) {
   );
 }
 
-// ── Timeclock Panel ──────────────────────────────────────────────
+// ── Tech Picker Modal ─────────────────────────────────────────────
+function TechPickerModal({ service, techs, onSelect, onDismiss }) {
+  return (
+    <div className="pos-overlay" onClick={onDismiss}>
+      <div className="pos-tech-picker" onClick={e => e.stopPropagation()}>
+        <div className="pos-tech-picker-service">{service.name}</div>
+        <div className="pos-tech-picker-label">Assign technician</div>
+        <div className="pos-tech-picker-grid">
+          {techs.map(t => (
+            <button
+              key={t.id}
+              className="pos-tech-pill"
+              onClick={() => onSelect(t)}
+            >
+              <span
+                className="pos-tech-pill-avatar"
+                style={{ background: t.color || '#438e8e' }}
+              >
+                {t.name.slice(0, 2).toUpperCase()}
+              </span>
+              <span className="pos-tech-pill-name">{t.name.split(' ')[0]}</span>
+            </button>
+          ))}
+        </div>
+        <button className="pos-tech-picker-cancel" onClick={onDismiss}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Timeclock Panel ───────────────────────────────────────────────
 function TimeclockPanel({ onClose }) {
   const { clockStatus, clockIn, clockOut } = useApp();
   const [loading, setLoading] = useState(null);
@@ -97,7 +147,7 @@ function TimeclockPanel({ onClose }) {
   );
 }
 
-// ── Check-In Screen ──────────────────────────────────────────────
+// ── Check-In Screen ───────────────────────────────────────────────
 function CheckInScreen({ onSelectAppointment, onSelectTech, onNewWalkin, onNavigate, onOpenClock }) {
   const { appointments, technicians, clockStatus, companyInfo } = useApp();
 
@@ -128,7 +178,6 @@ function CheckInScreen({ onSelectAppointment, onSelectTech, onNewWalkin, onNavig
       <button className="pos-mobile-back" onClick={() => onNavigate('calendar')}>
         <ChevronLeft size={15} /> Calendar
       </button>
-      {/* Header */}
       <div className="pos-checkin-header">
         <div className="pos-brand">
           <img src="/logo.png" alt="Logo" className="pos-logo" onError={e => { e.target.style.display = 'none'; }} />
@@ -143,10 +192,7 @@ function CheckInScreen({ onSelectAppointment, onSelectTech, onNewWalkin, onNavig
         </button>
       </div>
 
-      {/* Two-panel body */}
       <div className="pos-checkin-body">
-
-        {/* Left: Waiting List */}
         <div className="pos-waiting-panel">
           <div className="pos-panel-header">
             <span className="pos-panel-title"><UserCheck size={15} /> WAITING LIST</span>
@@ -178,7 +224,6 @@ function CheckInScreen({ onSelectAppointment, onSelectTech, onNewWalkin, onNavig
           </div>
         </div>
 
-        {/* Right: Available Techs */}
         <div className="pos-techs-panel">
           <div className="pos-panel-header">
             <span className="pos-panel-title"><User size={15} /> AVAILABLE TECHS</span>
@@ -204,7 +249,6 @@ function CheckInScreen({ onSelectAppointment, onSelectTech, onNewWalkin, onNavig
         </div>
       </div>
 
-      {/* Footer */}
       <div className="pos-checkin-footer">
         <button className="pos-footer-btn" onClick={() => onNavigate('calendar')}>
           <ChevronLeft size={15} /> Back to Calendar
@@ -219,14 +263,11 @@ function CheckInScreen({ onSelectAppointment, onSelectTech, onNewWalkin, onNavig
 export default function POSPage({ onNavigate }) {
   const { technicians, clients, companyInfo, clockStatus } = useApp();
 
-  // ── Mode ───────────────────────────────────────────────────────
-  const [mode, setMode] = useState('checkin'); // 'checkin' | 'checkout'
-
-  // ── Checkout state ─────────────────────────────────────────────
+  const [mode, setMode] = useState('checkin');
   const [services, setServices] = useState([]);
   const [activeCat, setActiveCat] = useState('all');
   const [ticket, setTicket] = useState([]);
-  const [selectedTech, setSelectedTech] = useState(null);
+  const [pendingService, setPendingService] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -234,6 +275,7 @@ export default function POSPage({ onNavigate }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const ticketIdRef = useRef(0);
 
   const showToast = (message, type = 'success') => setToast({ message, type });
 
@@ -241,41 +283,59 @@ export default function POSPage({ onNavigate }) {
     api.get('/pos/services').then(d => setServices(d.services || [])).catch(console.error);
   }, []);
 
-  useEffect(() => {
-    if (!selectedTech && technicians.length > 0) {
-      const active = technicians.find(t => clockStatus.find(s => s.id === t.id && s.status === 'active'));
-      setSelectedTech(active || technicians[0]);
-    }
-  }, [technicians, clockStatus, selectedTech]);
+  // Available (clocked-in) techs
+  const clockedInIds = useMemo(() =>
+    new Set(clockStatus.filter(s => s.status === 'active').map(s => s.id)),
+    [clockStatus]
+  );
+  const availableTechs = useMemo(() =>
+    technicians.filter(t => clockedInIds.has(t.id)),
+    [technicians, clockedInIds]
+  );
 
-  // ── Navigate from check-in → checkout ─────────────────────────
-  function goCheckout(client = null, tech = null) {
+  // Techs eligible for a given service (credential filter)
+  function getEligibleTechs(svc) {
+    const advanced = isAdvancedService(svc.name);
+    return availableTechs.filter(t => !advanced || !LIMITED_TECHS.has(t.name));
+  }
+
+  function goCheckout(client = null) {
     if (client) setSelectedClient(client);
-    if (tech) setSelectedTech(tech);
     setMode('checkout');
   }
 
   function handleSelectAppointment(apt) {
     const client = clients.find(c => c.id === apt.clientId) || { name: apt.clientName, id: null, phone: '' };
-    const tech = technicians.find(t => t.id === apt.technicianId) || null;
-    goCheckout(client, tech);
+    goCheckout(client);
   }
 
-  // ── Services ───────────────────────────────────────────────────
+  // ── Service categorization ────────────────────────────────────
   const categorizedServices = useMemo(() => services.map(s => {
     const n = s.name.toLowerCase();
     let cat = 'addons';
-    if (n.includes('manicure') || n.includes('mani')) cat = 'mani';
-    if (n.includes('pedicure') || n.includes('pedi')) cat = 'pedi';
-    if (n.includes('acrylic')) cat = 'acrylic';
+    if (n.includes('manicure') || (n.includes('mani') && !n.includes('combo'))) cat = 'mani';
+    if (n.includes('pedicure') || (n.includes('pedi') && !n.includes('combo'))) cat = 'pedi';
+    if (n.includes('acrylic') || n.includes('pink & white') || n.includes('pink fill')) cat = 'acrylic';
     if (n.includes('dip')) cat = 'dip';
     if (n.includes('builder') || n.includes('gel full') || n.includes('gel fill')) cat = 'gel';
     if (n.includes('kids')) cat = 'kids';
     return { ...s, cat };
   }), [services]);
 
+  // Grouped by category for "All" view
+  const groupedByCategory = useMemo(() => {
+    if (activeCat !== 'all') return null;
+    const buckets = {};
+    CATEGORIES.filter(c => c.id !== 'all').forEach(c => { buckets[c.id] = []; });
+    categorizedServices.forEach(s => { if (buckets[s.cat] !== undefined) buckets[s.cat].push(s); });
+    return CATEGORIES
+      .filter(c => c.id !== 'all')
+      .map(c => ({ ...c, services: buckets[c.id] || [] }))
+      .filter(g => g.services.length > 0);
+  }, [categorizedServices, activeCat]);
+
   const filteredServices = useMemo(() =>
-    activeCat === 'all' ? categorizedServices : categorizedServices.filter(s => s.cat === activeCat),
+    categorizedServices.filter(s => s.cat === activeCat),
     [categorizedServices, activeCat]
   );
 
@@ -287,17 +347,50 @@ export default function POSPage({ onNavigate }) {
     ).slice(0, 8);
   }, [clients, searchQuery]);
 
-  // ── Totals ─────────────────────────────────────────────────────
+  // ── Totals ────────────────────────────────────────────────────
   const subtotal = ticket.reduce((s, i) => s + i.price, 0);
   const serviceFee = paymentMethod === 'card' ? subtotal * 0.025 : 0;
   const grandTotal = subtotal + serviceFee;
 
-  // ── Ticket actions ─────────────────────────────────────────────
-  const addToTicket = svc => setTicket(prev => [...prev, {
-    ...svc, ticketId: Date.now(), tech: selectedTech?.name || 'Staff', techId: selectedTech?.id,
-  }]);
+  // ── Ticket grouping (same-category services shown together) ───
+  const groupedTicket = useMemo(() => {
+    const groups = [];
+    const groupMap = {};
+    ticket.forEach(item => {
+      const cat = item.cat || 'addons';
+      if (!groupMap[cat]) {
+        const group = { cat, label: CAT_LABELS[cat] || 'Service', items: [] };
+        groups.push(group);
+        groupMap[cat] = group;
+      }
+      groupMap[cat].items.push(item);
+    });
+    return groups;
+  }, [ticket]);
+
+  // ── Ticket actions ────────────────────────────────────────────
+  const confirmAdd = (svc, tech) => {
+    setTicket(prev => [...prev, {
+      ...svc,
+      ticketId: ++ticketIdRef.current,
+      tech: tech?.name || 'Staff',
+      techId: tech?.id || null,
+    }]);
+    setPendingService(null);
+  };
+
+  const addToTicket = svc => {
+    const eligible = getEligibleTechs(svc);
+    if (eligible.length <= 1) {
+      confirmAdd(svc, eligible[0] || null);
+    } else {
+      setPendingService(svc);
+    }
+  };
+
   const removeFromTicket = id => setTicket(prev => prev.filter(i => i.ticketId !== id));
 
+  // ── Checkout ──────────────────────────────────────────────────
   const handleCheckout = async () => {
     if (!ticket.length) return;
     setCheckoutLoading(true);
@@ -326,8 +419,8 @@ export default function POSPage({ onNavigate }) {
         {isClockOpen && <TimeclockPanel onClose={() => setIsClockOpen(false)} />}
         <CheckInScreen
           onSelectAppointment={handleSelectAppointment}
-          onSelectTech={tech => goCheckout(null, tech)}
-          onNewWalkin={() => goCheckout(null, null)}
+          onSelectTech={() => goCheckout(null)}
+          onNewWalkin={() => goCheckout(null)}
           onNavigate={onNavigate}
           onOpenClock={() => setIsClockOpen(true)}
         />
@@ -342,6 +435,15 @@ export default function POSPage({ onNavigate }) {
         <ChevronLeft size={15} /> Back
       </button>
       {toast && <Toast {...toast} onDismiss={() => setToast(null)} />}
+
+      {pendingService && (
+        <TechPickerModal
+          service={pendingService}
+          techs={getEligibleTechs(pendingService)}
+          onSelect={tech => confirmAdd(pendingService, tech)}
+          onDismiss={() => setPendingService(null)}
+        />
+      )}
 
       {/* Sidebar: Ticket */}
       <aside className="pos-sidebar">
@@ -372,20 +474,34 @@ export default function POSPage({ onNavigate }) {
             <span className="pos-item-count">{ticket.length} items</span>
           </div>
           <div className="pos-ticket-items">
-            {ticket.length === 0
-              ? <div className="pos-empty-state">Ticket is empty</div>
-              : ticket.map(item => (
-                <div key={item.ticketId} className="pos-ticket-item">
-                  <div className="pos-item-main">
-                    <span className="pos-item-name">{item.name}</span>
-                    <span className="pos-item-tech">with {item.tech}</span>
-                  </div>
-                  <span className="pos-item-price">${item.price.toFixed(2)}</span>
-                  <button className="pos-item-remove" onClick={() => removeFromTicket(item.ticketId)}>
-                    <Trash2 size={12} />
-                  </button>
+            {ticket.length === 0 ? (
+              <div className="pos-empty-state">Ticket is empty</div>
+            ) : (
+              groupedTicket.map(group => (
+                <div key={group.cat} className="pos-ticket-group">
+                  {group.items.length > 1 && (
+                    <div className="pos-ticket-group-header">
+                      <span>{group.label}</span>
+                      <span className="pos-simultaneous-badge">
+                        <Users size={10} /> {group.items.length} at once
+                      </span>
+                    </div>
+                  )}
+                  {group.items.map(item => (
+                    <div key={item.ticketId} className="pos-ticket-item">
+                      <div className="pos-item-main">
+                        <span className="pos-item-name">{item.name}</span>
+                        <span className="pos-item-tech">with {item.tech}</span>
+                      </div>
+                      <span className="pos-item-price">${item.price.toFixed(2)}</span>
+                      <button className="pos-item-remove" onClick={() => removeFromTicket(item.ticketId)}>
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -426,27 +542,41 @@ export default function POSPage({ onNavigate }) {
             ))}
           </nav>
           <div className="pos-header-actions">
-            <div className="pos-tech-select-wrapper">
-              <span className="pos-label">Tech:</span>
-              <select
-                className="pos-select"
-                value={selectedTech?.id || ''}
-                onChange={e => setSelectedTech(technicians.find(t => t.id === parseInt(e.target.value)))}
-              >
-                {technicians.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-              </select>
-            </div>
-            <button className="pos-btn-clock-header" onClick={() => setIsClockOpen(true)}><Clock size={16} /></button>
+            <button className="pos-btn-clock-header" onClick={() => setIsClockOpen(true)}>
+              <Clock size={16} />
+            </button>
           </div>
         </header>
 
-        <div className="pos-grid">
-          {filteredServices.map(svc => (
-            <button key={svc.name} className="pos-card" onClick={() => addToTicket(svc)}>
-              <span className="pos-card-name">{svc.name}</span>
-              <span className="pos-card-price">{svc.priceStr || `$${svc.price}`}</span>
-            </button>
-          ))}
+        <div className="pos-catalog-body">
+          {activeCat === 'all' ? (
+            groupedByCategory.map(group => (
+              <div key={group.id} className="pos-cat-section">
+                <div className="pos-cat-section-header">
+                  {group.icon}
+                  <span>{group.name}</span>
+                  <span className="pos-cat-count">{group.services.length}</span>
+                </div>
+                <div className="pos-grid">
+                  {group.services.map(svc => (
+                    <button key={svc.name} className="pos-card" onClick={() => addToTicket(svc)}>
+                      <span className="pos-card-name">{svc.name}</span>
+                      <span className="pos-card-price">{svc.priceStr || `$${svc.price}`}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="pos-grid">
+              {filteredServices.map(svc => (
+                <button key={svc.name} className="pos-card" onClick={() => addToTicket(svc)}>
+                  <span className="pos-card-name">{svc.name}</span>
+                  <span className="pos-card-price">{svc.priceStr || `$${svc.price}`}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <footer className="pos-footer">

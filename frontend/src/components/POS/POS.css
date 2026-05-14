@@ -455,15 +455,52 @@
   cursor: pointer;
 }
 
-.pos-grid {
+/* Scrollable catalog wrapper — replaces old flex-1 on pos-grid */
+.pos-catalog-body {
   flex: 1;
-  padding: 1rem;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-height: 0;
+}
+
+/* Category section (used in "All" view) */
+.pos-cat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pos-cat-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--pos-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--pos-border);
+}
+
+.pos-cat-count {
+  margin-left: auto;
+  background: rgba(0,0,0,0.08);
+  color: var(--pos-muted);
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.pos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 0.625rem;
   align-content: start;
-  overflow-y: auto;
-  min-height: 0;
 }
 
 .pos-card {
@@ -487,14 +524,14 @@
 }
 
 .pos-card-name {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .pos-card-price {
   margin-top: auto;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: var(--pos-gold);
 }
@@ -525,6 +562,129 @@
   font-size: 0.65rem;
   color: var(--pos-muted);
   opacity: 0.5;
+}
+
+/* ── Ticket Groups ───────────────────────────────────────────── */
+.pos-ticket-group {
+  margin-bottom: 0.5rem;
+}
+
+.pos-ticket-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--pos-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 0.25rem 0.3rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--pos-border);
+}
+
+.pos-simultaneous-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--pos-teal);
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* ── Tech Picker ─────────────────────────────────────────────── */
+.pos-tech-picker {
+  background: var(--pos-sidebar);
+  border-radius: 20px;
+  border: 1px solid var(--pos-border);
+  padding: 1.75rem 1.5rem 1.25rem;
+  max-width: 400px;
+  width: 92%;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+
+.pos-tech-picker-service {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--pos-text);
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+.pos-tech-picker-label {
+  font-size: 0.68rem;
+  color: var(--pos-muted);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pos-tech-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.pos-tech-pill {
+  background: var(--pos-card);
+  border: 1.5px solid var(--pos-border);
+  border-radius: 14px;
+  padding: 1rem 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.pos-tech-pill:hover {
+  border-color: var(--pos-gold);
+  background: var(--pos-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.pos-tech-pill-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.pos-tech-pill-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--pos-text);
+}
+
+.pos-tech-picker-cancel {
+  width: 100%;
+  background: none;
+  border: 1px solid var(--pos-border);
+  color: var(--pos-muted);
+  padding: 0.65rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.pos-tech-picker-cancel:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--pos-red);
+  color: var(--pos-red);
 }
 
 /* Modals & Overlays */

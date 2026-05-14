@@ -573,6 +573,209 @@
   text-decoration: none;
 }
 
+/* ── Service catalog sections (step 1) ── */
+.booking-svc-section {
+  margin-bottom: 20px;
+}
+
+.booking-svc-section-header {
+  font-size: 11px;
+  font-weight: 800;
+  color: #7a9ab8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(12,26,46,0.07);
+}
+
+/* ── Tech assignment groups (step 2) ── */
+.booking-tech-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.booking-tech-group {
+  background: #f8fbfd;
+  border: 1.5px solid rgba(12,26,46,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.booking-tech-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 11px 14px 10px;
+  background: #f0f6fc;
+  border-bottom: 1px solid rgba(12,26,46,0.07);
+}
+
+.booking-tech-group-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0c1a2e;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.booking-tech-group-count {
+  background: #0ea5e9;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Simultaneous / sequential toggle */
+.booking-timing-toggle {
+  display: flex;
+  background: #e8f1fa;
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.booking-timing-btn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7a9ab8;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.booking-timing-btn.active {
+  background: #fff;
+  color: #0ea5e9;
+  box-shadow: 0 1px 4px rgba(12,26,46,0.12);
+}
+
+.booking-timing-btn:hover:not(.active) {
+  color: #5a7a9b;
+}
+
+/* Per-service tech assignment row */
+.booking-service-assign {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(12,26,46,0.05);
+}
+
+.booking-service-assign:last-child {
+  border-bottom: none;
+}
+
+.booking-assign-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.booking-assign-service-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0c1a2e;
+}
+
+.booking-assign-duration {
+  font-size: 11px;
+  color: #7a9ab8;
+}
+
+.booking-assign-mode-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.booking-assign-mode-badge.simultaneous {
+  background: rgba(20,184,166,0.12);
+  color: #0d9488;
+}
+
+.booking-assign-mode-badge.sequential {
+  background: rgba(139,92,246,0.12);
+  color: #7c3aed;
+}
+
+/* Tech avatar pills in step 2 */
+.booking-assign-techs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.booking-assign-tech-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+  transition: transform 0.1s;
+}
+
+.booking-assign-tech-btn:hover {
+  transform: translateY(-2px);
+}
+
+.booking-assign-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #dce8f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: all 0.15s;
+}
+
+.booking-assign-tech-btn.selected .booking-assign-avatar {
+  box-shadow: 0 0 0 3px #0ea5e9, 0 2px 8px rgba(14,165,233,0.3);
+}
+
+.booking-assign-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: #5a7a9b;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 46px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.booking-assign-tech-btn.selected .booking-assign-name {
+  color: #0ea5e9;
+}
+
 /* ── Responsive ────────────────────────────────────────────────── */
 
 /* Short screens: let page scroll naturally instead of constraining card */
