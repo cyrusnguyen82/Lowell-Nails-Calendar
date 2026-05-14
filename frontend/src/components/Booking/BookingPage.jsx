@@ -214,50 +214,78 @@ export default function BookingPage() {
                 className={`booking-service-btn${count > 0 ? ' selected' : ''}`}
                 onClick={() => { setSelServices(prev => [...prev, s]); setSelSlot(null) }}
               >
-                {count > 0 && (
-                  <div style={{
-                    position: 'absolute', top: 6, right: 6,
-                    background: '#0ea5e9', color: '#fff',
-                    borderRadius: '50%', width: 18, height: 18,
-                    fontSize: 11, fontWeight: 800,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>{count}</div>
-                )}
                 <div className="booking-service-name">{s.name}</div>
                 <div className="booking-service-meta">{fmtDuration(s.duration)}</div>
-                {s.price > 0 && (
-                  <div className="booking-service-price">${Number(s.price).toFixed(0)}</div>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+                  {s.price > 0
+                    ? <div className="booking-service-price" style={{ margin: 0 }}>${Number(s.price).toFixed(0)}</div>
+                    : <div />}
+                  {count > 0 && (
+                    <div style={{
+                      background: '#0ea5e9', color: '#fff', borderRadius: 10,
+                      fontSize: 11, fontWeight: 800, padding: '2px 8px', lineHeight: 1.4,
+                    }}>×{count}</div>
+                  )}
+                </div>
               </button>
             )
           })}
         </div>
 
-        {selServices.length > 0 && (
-          <div style={{
-            marginTop: 14, background: '#f0f8ff', borderRadius: 10,
-            border: '1px solid #bae0f5', padding: '10px 14px',
-          }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#0284c7', marginBottom: 8 }}>
-              {selServices.length} service{selServices.length > 1 ? 's' : ''} selected · {fmtDuration(totalDuration)} total
-            </div>
-            {selServices.map((s, i) => (
-              <div key={i} style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '5px 0', borderBottom: i < selServices.length - 1 ? '1px solid #dbeafe' : 'none',
-              }}>
-                <span style={{ fontSize: 13, color: '#0c1a2e', fontWeight: 500 }}>{s.name}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 12, color: '#64a8c8' }}>{fmtDuration(s.duration)}</span>
-                  <button
-                    onClick={() => { setSelServices(prev => prev.filter((_, idx) => idx !== i)); setSelSlot(null) }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#93c5fd', fontSize: 18, padding: 0, lineHeight: 1 }}
-                  >×</button>
-                </div>
+        {selServices.length > 0 && (() => {
+          // Group into unique services with counts for the stepper
+          const groups = selServices.reduce((acc, s) => {
+            const g = acc.find(x => x.s.id === s.id)
+            if (g) g.count++
+            else acc.push({ s, count: 1 })
+            return acc
+          }, [])
+          return (
+            <div style={{
+              marginTop: 14, background: '#f0f8ff', borderRadius: 10,
+              border: '1px solid #bae0f5', padding: '10px 14px',
+            }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#0284c7', marginBottom: 8 }}>
+                {selServices.length} service{selServices.length > 1 ? 's' : ''} · {fmtDuration(totalDuration)} total
               </div>
-            ))}
-          </div>
-        )}
+              {groups.map(({ s, count }) => (
+                <div key={s.id} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '6px 0', borderBottom: '1px solid #dbeafe',
+                }}>
+                  <div>
+                    <div style={{ fontSize: 13, color: '#0c1a2e', fontWeight: 600 }}>{s.name}</div>
+                    <div style={{ fontSize: 11, color: '#64a8c8' }}>
+                      {fmtDuration(s.duration)}{count > 1 ? ` × ${count} = ${fmtDuration(s.duration * count)}` : ''}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelServices(prev => {
+                          const idx = prev.reduceRight((found, x, i) => found === -1 && x.id === s.id ? i : found, -1)
+                          return idx === -1 ? prev : prev.filter((_, i) => i !== idx)
+                        })
+                        setSelSlot(null)
+                      }}
+                      style={{ width: 28, height: 28, border: '1px solid #bae0f5', borderRadius: '6px 0 0 6px', background: '#fff', cursor: 'pointer', fontSize: 16, color: '#0ea5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}
+                    >−</button>
+                    <div style={{ width: 28, height: 28, border: '1px solid #bae0f5', borderTop: '1px solid #bae0f5', borderBottom: '1px solid #bae0f5', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#0c1a2e' }}>{count}</div>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelServices(prev => [...prev, s])
+                        setSelSlot(null)
+                      }}
+                      style={{ width: 28, height: 28, border: '1px solid #bae0f5', borderRadius: '0 6px 6px 0', background: '#0ea5e9', cursor: 'pointer', fontSize: 16, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}
+                    >+</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
       </div>
     )
   }
