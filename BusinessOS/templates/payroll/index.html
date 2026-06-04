@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block header %}Payroll{% endblock %}
+{% block header_actions %}
+  <a href="{{ url_for('payroll.run_page') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Run Payroll
+  </a>
+{% endblock %}
+{% block content %}
+
+<!-- Summary stats -->
+<div class="grid grid-cols-3 gap-5 mb-8">
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <p class="text-sm text-gray-500 mb-1">Total Employees</p>
+    <p class="text-3xl font-bold text-gray-900">{{ emp_count }}</p>
+    <p class="text-xs text-gray-400 mt-1">{{ w2_count }} W-2 · {{ cont_count }} contractors</p>
+  </div>
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <p class="text-sm text-gray-500 mb-1">Next Pay Period</p>
+    <p class="text-lg font-bold text-gray-900">{{ next_period_start.strftime('%b %d') }} – {{ next_period_end.strftime('%b %d') }}</p>
+    <a href="{{ url_for('payroll.run_page') }}" class="text-xs text-indigo-600 mt-1 inline-block hover:underline">Start run →</a>
+  </div>
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <p class="text-sm text-gray-500 mb-1">Total Runs This Year</p>
+    <p class="text-3xl font-bold text-gray-900">{{ runs | selectattr('status', 'ne', 'void') | list | length }}</p>
+    <p class="text-xs text-gray-400 mt-1">{{ runs | selectattr('status', 'eq', 'paid') | list | length }} paid · {{ runs | selectattr('status', 'eq', 'draft') | list | length }} draft</p>
+  </div>
+</div>
+
+<!-- Payroll run history -->
+<div class="bg-white rounded-xl border border-gray-200">
+  <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+    <h2 class="font-semibold text-gray-900">Payroll History</h2>
+  </div>
+  {% if runs %}
+  <table class="w-full">
+    <thead>
+      <tr class="text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-100">
+        <th class="text-left px-6 py-3">Pay Period</th>
+        <th class="text-left px-6 py-3">Pay Date</th>
+        <th class="text-right px-6 py-3">Gross</th>
+        <th class="text-right px-6 py-3">Net</th>
+        <th class="text-right px-6 py-3">Er. Taxes</th>
+        <th class="text-center px-6 py-3">Status</th>
+        <th class="px-6 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {% for r in runs %}
+      <tr class="hover:bg-gray-50 {% if r.status == 'void' %}opacity-40{% endif %}">
+        <td class="px-6 py-4">
+          <p class="text-sm font-medium text-gray-900">
+            {{ r.pay_period_start.strftime('%b %d') }} – {{ r.pay_period_end.strftime('%b %d, %Y') }}
+          </p>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-500">{{ r.pay_date.strftime('%b %d, %Y') }}</td>
+        <td class="px-6 py-4 text-sm font-semibold text-gray-900 text-right">{{ fmt(r.total_gross) }}</td>
+        <td class="px-6 py-4 text-sm text-gray-700 text-right">{{ fmt(r.total_net) }}</td>
+        <td class="px-6 py-4 text-sm text-gray-500 text-right">{{ fmt(r.total_employer_tax) }}</td>
+        <td class="px-6 py-4 text-center">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+            {% if r.status == 'paid' %}bg-green-100 text-green-700
+            {% elif r.status == 'draft' %}bg-yellow-100 text-yellow-700
+            {% elif r.status == 'void' %}bg-gray-100 text-gray-500
+            {% else %}bg-blue-100 text-blue-700{% endif %}">
+            {{ r.status | title }}
+          </span>
+        </td>
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-3 justify-end">
+            <a href="{{ url_for('payroll.stubs', run_id=r.id) }}" class="text-xs text-indigo-600 hover:underline">Stubs</a>
+            {% if r.status == 'draft' %}
+            <form method="POST" action="{{ url_for('payroll.approve_run', run_id=r.id) }}" class="inline">
+              <button type="submit" class="text-xs text-green-600 hover:underline font-medium">Mark Paid</button>
+            </form>
+            <form method="POST" action="{{ url_for('payroll.void_run', run_id=r.id) }}" class="inline"
+                  onsubmit="return confirm('Void run #{{ r.id }}?')">
+              <button type="submit" class="text-xs text-red-400 hover:underline">Void</button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="px-6 py-16 text-center">
+    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+    <p class="text-gray-500 font-medium">No payroll runs yet</p>
+    <a href="{{ url_for('payroll.run_page') }}" class="mt-3 inline-flex items-center gap-2 bg-indigo-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-indigo-700">
+      Run Your First Payroll
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

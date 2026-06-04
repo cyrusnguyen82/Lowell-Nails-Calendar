@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+{% block header %}Employees{% endblock %}
+{% block header_actions %}
+  <button onclick="openAddModal()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+    Add Employee
+  </button>
+{% endblock %}
+{% block content %}
+
+<div class="bg-white rounded-xl border border-gray-200">
+  <div class="px-6 py-4 border-b border-gray-100">
+    <h2 class="font-semibold text-gray-900">All Employees</h2>
+    <p class="text-xs text-gray-400 mt-0.5">{{ employees|length }} total · {{ employees|selectattr('active')|list|length }} active</p>
+  </div>
+
+  {% if employees %}
+  <table class="w-full">
+    <thead>
+      <tr class="text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-100">
+        <th class="text-left px-6 py-3">Name</th>
+        <th class="text-left px-6 py-3">Type</th>
+        <th class="text-left px-6 py-3">Pay Basis</th>
+        <th class="text-right px-6 py-3">Rate / Salary</th>
+        <th class="text-left px-6 py-3">Filing</th>
+        <th class="text-left px-6 py-3">State</th>
+        <th class="text-center px-6 py-3">Status</th>
+        <th class="px-6 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {% for e in employees %}
+      <tr class="hover:bg-gray-50 {% if not e.active %}opacity-50{% endif %}">
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-xs font-bold text-indigo-600">
+              {{ e.first_name[0] }}{{ e.last_name[0] }}
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-900">{{ e.first_name }} {{ e.last_name }}</p>
+              {% if e.email %}<p class="text-xs text-gray-400">{{ e.email }}</p>{% endif %}
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+            {% if e.employee_type == 'w2' %}bg-blue-50 text-blue-700{% else %}bg-orange-50 text-orange-700{% endif %}">
+            {{ 'W-2' if e.employee_type == 'w2' else '1099' }}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-700 capitalize">{{ e.pay_basis }}</td>
+        <td class="px-6 py-4 text-sm text-gray-900 text-right">
+          {% if e.pay_basis == 'salary' %}
+            {{ fmt(e.salary_annual) }}/yr
+          {% elif e.pay_basis in ('hourly','hybrid') %}
+            {{ fmt(e.hourly_rate) }}/hr
+          {% else %}
+            {{ '%.0f'|format((e.commission_rate or 0.45) * 100) }}%
+          {% endif %}
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-500 capitalize">{{ (e.filing_status or 'single') }}</td>
+        <td class="px-6 py-4 text-sm text-gray-500">{{ e.state_code or '—' }}</td>
+        <td class="px-6 py-4 text-center">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+            {{ 'bg-green-100 text-green-700' if e.active else 'bg-gray-100 text-gray-500' }}">
+            {{ 'Active' if e.active else 'Inactive' }}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-right">
+          <button onclick="openEditModal({{ e|tojson }})"
+            class="text-xs text-indigo-600 hover:underline font-medium">Edit</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="px-6 py-16 text-center">
+    <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <p class="text-gray-500 font-medium">No employees yet</p>
+    <button onclick="openAddModal()" class="mt-3 inline-flex items-center gap-2 bg-indigo-600 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-indigo-700">
+      Add First Employee
+    </button>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal backdrop -->
+<div id="modal-backdrop" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 id="modal-title" class="font-semibold text-gray-900">Add Employee</h3>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <form method="POST" action="{{ url_for('payroll.save_employee') }}" class="p-6 space-y-5">
+      <input type="hidden" name="technician_id" id="f-tech-id">
+
+      <!-- Technician picker (shown only on Add) -->
+      <div id="tech-picker">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Technician</label>
+        {% if unlinked %}
+        <select name="technician_id_select" id="f-tech-select"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          onchange="document.getElementById('f-tech-id').value = this.value">
+          <option value="">Select technician…</option>
+          {% for t in unlinked %}
+          <option value="{{ t.id }}">{{ t.first_name }} {{ t.last_name }}</option>
+          {% endfor %}
+        </select>
+        {% else %}
+        <p class="text-sm text-gray-500 italic">All technicians already have employee records.</p>
+        {% endif %}
+      </div>
+
+      <!-- Name display for edit -->
+      <div id="edit-name-display" class="hidden">
+        <p class="text-sm font-medium text-gray-700">Editing: <span id="edit-name-text" class="text-indigo-600"></span></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Employee Type</label>
+          <select name="employee_type" id="f-emp-type"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            onchange="togglePayFields()">
+            <option value="w2">W-2 Employee</option>
+            <option value="contractor">1099 Contractor</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Pay Basis</label>
+          <select name="pay_basis" id="f-pay-basis"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            onchange="togglePayFields()">
+            <option value="hourly">Hourly</option>
+            <option value="salary">Salary</option>
+            <option value="commission">Commission</option>
+            <option value="hybrid">Hybrid (Hourly + Commission)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <div id="row-hourly">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Hourly Rate ($)</label>
+          <input type="number" name="hourly_rate" id="f-hourly-rate" step="0.01" min="0" placeholder="0.00"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div id="row-salary">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Annual Salary ($)</label>
+          <input type="number" name="salary_annual" id="f-salary" step="100" min="0" placeholder="0.00"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div id="row-comm">
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Commission Rate (%)</label>
+          <input type="number" name="commission_rate" id="f-comm-rate" step="0.01" min="0" max="1" placeholder="0.45"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </div>
+
+      <!-- W-2 tax fields -->
+      <div id="w2-fields">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Federal Tax Withholding</p>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Filing Status</label>
+            <select name="filing_status" id="f-filing"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="single">Single / MFS</option>
+              <option value="married">Married Filing Jointly</option>
+              <option value="head_of_household">Head of Household</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Allowances (W-4)</label>
+            <input type="number" name="federal_allowances" id="f-fed-allow" min="0" value="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Extra Withholding ($)</label>
+            <input type="number" name="federal_extra_withholding" id="f-fed-extra" step="0.01" min="0" value="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mt-4 mb-3">State Tax (Michigan)</p>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">State Code</label>
+            <input type="text" name="state_code" id="f-state" maxlength="2" placeholder="MI"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase"
+              oninput="toggleCitySection()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">MI W-4 Exemptions</label>
+            <input type="number" name="state_allowances" id="f-state-allow" min="0" value="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Extra State WH ($)</label>
+            <input type="number" name="state_extra_withholding" id="f-state-extra" step="0.01" min="0" value="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <!-- Michigan city tax — shown only when state = MI -->
+        <div id="mi-city-section" class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p class="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-3">Michigan City Income Tax</p>
+          <p class="text-xs text-blue-600 mb-3">Required if the employee works or lives in a Michigan city that levies a local income tax.</p>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">City</label>
+              <select name="city_code" id="f-city-code"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="">None — no city tax</option>
+                <option value="albion">Albion (1.0% / 0.5%)</option>
+                <option value="battle_creek">Battle Creek (1.0% / 0.5%)</option>
+                <option value="big_rapids">Big Rapids (1.0% / 0.5%)</option>
+                <option value="detroit">Detroit (2.4% / 1.2%)</option>
+                <option value="flint">Flint (1.0% / 0.5%)</option>
+                <option value="grand_rapids">Grand Rapids (1.5% / 0.75%)</option>
+                <option value="hamtramck">Hamtramck (1.0% / 0.5%)</option>
+                <option value="highland_park">Highland Park (2.0% / 1.0%)</option>
+                <option value="ionia">Ionia (1.0% / 0.5%)</option>
+                <option value="lansing">Lansing (1.0% / 0.5%)</option>
+                <option value="muskegon">Muskegon (1.0% / 0.5%)</option>
+                <option value="muskegon_heights">Muskegon Heights (1.0% / 0.5%)</option>
+                <option value="pontiac">Pontiac (1.0% / 0.5%)</option>
+                <option value="port_huron">Port Huron (1.0% / 0.5%)</option>
+                <option value="saginaw">Saginaw (1.5% / 0.75%)</option>
+                <option value="springfield">Springfield (1.0% / 0.5%)</option>
+                <option value="walker">Walker (1.0% / 0.5%)</option>
+              </select>
+              <p class="text-xs text-gray-400 mt-1">Format: Resident rate / Non-resident rate</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Residency Status</label>
+              <div class="space-y-2 mt-1">
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                  <input type="radio" name="city_resident" id="f-city-res" value="resident" checked class="text-indigo-600">
+                  Resident (lives in the city)
+                </label>
+                <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                  <input type="radio" name="city_resident" value="nonresident" class="text-indigo-600">
+                  Non-resident (works in the city only)
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">SSN (last 4)</label>
+            <input type="text" name="ssn_last4" id="f-ssn" maxlength="4" placeholder="1234"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared fields -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+          <input type="email" name="email" id="f-email" placeholder="employee@example.com"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
+          <input type="text" name="notes" id="f-notes" placeholder="Optional"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+        <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">Cancel</button>
+        <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors">Save Employee</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function togglePayFields() {
+  const basis = document.getElementById('f-pay-basis').value;
+  const type  = document.getElementById('f-emp-type').value;
+  document.getElementById('row-hourly').style.display  = ['hourly','hybrid'].includes(basis) ? '' : 'none';
+  document.getElementById('row-salary').style.display  = basis === 'salary' ? '' : 'none';
+  document.getElementById('row-comm').style.display    = ['commission','hybrid'].includes(basis) ? '' : 'none';
+  document.getElementById('w2-fields').style.display   = type === 'w2' ? '' : 'none';
+  toggleCitySection();
+}
+function toggleCitySection() {
+  const state = (document.getElementById('f-state').value || '').toUpperCase();
+  const type  = document.getElementById('f-emp-type').value;
+  const show  = state === 'MI' && type === 'w2';
+  document.getElementById('mi-city-section').style.display = show ? '' : 'none';
+}
+
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'Add Employee';
+  document.getElementById('f-tech-id').value = '';
+  document.getElementById('tech-picker').style.display = '';
+  document.getElementById('edit-name-display').classList.add('hidden');
+
+  // Reset all fields
+  ['f-emp-type','f-pay-basis','f-filing'].forEach(id => document.getElementById(id).selectedIndex = 0);
+  ['f-hourly-rate','f-salary','f-comm-rate','f-fed-allow','f-fed-extra','f-state','f-ssn','f-email','f-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  togglePayFields();
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+
+function openEditModal(emp) {
+  document.getElementById('modal-title').textContent = 'Edit Employee';
+  document.getElementById('f-tech-id').value = emp.technician_id;
+  document.getElementById('tech-picker').style.display = 'none';
+  document.getElementById('edit-name-display').classList.remove('hidden');
+  document.getElementById('edit-name-text').textContent = emp.first_name + ' ' + emp.last_name;
+
+  setVal('f-emp-type',    emp.employee_type || 'w2');
+  setVal('f-pay-basis',   emp.pay_basis || 'hourly');
+  setVal('f-filing',      emp.filing_status || 'single');
+  setVal('f-hourly-rate', emp.hourly_rate || '');
+  setVal('f-salary',      emp.salary_annual || '');
+  setVal('f-comm-rate',   emp.commission_rate || '');
+  setVal('f-fed-allow',   emp.federal_allowances || 0);
+  setVal('f-fed-extra',   emp.federal_extra_withholding || 0);
+  setVal('f-state',       emp.state_code || '');
+  setVal('f-state-allow', emp.state_allowances || 0);
+  setVal('f-state-extra', emp.state_extra_withholding || 0);
+  setVal('f-city-code',   emp.city_code || '');
+  const resEl = document.querySelector(`input[name="city_resident"][value="${emp.city_resident === false ? 'nonresident' : 'resident'}"]`);
+  if (resEl) resEl.checked = true;
+  setVal('f-ssn',         emp.ssn_last4 || '');
+  setVal('f-email',       emp.email || '');
+  setVal('f-notes',       emp.notes || '');
+
+  togglePayFields();
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.add('hidden');
+}
+
+document.getElementById('modal-backdrop').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+togglePayFields();
+</script>
+{% endblock %}

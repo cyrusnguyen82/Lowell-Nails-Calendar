@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments — {{ company.name or 'BusinessOS' }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── POS palette (Polar light theme) ────────────────────────── */
+    :root {
+      --pos-bg:      #f5f8fc;
+      --pos-sidebar: #edf2f9;
+      --pos-card:    #ffffff;
+      --pos-hover:   #e3ecf6;
+      --pos-gold:    #0ea5e9;
+      --pos-red:     #ef4444;
+      --pos-green:   #10b981;
+      --pos-text:    #0c1a2e;
+      --pos-muted:   #5a7a9b;
+      --pos-border:  rgba(12,26,46,0.08);
+      --r: 8px; --r-sm: 6px; --r-xl: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter','Segoe UI',sans-serif;
+      background: var(--pos-bg);
+      color: var(--pos-text);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── BusinessOS sidebar (mirrored from base.html) ──────────── */
+    .bos-sidebar {
+      width: 240px; flex-shrink: 0;
+      background: #111827;
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .bos-logo {
+      height: 64px; display: flex; align-items: center; gap: 10px;
+      padding: 0 20px; border-bottom: 1px solid rgba(255,255,255,0.07);
+      flex-shrink: 0;
+    }
+    .bos-logo-icon {
+      width: 32px; height: 32px; background: #4f46e5; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bos-logo-name { color: #fff; font-weight: 600; font-size: 13px; }
+    .bos-nav { flex: 1; padding: 12px; }
+    .bos-nav-section {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #6b7280; padding: 16px 8px 4px;
+    }
+    .bos-nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px;
+      text-decoration: none; font-size: 13px; font-weight: 500;
+      color: #9ca3af; transition: background 0.15s, color 0.15s;
+      margin-bottom: 1px;
+    }
+    .bos-nav a:hover { background: rgba(255,255,255,0.07); color: #fff; }
+    .bos-nav a.active { background: #4f46e5; color: #fff; }
+    .bos-nav svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .bos-user {
+      border-top: 1px solid rgba(255,255,255,0.07); padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .bos-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+    .bos-user-role { font-size: 11px; color: #6b7280; margin-top: 1px; }
+    .bos-logout { color: #6b7280; }
+    .bos-logout:hover { color: #fff; }
+    .bos-logout svg { width: 18px; height: 18px; }
+
+    /* ── Main calendar area ─────────────────────────────────────── */
+    .cal-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Toolbar ────────────────────────────────────────────────── */
+    .cal-toolbar {
+      height: 56px; display: flex; align-items: center; gap: 12px;
+      padding: 0 20px; background: var(--pos-sidebar);
+      border-bottom: 1px solid var(--pos-border); flex-shrink: 0;
+    }
+    .cal-toolbar-date { font-size: 15px; font-weight: 700; color: var(--pos-text); white-space: nowrap; flex: 1; }
+    .nav-btn {
+      background: var(--pos-card); border: 1px solid var(--pos-border);
+      color: var(--pos-muted); padding: 6px 14px; border-radius: var(--r);
+      cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit;
+      transition: background 0.15s; white-space: nowrap;
+    }
+    .nav-btn:hover { background: var(--pos-hover); color: var(--pos-text); }
+    .nav-btn.today { background: rgba(14,165,233,0.1); border-color: rgba(14,165,233,0.3); color: var(--pos-gold); }
+    .view-toggle {
+      display: flex; gap: 2px; background: rgba(12,26,46,0.06);
+      padding: 3px; border-radius: var(--r);
+    }
+    .view-btn {
+      padding: 5px 14px; border: none; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+      background: transparent; color: var(--pos-muted); transition: background 0.15s, color 0.15s;
+    }
+    .view-btn:hover { background: var(--pos-card); color: var(--pos-text); }
+    .view-btn.active { background: var(--pos-card); color: var(--pos-gold); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .add-btn {
+      background: var(--pos-gold); color: #fff; border: none;
+      padding: 7px 16px; border-radius: var(--r); font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+      transition: filter 0.15s;
+    }
+    .add-btn:hover { filter: brightness(1.1); }
+
+    /* ── Day view ────────────────────────────────────────────────── */
+    #day-view { flex: 1; overflow: auto; display: flex; flex-direction: column; }
+    .cal-scroll { flex: 1; overflow: auto; }
+    .cal-inner { display: flex; flex-direction: column; min-width: max-content; }
+
+    .cal-header-row {
+      display: flex; position: sticky; top: 0; z-index: 20;
+      background: var(--pos-sidebar); border-bottom: 2px solid var(--pos-border);
+      min-width: max-content;
+    }
+    .cal-header-gutter {
+      width: 72px; flex-shrink: 0; position: sticky; left: 0; z-index: 21;
+      background: var(--pos-sidebar); border-right: 1px solid var(--pos-border);
+    }
+    .tech-header-cell {
+      width: 180px; flex-shrink: 0; display: flex; align-items: center;
+      gap: 10px; padding: 10px 14px; border-right: 1px solid var(--pos-border);
+    }
+    .tech-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .tech-name { font-size: 13px; font-weight: 600; color: var(--pos-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tech-apt-count { font-size: 11px; color: var(--pos-muted); margin-left: auto; flex-shrink: 0; font-weight: 500; }
+
+    .cal-body-grid { display: flex; flex: 1; min-width: max-content; }
+    .time-gutter {
+      width: 72px; flex-shrink: 0; position: sticky; left: 0;
+      background: var(--pos-sidebar); z-index: 10; border-right: 1px solid var(--pos-border);
+    }
+    .time-slot-label { height: 120px; display: flex; flex-direction: column; padding-right: 8px; }
+    .time-label-hour {
+      height: 30px; display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 4px; font-size: 11px; font-weight: 600; color: var(--pos-muted);
+    }
+    .time-label-sub {
+      height: 30px; display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-top: 4px; font-size: 9px; color: rgba(12,26,46,0.2);
+    }
+    .tech-cols-wrapper { display: flex; flex: 1; position: relative; }
+    .tech-col { width: 180px; flex-shrink: 0; position: relative; border-right: 1px solid var(--pos-border); }
+    .time-slots { position: absolute; inset: 0; }
+    .slot {
+      height: 30px; border-bottom: 1px dashed rgba(12,26,46,0.06); cursor: pointer; transition: background 0.1s;
+    }
+    .slot:nth-child(2n) { border-bottom-color: rgba(12,26,46,0.1); }
+    .slot:nth-child(4n) { border-bottom: 1px solid rgba(12,26,46,0.14); }
+    .slot:hover { background: rgba(14,165,233,0.05); }
+
+    /* ── Appointment block ───────────────────────────────────────── */
+    .apt-block {
+      position: absolute; left: 4px; right: 4px; border-radius: var(--r-sm);
+      padding: 5px 8px; cursor: pointer; overflow: hidden; z-index: 5;
+      border-left: 3px solid; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
+    }
+    .apt-block:hover { filter: brightness(0.96); transform: scaleX(1.01) translateY(-1px); z-index: 6; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .apt-client { font-size: 12px; font-weight: 700; color: var(--pos-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .apt-service { font-size: 11px; color: var(--pos-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .apt-time { font-size: 10px; color: var(--pos-muted); margin-top: 3px; opacity: 0.8; }
+    .apt-checkedin { display: flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 800; letter-spacing: 0.08em; color: var(--pos-green); text-transform: uppercase; margin-bottom: 2px; }
+    .apt-checkedin-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pos-green); animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.45;transform:scale(0.65)} }
+
+    /* current time line */
+    .time-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--pos-red); z-index: 15; pointer-events: none; }
+    .time-dot { position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--pos-red); box-shadow: 0 0 0 3px rgba(239,68,68,0.2); }
+
+    /* ── Week view ───────────────────────────────────────────────── */
+    #week-view { flex: 1; overflow: auto; display: none; flex-direction: column; }
+    .week-header {
+      display: flex; background: var(--pos-sidebar); border-bottom: 2px solid var(--pos-border);
+      position: sticky; top: 0; z-index: 20; min-width: max-content;
+    }
+    .week-gutter { width: 60px; flex-shrink: 0; position: sticky; left: 0; background: var(--pos-sidebar); border-right: 1px solid var(--pos-border); z-index: 21; }
+    .week-day-col {
+      flex: 1; min-width: 110px; text-align: center; padding: 10px 8px;
+      border-right: 1px solid var(--pos-border); cursor: pointer; user-select: none;
+      transition: background 0.12s;
+    }
+    .week-day-col:hover { background: var(--pos-hover); }
+    .week-day-col.today { background: rgba(14,165,233,0.06); }
+    .week-day-name { font-size: 11px; font-weight: 700; color: var(--pos-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .week-day-num { font-size: 18px; font-weight: 700; color: var(--pos-text); margin-top: 2px; }
+    .week-day-col.today .week-day-num { color: var(--pos-gold); }
+    .week-body { display: flex; min-width: max-content; }
+    .week-time-col { width: 60px; flex-shrink: 0; position: sticky; left: 0; background: var(--pos-sidebar); border-right: 1px solid var(--pos-border); z-index: 10; }
+    .week-time-label { height: 60px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 4px 8px 0 0; font-size: 11px; font-weight: 600; color: var(--pos-muted); }
+    .week-col { flex: 1; min-width: 110px; position: relative; border-right: 1px solid var(--pos-border); }
+    .week-slot { height: 60px; border-bottom: 1px solid rgba(12,26,46,0.06); cursor: pointer; transition: background 0.1s; }
+    .week-slot:nth-child(odd) { border-bottom-style: dashed; }
+    .week-slot:hover { background: rgba(14,165,233,0.04); }
+    .week-apt {
+      position: absolute; left: 3px; right: 3px; border-radius: var(--r-sm);
+      padding: 3px 6px; cursor: pointer; overflow: hidden; z-index: 5;
+      border-left: 3px solid; font-size: 11px; font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08); transition: filter 0.15s;
+    }
+    .week-apt:hover { filter: brightness(0.94); }
+    .week-current-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--pos-red); z-index: 15; pointer-events: none; }
+
+    /* ── Month view ──────────────────────────────────────────────── */
+    #month-view { flex: 1; display: none; flex-direction: column; }
+    .month-day-names { display: grid; grid-template-columns: repeat(7,1fr); background: var(--pos-sidebar); border-bottom: 1px solid var(--pos-border); }
+    .month-day-name-cell { padding: 10px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--pos-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .month-grid { flex: 1; display: grid; grid-template-columns: repeat(7,1fr); grid-template-rows: repeat(6,1fr); background: var(--pos-border); gap: 1px; overflow: hidden; }
+    .month-cell { background: var(--pos-card); padding: 6px 8px; cursor: pointer; transition: background 0.1s; min-height: 80px; }
+    .month-cell:hover { background: var(--pos-hover); }
+    .month-cell.other-month { background: rgba(245,248,252,0.5); }
+    .month-cell.today { background: rgba(14,165,233,0.05); }
+    .month-cell-num {
+      font-size: 13px; font-weight: 600; color: var(--pos-muted);
+      margin-bottom: 4px; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
+    }
+    .month-cell.today .month-cell-num { background: var(--pos-gold); color: #fff; font-weight: 700; }
+    .month-apt-pill {
+      font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── Modal ───────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; backdrop-filter: blur(4px); padding: 16px;
+    }
+    .modal {
+      background: var(--pos-card); border: 1px solid var(--pos-border);
+      border-radius: var(--r-xl); width: 440px; max-width: 100%; max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: modalIn 0.18s ease-out;
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.97) translateY(4px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .modal-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 20px 22px 16px; border-bottom: 1px solid var(--pos-border);
+    }
+    .modal-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .modal-title { font-size: 16px; font-weight: 700; flex: 1; color: var(--pos-text); }
+    .modal-close {
+      background: var(--pos-hover); border: none; width: 28px; height: 28px;
+      border-radius: 50%; font-size: 16px; cursor: pointer; color: var(--pos-muted);
+      display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--pos-border); color: var(--pos-text); }
+    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .modal-footer { padding: 14px 22px 20px; display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid var(--pos-border); }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-label { font-size: 11.5px; font-weight: 700; color: var(--pos-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-input, .form-select, .form-textarea {
+      border: 1px solid var(--pos-border); border-radius: var(--r); padding: 9px 12px;
+      font-size: 14px; color: var(--pos-text); outline: none;
+      background: var(--pos-bg); font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--pos-gold); box-shadow: 0 0 0 3px rgba(14,165,233,0.12);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-textarea { resize: vertical; min-height: 70px; }
+    .btn { padding: 8px 16px; border-radius: var(--r); font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: background 0.15s; }
+    .btn-ghost { background: var(--pos-hover); color: var(--pos-muted); border: 1px solid var(--pos-border); }
+    .btn-ghost:hover { background: var(--pos-border); color: var(--pos-text); }
+    .btn-primary { background: var(--pos-gold); color: #fff; font-weight: 700; }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-danger { background: rgba(239,68,68,0.08); color: var(--pos-red); border: 1px solid rgba(239,68,68,0.2); margin-right: auto; }
+    .btn-danger:hover { background: rgba(239,68,68,0.15); }
+    .status-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .status-pill {
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid var(--pos-border); background: none;
+      color: var(--pos-muted); font-family: inherit; transition: all 0.15s;
+    }
+    .status-pill.active { font-weight: 700; }
+    .client-suggestions {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 50;
+      background: var(--pos-card); border: 1px solid var(--pos-border);
+      border-radius: var(--r); box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-height: 200px; overflow-y: auto;
+    }
+    .client-suggestion {
+      padding: 9px 12px; cursor: pointer; font-size: 13px; transition: background 0.1s;
+      border-bottom: 1px solid var(--pos-border);
+    }
+    .client-suggestion:last-child { border-bottom: none; }
+    .client-suggestion:hover { background: var(--pos-hover); }
+    .client-suggestion-name { font-weight: 600; color: var(--pos-text); }
+    .client-suggestion-phone { font-size: 11px; color: var(--pos-muted); }
+  </style>
+</head>
+<body>
+
+<!-- BusinessOS Sidebar -->
+<div class="bos-sidebar">
+  <div class="bos-logo">
+    <div class="bos-logo-icon">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="white"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+    </div>
+    <span class="bos-logo-name">{{ company.name or 'BusinessOS' }}</span>
+  </div>
+  <nav class="bos-nav">
+    <a href="/dashboard">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Dashboard
+    </a>
+    <p class="bos-nav-section">Salon</p>
+    <a href="/calendar/" class="active">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Appointments
+    </a>
+    {% if 'payroll' in modules %}
+    <p class="bos-nav-section">Payroll</p>
+    <a href="/payroll/"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Overview</a>
+    <a href="/payroll/employees/"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Employees</a>
+    {% endif %}
+    {% if 'timeclock' in modules %}
+    <p class="bos-nav-section">Time Clock</p>
+    <a href="/timeclock/"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Clock In/Out</a>
+    <a href="/timeclock/admin"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Timesheets</a>
+    {% endif %}
+    {% if 'financial' in modules %}
+    <p class="bos-nav-section">Financial</p>
+    <a href="/financial/"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Dashboard</a>
+    {% endif %}
+    <p class="bos-nav-section">System</p>
+    <a href="/settings"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Settings</a>
+  </nav>
+  <div class="bos-user">
+    <div>
+      <div class="bos-user-name">{{ session.get('username','Admin') }}</div>
+      <div class="bos-user-role">Administrator</div>
+    </div>
+    <a href="/logout" class="bos-logout">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- Calendar Main -->
+<div class="cal-main">
+
+  <!-- Toolbar -->
+  <div class="cal-toolbar">
+    <button class="nav-btn" onclick="prevDay()">‹</button>
+    <button class="nav-btn today" onclick="goToday()">Today</button>
+    <button class="nav-btn" onclick="nextDay()">›</button>
+    <span class="cal-toolbar-date" id="toolbar-date"></span>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-day"   onclick="setView('day')">Day</button>
+      <button class="view-btn"        id="btn-week"  onclick="setView('week')">Week</button>
+      <button class="view-btn"        id="btn-month" onclick="setView('month')">Month</button>
+    </div>
+    <button class="add-btn" onclick="openAddModal()">+ New Appointment</button>
+  </div>
+
+  <!-- Day View -->
+  <div id="day-view" style="display:flex; flex:1; overflow:hidden;">
+    <div class="cal-scroll" id="day-scroll">
+      <div class="cal-inner">
+        <div class="cal-header-row" id="tech-header"></div>
+        <div class="cal-body-grid">
+          <div class="time-gutter" id="time-gutter"></div>
+          <div class="tech-cols-wrapper" id="tech-cols"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Week View -->
+  <div id="week-view" style="display:none; flex:1; overflow:hidden; flex-direction:column;">
+    <div style="overflow:auto; flex:1;">
+      <div style="min-width:max-content;">
+        <div class="week-header" id="week-header"></div>
+        <div class="week-body" id="week-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Month View -->
+  <div id="month-view" style="display:none; flex:1; flex-direction:column;">
+    <div class="month-day-names">
+      <div class="month-day-name-cell">Sun</div><div class="month-day-name-cell">Mon</div>
+      <div class="month-day-name-cell">Tue</div><div class="month-day-name-cell">Wed</div>
+      <div class="month-day-name-cell">Thu</div><div class="month-day-name-cell">Fri</div>
+      <div class="month-day-name-cell">Sat</div>
+    </div>
+    <div class="month-grid" id="month-grid"></div>
+  </div>
+
+</div>
+
+<!-- Appointment Modal -->
+<div class="modal-overlay" id="apt-modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-dot" id="modal-dot" style="background:#0ea5e9"></div>
+      <div class="modal-title" id="modal-title">New Appointment</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="apt-id">
+      <div class="form-group" style="position:relative;">
+        <label class="form-label">Client Name *</label>
+        <input class="form-input" id="apt-client-name" placeholder="Search or type name…" autocomplete="off" oninput="searchClients(this.value)">
+        <div class="client-suggestions" id="client-suggestions" style="display:none"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-input" id="apt-phone" placeholder="(555) 000-0000" type="tel">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="apt-status">
+            <option value="confirmed">Confirmed</option>
+            <option value="checkedin">Checked In</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="noshow">No Show</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Technician *</label>
+        <select class="form-select" id="apt-tech">
+          {% for t in techs %}
+          <option value="{{ t.id }}" data-color="{{ t.color }}">{{ t.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service</label>
+        <input class="form-input" id="apt-service" placeholder="e.g. Full Set Acrylic">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input class="form-input" id="apt-date" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Start Time</label>
+          <input class="form-input" id="apt-start" type="time">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duration (minutes)</label>
+        <select class="form-select" id="apt-duration">
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60" selected>1 hour</option>
+          <option value="75">1h 15m</option>
+          <option value="90">1h 30m</option>
+          <option value="120">2 hours</option>
+          <option value="150">2h 30m</option>
+          <option value="180">3 hours</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="apt-notes" placeholder="Optional notes…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="delete-btn" onclick="deleteApt()" style="display:none">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveApt()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants ────────────────────────────────────────────────────
+const START_HOUR = 8, END_HOUR = 21;
+const SLOT_H = 30, SLOT_MINS = 15;
+
+const TECHS = {{ techs | tojson }};
+const TODAY_STR = '{{ today }}';
+
+// ── State ────────────────────────────────────────────────────────
+let currentDate = new Date(TODAY_STR + 'T12:00:00');
+let currentView = 'day';
+let dayApts = [];
+
+// ── Helpers ──────────────────────────────────────────────────────
+function fmtDate(d) {
+  return d.toISOString().split('T')[0];
+}
+function fmtDisplay(d) {
+  return d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+}
+function fmtTime(t) {
+  const [h,m] = t.split(':').map(Number);
+  const hr = h > 12 ? h-12 : h === 0 ? 12 : h;
+  return `${hr}:${String(m).padStart(2,'0')} ${h >= 12 ? 'pm' : 'am'}`;
+}
+function timeToOffset(t) {
+  const [h,m] = t.split(':').map(Number);
+  return ((h - START_HOUR) * 60 + m) / SLOT_MINS * SLOT_H;
+}
+function techColor(id) {
+  const t = TECHS.find(x => x.id === id);
+  return t ? t.color : '#6366f1';
+}
+function techInitials(id) {
+  const t = TECHS.find(x => x.id === id);
+  return t ? (t.initials || t.name.charAt(0)) : '?';
+}
+
+// ── Navigation ───────────────────────────────────────────────────
+function prevDay() {
+  if (currentView === 'day') {
+    currentDate.setDate(currentDate.getDate() - 1);
+    loadDay();
+  } else if (currentView === 'week') {
+    currentDate.setDate(currentDate.getDate() - 7);
+    loadWeek();
+  } else {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    loadMonth();
+  }
+}
+function nextDay() {
+  if (currentView === 'day') {
+    currentDate.setDate(currentDate.getDate() + 1);
+    loadDay();
+  } else if (currentView === 'week') {
+    currentDate.setDate(currentDate.getDate() + 7);
+    loadWeek();
+  } else {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    loadMonth();
+  }
+}
+function goToday() {
+  currentDate = new Date(TODAY_STR + 'T12:00:00');
+  if (currentView === 'day') loadDay();
+  else if (currentView === 'week') loadWeek();
+  else loadMonth();
+}
+function setView(v) {
+  currentView = v;
+  ['day','week','month'].forEach(x => {
+    document.getElementById(x+'-view').style.display = x === v ? 'flex' : 'none';
+    document.getElementById('btn-'+x).classList.toggle('active', x === v);
+  });
+  if (v === 'month') { document.getElementById('month-view').style.flexDirection = 'column'; }
+  if (v === 'day') loadDay();
+  else if (v === 'week') loadWeek();
+  else loadMonth();
+}
+
+// ── Day view ─────────────────────────────────────────────────────
+async function loadDay() {
+  const ds = fmtDate(currentDate);
+  document.getElementById('toolbar-date').textContent = fmtDisplay(currentDate);
+  const resp = await fetch('/calendar/api/appointments?date=' + ds);
+  dayApts = await resp.json();
+  renderDay(ds);
+}
+
+function renderDay(ds) {
+  renderTimeGutter();
+  renderTechHeader(ds);
+  renderTechCols(ds);
+}
+
+function renderTimeGutter() {
+  const el = document.getElementById('time-gutter');
+  el.innerHTML = '';
+  for (let h = START_HOUR; h < END_HOUR; h++) {
+    const div = document.createElement('div');
+    div.className = 'time-slot-label';
+    const fh = h === 12 ? '12 PM' : h > 12 ? `${h-12} PM` : `${h} AM`;
+    div.innerHTML = `
+      <div class="time-label-hour">${fh}</div>
+      <div class="time-label-sub">:15</div>
+      <div class="time-label-sub">:30</div>
+      <div class="time-label-sub">:45</div>`;
+    el.appendChild(div);
+  }
+}
+
+function renderTechHeader(ds) {
+  const hdr = document.getElementById('tech-header');
+  hdr.innerHTML = '<div class="cal-header-gutter"></div>';
+  TECHS.forEach(tech => {
+    const count = dayApts.filter(a => a.technicianId === tech.id).length;
+    const div = document.createElement('div');
+    div.className = 'tech-header-cell';
+    div.innerHTML = `
+      <div class="tech-avatar" style="background:${tech.color}">${tech.initials || tech.name.charAt(0)}</div>
+      <span class="tech-name">${tech.name}</span>
+      <span class="tech-apt-count">${count} appt${count!==1?'s':''}</span>`;
+    hdr.appendChild(div);
+  });
+}
+
+function renderTechCols(ds) {
+  const wrapper = document.getElementById('tech-cols');
+  wrapper.innerHTML = '';
+  const totalSlots = (END_HOUR - START_HOUR) * 60 / SLOT_MINS;
+
+  // Current time line
+  const now = new Date();
+  const isToday = fmtDate(now) === ds;
+  if (isToday) {
+    const h = now.getHours(), m = now.getMinutes();
+    if (h >= START_HOUR && h < END_HOUR) {
+      const offset = ((h - START_HOUR) * 60 + m) / SLOT_MINS * SLOT_H;
+      const line = document.createElement('div');
+      line.className = 'time-line';
+      line.style.top = offset + 'px';
+      line.innerHTML = '<div class="time-dot"></div>';
+      wrapper.appendChild(line);
+    }
+  }
+
+  TECHS.forEach(tech => {
+    const col = document.createElement('div');
+    col.className = 'tech-col';
+    col.style.height = (totalSlots * SLOT_H) + 'px';
+
+    // Clickable slots
+    const slotsDiv = document.createElement('div');
+    slotsDiv.className = 'time-slots';
+    for (let s = 0; s < totalSlots; s++) {
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      const h = START_HOUR + Math.floor(s * SLOT_MINS / 60);
+      const m = (s * SLOT_MINS) % 60;
+      const t = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      slot.onclick = () => openAddModal(tech.id, ds, t);
+      slotsDiv.appendChild(slot);
+    }
+    col.appendChild(slotsDiv);
+
+    // Appointment blocks
+    const techApts = dayApts.filter(a => a.technicianId === tech.id);
+    techApts.forEach(apt => {
+      const top = timeToOffset(apt.startTime);
+      const height = (apt.duration / SLOT_MINS) * SLOT_H;
+      const isIn = apt.status === 'checkedin';
+      const color = tech.color;
+      const block = document.createElement('div');
+      block.className = 'apt-block';
+      block.style.top = (top + 2) + 'px';
+      block.style.height = Math.max(height - 4, 20) + 'px';
+      block.style.borderLeftColor = color;
+      block.style.backgroundColor = color + '18';
+      if (isIn) block.style.boxShadow = `0 0 0 1px ${color}40, 0 2px 10px ${color}22`;
+
+      let html = '';
+      if (isIn) html += `<div class="apt-checkedin"><span class="apt-checkedin-dot"></span>IN</div>`;
+      html += `<div class="apt-client">${apt.clientName}</div>`;
+      if (height > 44) html += `<div class="apt-service">${apt.service || ''}</div>`;
+      if (height > 64) html += `<div class="apt-time">${fmtTime(apt.startTime)} · ${apt.duration}m</div>`;
+      block.innerHTML = html;
+      block.onclick = e => { e.stopPropagation(); openEditModal(apt); };
+      col.appendChild(block);
+    });
+
+    wrapper.appendChild(col);
+  });
+}
+
+// ── Week view ────────────────────────────────────────────────────
+async function loadWeek() {
+  // Get Monday of the week containing currentDate
+  const d = new Date(currentDate);
+  const dow = d.getDay(); // 0=Sun
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
+  const startStr = fmtDate(monday);
+
+  const m = monday.toLocaleDateString('en-US', {month:'long'});
+  const y = monday.getFullYear();
+  document.getElementById('toolbar-date').textContent = `${m} ${y}`;
+
+  const resp = await fetch('/calendar/api/appointments/week?start=' + startStr);
+  const apts = await resp.json();
+  renderWeek(monday, apts);
+}
+
+function renderWeek(monday, apts) {
+  const hdr = document.getElementById('week-header');
+  const body = document.getElementById('week-body');
+  const today = fmtDate(new Date());
+  const days = Array.from({length:7}, (_,i) => { const d = new Date(monday); d.setDate(monday.getDate()+i); return d; });
+  const NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  hdr.innerHTML = '<div class="week-gutter"></div>';
+  days.forEach((d,i) => {
+    const ds = fmtDate(d);
+    const div = document.createElement('div');
+    div.className = 'week-day-col' + (ds === today ? ' today' : '');
+    div.innerHTML = `<div class="week-day-name">${NAMES[i]}</div><div class="week-day-num">${d.getDate()}</div>`;
+    div.onclick = () => { currentDate = new Date(d); setView('day'); };
+    hdr.appendChild(div);
+  });
+
+  const totalSlots = (END_HOUR - START_HOUR) * 2; // 30-min slots for week
+  const slotH = 60;
+  body.innerHTML = '';
+  const timeCol = document.createElement('div');
+  timeCol.className = 'week-time-col';
+  for (let h = START_HOUR; h < END_HOUR; h++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'week-time-label';
+    lbl.textContent = h === 12 ? '12 PM' : h > 12 ? `${h-12} PM` : `${h} AM`;
+    timeCol.appendChild(lbl);
+  }
+  body.appendChild(timeCol);
+
+  days.forEach(d => {
+    const ds = fmtDate(d);
+    const col = document.createElement('div');
+    col.className = 'week-col';
+    col.style.height = (totalSlots * slotH) + 'px';
+    col.style.position = 'relative';
+
+    // Slots
+    for (let s = 0; s < totalSlots; s++) {
+      const slot = document.createElement('div');
+      slot.className = 'week-slot';
+      const h = START_HOUR + Math.floor(s * 30 / 60);
+      const m = (s * 30) % 60;
+      const t = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      slot.onclick = () => { currentDate = new Date(d); openAddModal(null, ds, t); };
+      col.appendChild(slot);
+    }
+
+    // Current time
+    const now = new Date();
+    if (fmtDate(now) === ds) {
+      const h = now.getHours(), m = now.getMinutes();
+      if (h >= START_HOUR && h < END_HOUR) {
+        const offset = ((h - START_HOUR) * 60 + m) / 30 * slotH;
+        const line = document.createElement('div');
+        line.className = 'week-current-line';
+        line.style.top = offset + 'px';
+        col.appendChild(line);
+      }
+    }
+
+    // Apts
+    apts.filter(a => a.date === ds).forEach(apt => {
+      const [ah,am] = apt.startTime.split(':').map(Number);
+      const top = ((ah - START_HOUR) * 60 + am) / 30 * slotH;
+      const height = (apt.duration / 30) * slotH;
+      const color = techColor(apt.technicianId);
+      const block = document.createElement('div');
+      block.className = 'week-apt';
+      block.style.top = (top + 2) + 'px';
+      block.style.height = Math.max(height - 4, 18) + 'px';
+      block.style.borderLeftColor = color;
+      block.style.backgroundColor = color + '18';
+      block.innerHTML = `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--pos-text)">${apt.clientName}</div>`;
+      block.onclick = e => { e.stopPropagation(); currentDate = new Date(d); openEditModal(apt); };
+      col.appendChild(block);
+    });
+
+    body.appendChild(col);
+  });
+}
+
+// ── Month view ───────────────────────────────────────────────────
+async function loadMonth() {
+  const month = fmtDate(currentDate).slice(0,7);
+  document.getElementById('toolbar-date').textContent =
+    currentDate.toLocaleDateString('en-US', {month:'long', year:'numeric'});
+  const resp = await fetch('/calendar/api/appointments/month?month=' + month);
+  const counts = await resp.json();
+  renderMonth(counts);
+}
+
+function renderMonth(counts) {
+  const grid = document.getElementById('month-grid');
+  grid.innerHTML = '';
+  const today = fmtDate(new Date());
+  const year = currentDate.getFullYear(), month = currentDate.getMonth();
+  const first = new Date(year, month, 1);
+  const last  = new Date(year, month+1, 0);
+  let startDow = first.getDay(); // 0=Sun
+
+  // Fill grid with 6 weeks × 7 days
+  for (let i = 0; i < 42; i++) {
+    const dayNum = i - startDow + 1;
+    const d = new Date(year, month, dayNum);
+    const ds = fmtDate(d);
+    const isCurrentMonth = d.getMonth() === month;
+    const cell = document.createElement('div');
+    cell.className = 'month-cell' + (isCurrentMonth ? '' : ' other-month') + (ds === today ? ' today' : '');
+    cell.onclick = () => { currentDate = new Date(d); setView('day'); };
+    const num = document.createElement('div');
+    num.className = 'month-cell-num';
+    num.textContent = d.getDate();
+    cell.appendChild(num);
+    if (counts[ds]) {
+      const pill = document.createElement('div');
+      pill.className = 'month-apt-pill';
+      const color = '#0ea5e9';
+      pill.style.backgroundColor = color + '20';
+      pill.style.color = color;
+      pill.textContent = `${counts[ds]} appt${counts[ds]!==1?'s':''}`;
+      cell.appendChild(pill);
+    }
+    grid.appendChild(cell);
+  }
+}
+
+// ── Modal ────────────────────────────────────────────────────────
+function openAddModal(techId, ds, t) {
+  document.getElementById('apt-id').value = '';
+  document.getElementById('apt-client-name').value = '';
+  document.getElementById('apt-phone').value = '';
+  document.getElementById('apt-service').value = '';
+  document.getElementById('apt-notes').value = '';
+  document.getElementById('apt-status').value = 'confirmed';
+  document.getElementById('apt-date').value = ds || fmtDate(currentDate);
+  document.getElementById('apt-start').value = t || '09:00';
+  document.getElementById('apt-duration').value = '60';
+  if (techId) document.getElementById('apt-tech').value = techId;
+  document.getElementById('modal-title').textContent = 'New Appointment';
+  document.getElementById('delete-btn').style.display = 'none';
+  updateModalDot();
+  document.getElementById('apt-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('apt-client-name').focus(), 50);
+}
+
+function openEditModal(apt) {
+  document.getElementById('apt-id').value = apt.id;
+  document.getElementById('apt-client-name').value = apt.clientName;
+  document.getElementById('apt-phone').value = apt.clientPhone || '';
+  document.getElementById('apt-service').value = apt.service || '';
+  document.getElementById('apt-notes').value = apt.notes || '';
+  document.getElementById('apt-status').value = apt.status || 'confirmed';
+  document.getElementById('apt-date').value = apt.date;
+  document.getElementById('apt-start').value = apt.startTime;
+  document.getElementById('apt-duration').value = String(apt.duration);
+  document.getElementById('apt-tech').value = apt.technicianId;
+  document.getElementById('modal-title').textContent = apt.clientName;
+  document.getElementById('modal-dot').style.background = techColor(apt.technicianId);
+  document.getElementById('delete-btn').style.display = 'inline-flex';
+  document.getElementById('apt-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('apt-modal').style.display = 'none';
+  document.getElementById('client-suggestions').style.display = 'none';
+}
+
+function updateModalDot() {
+  const sel = document.getElementById('apt-tech');
+  const opt = sel.options[sel.selectedIndex];
+  const color = opt ? opt.dataset.color : '#0ea5e9';
+  document.getElementById('modal-dot').style.background = color || '#0ea5e9';
+}
+document.getElementById('apt-tech').addEventListener('change', updateModalDot);
+
+async function saveApt() {
+  const id   = document.getElementById('apt-id').value;
+  const data = {
+    clientName:  document.getElementById('apt-client-name').value.trim(),
+    clientPhone: document.getElementById('apt-phone').value.trim(),
+    service:     document.getElementById('apt-service').value.trim(),
+    notes:       document.getElementById('apt-notes').value.trim(),
+    status:      document.getElementById('apt-status').value,
+    date:        document.getElementById('apt-date').value,
+    startTime:   document.getElementById('apt-start').value,
+    duration:    parseInt(document.getElementById('apt-duration').value),
+    technicianId:parseInt(document.getElementById('apt-tech').value),
+  };
+  if (!data.clientName) { alert('Client name is required.'); return; }
+  const url    = id ? `/calendar/api/appointments/${id}` : '/calendar/api/appointments';
+  const method = id ? 'PUT' : 'POST';
+  const resp   = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+  const result = await resp.json();
+  if (result.success) {
+    closeModal();
+    if (currentView === 'day') loadDay();
+    else if (currentView === 'week') loadWeek();
+    else loadMonth();
+  } else {
+    alert('Error saving appointment.');
+  }
+}
+
+async function deleteApt() {
+  const id = document.getElementById('apt-id').value;
+  if (!id || !confirm('Delete this appointment?')) return;
+  const resp = await fetch(`/calendar/api/appointments/${id}`, { method: 'DELETE' });
+  const result = await resp.json();
+  if (result.success) {
+    closeModal();
+    if (currentView === 'day') loadDay();
+    else if (currentView === 'week') loadWeek();
+    else loadMonth();
+  }
+}
+
+// ── Client search ────────────────────────────────────────────────
+let searchTimeout;
+function searchClients(q) {
+  clearTimeout(searchTimeout);
+  if (q.length < 2) { document.getElementById('client-suggestions').style.display = 'none'; return; }
+  searchTimeout = setTimeout(async () => {
+    const resp = await fetch('/calendar/api/clients/search?q=' + encodeURIComponent(q));
+    const clients = await resp.json();
+    const box = document.getElementById('client-suggestions');
+    if (!clients.length) { box.style.display = 'none'; return; }
+    box.innerHTML = clients.map(c => `
+      <div class="client-suggestion" onclick="selectClient(${JSON.stringify(c.first_name + ' ' + c.last_name).replace(/"/g,'&quot;')}, '${c.phone||''}')">
+        <div class="client-suggestion-name">${c.first_name} ${c.last_name}</div>
+        <div class="client-suggestion-phone">${c.phone || ''}</div>
+      </div>`).join('');
+    box.style.display = 'block';
+  }, 250);
+}
+function selectClient(name, phone) {
+  document.getElementById('apt-client-name').value = name;
+  document.getElementById('apt-phone').value = phone;
+  document.getElementById('client-suggestions').style.display = 'none';
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#apt-client-name') && !e.target.closest('#client-suggestions'))
+    document.getElementById('client-suggestions').style.display = 'none';
+});
+
+// ── Auto-scroll to current time ───────────────────────────────────
+function scrollToNow() {
+  const now = new Date();
+  if (now.getHours() >= START_HOUR && now.getHours() < END_HOUR) {
+    const offset = ((now.getHours() - START_HOUR) * 60 + now.getMinutes()) / SLOT_MINS * SLOT_H;
+    const el = document.getElementById('day-scroll');
+    if (el) el.scrollTop = Math.max(0, offset - 180);
+  }
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+loadDay();
+scrollToNow();
+
+// Update time line every minute
+setInterval(() => {
+  if (currentView === 'day') {
+    const ds = fmtDate(currentDate);
+    const existing = document.querySelector('.time-line');
+    if (existing) existing.remove();
+    const now = new Date();
+    const isToday = fmtDate(now) === ds;
+    if (isToday) {
+      const h = now.getHours(), m = now.getMinutes();
+      if (h >= START_HOUR && h < END_HOUR) {
+        const offset = ((h - START_HOUR) * 60 + m) / SLOT_MINS * SLOT_H;
+        const wrapper = document.getElementById('tech-cols');
+        const line = document.createElement('div');
+        line.className = 'time-line';
+        line.style.top = offset + 'px';
+        line.innerHTML = '<div class="time-dot"></div>';
+        wrapper.insertBefore(line, wrapper.firstChild);
+      }
+    }
+  }
+}, 60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Pay Stubs — {{ run.pay_period_start.strftime('%b %d') }}–{{ run.pay_period_end.strftime('%b %d, %Y') }}{% endblock %}
+{% block header %}Pay Stubs{% endblock %}
+{% block header_actions %}
+  <button onclick="window.print()" class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+    Print All
+  </button>
+  <a href="{{ url_for('payroll.index') }}" class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm font-medium px-3 py-2 rounded-lg transition-colors">
+    ← Back to Payroll
+  </a>
+{% endblock %}
+{% block content %}
+
+<style>
+  @media print {
+    .no-print { display: none !important; }
+    .stub-card { page-break-after: always; box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+    .stub-card:last-child { page-break-after: avoid; }
+  }
+</style>
+
+<!-- Run header -->
+<div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 mb-6 no-print">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm font-medium text-indigo-900">Pay Period: {{ run.pay_period_start.strftime('%B %d') }} – {{ run.pay_period_end.strftime('%B %d, %Y') }}</p>
+      <p class="text-xs text-indigo-600 mt-0.5">Pay Date: {{ run.pay_date.strftime('%B %d, %Y') }} · {{ entries|length }} employees · Status: <strong>{{ run.status|title }}</strong></p>
+    </div>
+    <div class="text-right">
+      <p class="text-2xl font-bold text-indigo-900">{{ fmt(run.total_gross) }}</p>
+      <p class="text-xs text-indigo-500 mt-0.5">Total Gross</p>
+    </div>
+  </div>
+</div>
+
+<!-- Stubs grid -->
+<div class="space-y-6">
+  {% for e in entries %}
+  <div class="stub-card bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+
+    <!-- Stub header -->
+    <div class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+      <div>
+        <p class="font-bold text-lg">{{ e.name }}</p>
+        <p class="text-gray-400 text-xs mt-0.5">
+          {{ 'W-2 Employee' if e.employee_type == 'w2' else '1099 Contractor' }} ·
+          {{ e.emp.pay_basis|title if e.emp else '' }}
+          {% if e.emp and e.emp.state_code %} · {{ e.emp.state_code }}{% endif %}
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-gray-400 uppercase tracking-wider">Pay Statement</p>
+        <p class="text-sm font-medium mt-0.5">{{ run.pay_period_start.strftime('%b %d') }} – {{ run.pay_period_end.strftime('%b %d, %Y') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">Pay Date: {{ run.pay_date.strftime('%b %d, %Y') }}</p>
+      </div>
+    </div>
+
+    <div class="p-6 grid grid-cols-2 gap-6">
+
+      <!-- Earnings -->
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Earnings</p>
+        <table class="w-full text-sm">
+          {% if e.regular_pay %}
+          <tr>
+            <td class="py-1 text-gray-600">Regular Pay
+              {% if e.hours_worked %}<span class="text-xs text-gray-400">({{ '%.2f'|format(e.hours_worked|float) }}h @ {{ fmt(e.hourly_rate or 0) }})</span>{% endif %}
+            </td>
+            <td class="text-right font-medium text-gray-900">{{ fmt(e.regular_pay) }}</td>
+          </tr>
+          {% endif %}
+          {% if e.overtime_pay %}
+          <tr>
+            <td class="py-1 text-gray-600">Overtime Pay <span class="text-xs text-gray-400">(1.5x)</span></td>
+            <td class="text-right font-medium text-gray-900">{{ fmt(e.overtime_pay) }}</td>
+          </tr>
+          {% endif %}
+          {% if e.commission_pay %}
+          <tr>
+            <td class="py-1 text-gray-600">Commission</td>
+            <td class="text-right font-medium text-gray-900">{{ fmt(e.commission_pay) }}</td>
+          </tr>
+          {% endif %}
+          <tr class="border-t border-gray-100 mt-1">
+            <td class="py-2 font-semibold text-gray-900">Gross Pay</td>
+            <td class="text-right font-bold text-gray-900">{{ fmt(e.gross_pay) }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Deductions -->
+      <div>
+        {% if e.employee_type == 'w2' %}
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Deductions</p>
+        <table class="w-full text-sm">
+          {% if e.federal_income_tax %}
+          <tr><td class="py-1 text-gray-600">Federal Income Tax</td><td class="text-right text-gray-900">{{ fmt(e.federal_income_tax) }}</td></tr>
+          {% endif %}
+          {% if e.social_security_tax %}
+          <tr><td class="py-1 text-gray-600">Social Security (6.2%)</td><td class="text-right text-gray-900">{{ fmt(e.social_security_tax) }}</td></tr>
+          {% endif %}
+          {% if e.medicare_tax %}
+          <tr><td class="py-1 text-gray-600">Medicare (1.45%)</td><td class="text-right text-gray-900">{{ fmt(e.medicare_tax) }}</td></tr>
+          {% endif %}
+          {% if e.additional_medicare %}
+          <tr><td class="py-1 text-gray-600">Additional Medicare (0.9%)</td><td class="text-right text-gray-900">{{ fmt(e.additional_medicare) }}</td></tr>
+          {% endif %}
+          {% if e.state_income_tax %}
+          <tr><td class="py-1 text-gray-600">State Income Tax {% if e.emp.state_code %}({{ e.emp.state_code }}){% endif %}</td><td class="text-right text-gray-900">{{ fmt(e.state_income_tax) }}</td></tr>
+          {% endif %}
+          {% if e.state_sdi %}
+          <tr><td class="py-1 text-gray-600">State SDI</td><td class="text-right text-gray-900">{{ fmt(e.state_sdi) }}</td></tr>
+          {% endif %}
+          {% if e.city_income_tax %}
+          <tr><td class="py-1 text-gray-600">City Income Tax {% if e.emp.city_code %}({{ e.emp.city_code.replace('_',' ')|title }}){% endif %}</td><td class="text-right text-gray-900">{{ fmt(e.city_income_tax) }}</td></tr>
+          {% endif %}
+          <tr class="border-t border-gray-100">
+            <td class="py-2 font-semibold text-gray-900">Total Deductions</td>
+            <td class="text-right font-bold text-red-600">{{ fmt(e.total_deductions) }}</td>
+          </tr>
+        </table>
+        {% else %}
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Notes</p>
+        <div class="text-xs text-gray-500 space-y-1">
+          <p>No employer tax withholding for 1099 contractors.</p>
+          <p>Contractor is responsible for self-employment tax (SE tax ≈ 15.3%).</p>
+          {% if e.gross_pay >= 600 %}<p class="mt-2 text-orange-600">IRS threshold met — will appear on 1099-NEC for {{ run.pay_period_end.year }}.</p>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Net pay + YTD footer -->
+    <div class="border-t border-gray-100 px-6 py-4 bg-gray-50 flex items-center justify-between">
+      <div class="flex gap-8">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wider">YTD Gross</p>
+          <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ fmt(e.ytd_gross or 0) }}</p>
+        </div>
+        {% if e.employee_type == 'w2' %}
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wider">YTD Federal Tax</p>
+          <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ fmt(e.ytd_federal_tax or 0) }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-wider">YTD SS Wages</p>
+          <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ fmt(e.ytd_ss_wages or 0) }}</p>
+        </div>
+        {% endif %}
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-gray-400 uppercase tracking-wider">Net Pay</p>
+        <p class="text-2xl font-bold text-green-600 mt-0.5">{{ fmt(e.net_pay) }}</p>
+      </div>
+    </div>
+
+    {% if e.employee_type == 'w2' %}
+    <!-- Employer taxes (admin view) -->
+    <div class="border-t border-dashed border-gray-200 px-6 py-3 bg-yellow-50 no-print">
+      <p class="text-xs text-yellow-700 font-medium">Employer Taxes (not deducted from employee)</p>
+      <div class="flex gap-6 mt-1 text-xs text-yellow-600">
+        <span>SS: {{ fmt(e.employer_ss) }}</span>
+        <span>Medicare: {{ fmt(e.employer_medicare) }}</span>
+        <span>FUTA: {{ fmt(e.employer_futa) }}</span>
+        <span>SUTA: {{ fmt(e.employer_suta) }}</span>
+        <span class="font-semibold">Total: {{ fmt(e.total_employer_tax) }}</span>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+  {% endfor %}
+</div>
+
+{% if not entries %}
+<div class="bg-white rounded-xl border border-gray-200 px-6 py-16 text-center">
+  <p class="text-gray-500">No entries found for this payroll run.</p>
+</div>
+{% endif %}
+
+{% endblock %}

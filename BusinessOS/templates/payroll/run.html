@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block header %}Run Payroll{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto">
+
+<!-- Stepper -->
+<div class="flex items-center mb-8">
+  {% for step in [('1','Select Period'), ('2','Review'), ('3','Confirm')] %}
+  <div class="flex items-center {% if not loop.last %}flex-1{% endif %}">
+    <div id="step-dot-{{ loop.index }}" class="flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-bold transition-all
+      {% if loop.index == 1 %}border-indigo-600 bg-indigo-600 text-white{% else %}border-gray-300 text-gray-400{% endif %}">
+      <span id="step-num-{{ loop.index }}">{{ step[0] }}</span>
+    </div>
+    <span id="step-label-{{ loop.index }}" class="ml-2 text-sm font-medium {% if loop.index == 1 %}text-indigo-600{% else %}text-gray-400{% endif %}">{{ step[1] }}</span>
+    {% if not loop.last %}
+    <div class="flex-1 mx-4 h-0.5 bg-gray-200" id="step-line-{{ loop.index }}"></div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Step 1: Period selection -->
+<div id="step1" class="bg-white rounded-xl border border-gray-200 p-8">
+  <h2 class="text-lg font-semibold text-gray-900 mb-1">Select Pay Period</h2>
+  <p class="text-sm text-gray-500 mb-6">Weekly payroll runs Monday – Sunday.</p>
+  <div class="grid grid-cols-2 gap-6 mb-6">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1.5">Period Start (Monday)</label>
+      <input type="date" id="period_start" value="{{ default_start.isoformat() }}"
+        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1.5">Period End (Sunday)</label>
+      <input type="date" id="period_end" value="{{ default_end.isoformat() }}"
+        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    </div>
+  </div>
+  <button onclick="previewPayroll()"
+    class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-lg text-sm transition-colors">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+    Preview Payroll
+  </button>
+  <div id="loading" class="hidden mt-4 text-sm text-gray-500 flex items-center gap-2">
+    <svg class="animate-spin w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+    Computing payroll...
+  </div>
+  <div id="preview-error" class="hidden mt-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3"></div>
+</div>
+
+<!-- Step 2: Review (hidden initially) -->
+<div id="step2" class="hidden bg-white rounded-xl border border-gray-200 mt-5">
+  <div class="px-8 py-5 border-b border-gray-100">
+    <h2 class="text-lg font-semibold text-gray-900">Review Payroll</h2>
+    <p id="period-label" class="text-sm text-gray-500 mt-0.5"></p>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-100">
+          <th class="text-left px-6 py-3">Employee</th>
+          <th class="text-center px-4 py-3">Type</th>
+          <th class="text-right px-4 py-3">Hours</th>
+          <th class="text-right px-4 py-3">Gross</th>
+          <th class="text-right px-4 py-3">Taxes</th>
+          <th class="text-right px-4 py-3">Er. Taxes</th>
+          <th class="text-right px-6 py-3">Net Pay</th>
+        </tr>
+      </thead>
+      <tbody id="preview-rows" class="divide-y divide-gray-50"></tbody>
+      <tfoot>
+        <tr class="bg-gray-50 font-semibold" id="preview-totals"></tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="flex items-center justify-between px-8 py-5 border-t border-gray-100">
+    <button onclick="backToStep1()" class="text-sm text-gray-500 hover:text-gray-700">← Back</button>
+    <button onclick="goToStep3()"
+      class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-lg text-sm">
+      Looks Good — Confirm →
+    </button>
+  </div>
+</div>
+
+<!-- Step 3: Confirm -->
+<div id="step3" class="hidden bg-white rounded-xl border border-gray-200 p-8 mt-5">
+  <div class="flex items-start gap-4">
+    <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center flex-shrink-0">
+      <svg class="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900 mb-1">Ready to save this payroll run?</h2>
+      <p class="text-sm text-gray-500 mb-4">This will create a <strong>draft</strong> payroll run. You'll need to issue payments and mark it as paid.</p>
+      <div id="confirm-summary" class="bg-gray-50 rounded-lg px-5 py-4 mb-6 text-sm space-y-2"></div>
+      <div class="flex items-center gap-3">
+        <button onclick="savePayroll()" id="save-btn"
+          class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2.5 rounded-lg text-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Save Payroll Run
+        </button>
+        <button onclick="goToStep2()" class="text-sm text-gray-500 hover:text-gray-700">← Back to Review</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 4: Done -->
+<div id="step4" class="hidden bg-white rounded-xl border border-gray-200 p-12 mt-5 text-center">
+  <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+    <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+  </div>
+  <h2 class="text-xl font-bold text-gray-900 mb-2">Payroll Run Saved!</h2>
+  <p class="text-gray-500 text-sm mb-6">Issue payments to each employee, then mark the run as paid.</p>
+  <div class="flex items-center justify-center gap-3">
+    <a id="stubs-link" href="#" class="inline-flex items-center gap-2 bg-indigo-600 text-white font-medium px-5 py-2.5 rounded-lg text-sm hover:bg-indigo-700">
+      View Pay Stubs
+    </a>
+    <a href="{{ url_for('payroll.index') }}" class="text-sm text-gray-500 hover:text-gray-700">← Back to Payroll</a>
+  </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let previewData = null;
+
+function fmt(n) {
+  return '$' + parseFloat(n || 0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById(`step-dot-${i}`);
+    const label = document.getElementById(`step-label-${i}`);
+    if (i < n) {
+      dot.className = dot.className.replace(/border-\S+ bg-\S+ text-\S+/, 'border-green-500 bg-green-500 text-white');
+      label.className = label.className.replace(/text-\S+$/, 'text-green-600');
+    } else if (i === n) {
+      dot.className = dot.className.replace(/border-\S+ bg-\S+ text-\S+/, 'border-indigo-600 bg-indigo-600 text-white');
+      label.className = label.className.replace(/text-\S+$/, 'text-indigo-600');
+    } else {
+      dot.className = dot.className.replace(/border-\S+ bg-\S+ text-\S+/, 'border-gray-300 bg-white text-gray-400');
+      label.className = label.className.replace(/text-\S+$/, 'text-gray-400');
+    }
+  }
+}
+
+async function previewPayroll() {
+  const ps = document.getElementById('period_start').value;
+  const pe = document.getElementById('period_end').value;
+  if (!ps || !pe) { alert('Select both start and end dates.'); return; }
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('preview-error').classList.add('hidden');
+  try {
+    const res = await fetch('/payroll/run/preview', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({period_start: ps, period_end: pe}),
+    });
+    const data = await res.json();
+    document.getElementById('loading').classList.add('hidden');
+    if (!data.success) { throw new Error(data.error || 'Unknown error'); }
+    if (!data.entries.length) { throw new Error('No active employees found with earnings for this period.'); }
+    previewData = data;
+    renderPreview(data);
+    document.getElementById('step2').classList.remove('hidden');
+    setStep(2);
+    document.getElementById('step2').scrollIntoView({behavior:'smooth', block:'start'});
+  } catch(e) {
+    document.getElementById('loading').classList.add('hidden');
+    const err = document.getElementById('preview-error');
+    err.textContent = e.message; err.classList.remove('hidden');
+  }
+}
+
+function renderPreview(data) {
+  const ps = document.getElementById('period_start').value;
+  const pe = document.getElementById('period_end').value;
+  document.getElementById('period-label').textContent =
+    `Period: ${new Date(ps+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${new Date(pe+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+
+  const tbody = document.getElementById('preview-rows');
+  tbody.innerHTML = data.entries.map(e => `
+    <tr class="hover:bg-gray-50">
+      <td class="px-6 py-3">
+        <p class="text-sm font-medium text-gray-900">${e.name}</p>
+        <p class="text-xs text-gray-400">${e.basis.charAt(0).toUpperCase() + e.basis.slice(1)}${e.hours > 0 ? ' · ' + e.hours.toFixed(1) + ' hrs' : ''}</p>
+      </td>
+      <td class="px-4 py-3 text-center">
+        <span class="inline-flex px-2 py-0.5 text-xs rounded-full font-medium ${e.type === 'w2' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}">
+          ${e.type === 'w2' ? 'W-2' : '1099'}
+        </span>
+      </td>
+      <td class="px-4 py-3 text-sm text-gray-600 text-right">${e.hours > 0 ? e.hours.toFixed(1) : '—'}</td>
+      <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">${fmt(e.gross)}</td>
+      <td class="px-4 py-3 text-sm text-red-600 text-right">${e.type==='w2' ? '-' + fmt(e.taxes.total_ded) : '—'}</td>
+      <td class="px-4 py-3 text-sm text-orange-600 text-right">${e.type==='w2' ? fmt(e.taxes.total_er) : '—'}</td>
+      <td class="px-6 py-3 text-sm font-bold text-green-700 text-right">${fmt(e.net)}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('preview-totals').innerHTML = `
+    <td class="px-6 py-3 text-sm font-semibold text-gray-700">TOTAL</td>
+    <td class="px-4 py-3"></td><td class="px-4 py-3"></td>
+    <td class="px-4 py-3 text-sm font-bold text-gray-900 text-right">${fmt(data.total_gross)}</td>
+    <td class="px-4 py-3 text-sm font-semibold text-red-600 text-right"></td>
+    <td class="px-4 py-3 text-sm font-semibold text-orange-600 text-right">${fmt(data.total_er_tax)}</td>
+    <td class="px-6 py-3 text-sm font-bold text-green-700 text-right">${fmt(data.total_net)}</td>
+  `;
+}
+
+function goToStep3() {
+  document.getElementById('step3').classList.remove('hidden');
+  setStep(3);
+  const ps = document.getElementById('period_start').value;
+  const pe = document.getElementById('period_end').value;
+  document.getElementById('confirm-summary').innerHTML = `
+    <div class="flex justify-between"><span class="text-gray-500">Pay period</span><span class="font-medium">${ps} to ${pe}</span></div>
+    <div class="flex justify-between"><span class="text-gray-500">Employees</span><span class="font-medium">${previewData.entries.length}</span></div>
+    <div class="flex justify-between"><span class="text-gray-500">Total gross</span><span class="font-semibold text-gray-900">${fmt(previewData.total_gross)}</span></div>
+    <div class="flex justify-between"><span class="text-gray-500">Total net pay</span><span class="font-semibold text-green-700">${fmt(previewData.total_net)}</span></div>
+    <div class="flex justify-between"><span class="text-gray-500">Total employer taxes</span><span class="font-semibold text-orange-600">${fmt(previewData.total_er_tax)}</span></div>
+    <div class="flex justify-between border-t border-gray-200 pt-2 mt-1"><span class="text-gray-500">Total liability</span><span class="font-bold text-gray-900">${fmt(previewData.total_gross + previewData.total_er_tax)}</span></div>
+  `;
+  document.getElementById('step3').scrollIntoView({behavior:'smooth'});
+}
+
+function goToStep2() {
+  document.getElementById('step3').classList.add('hidden');
+  setStep(2);
+}
+
+function backToStep1() {
+  document.getElementById('step2').classList.add('hidden');
+  setStep(1);
+}
+
+async function savePayroll() {
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const ps = document.getElementById('period_start').value;
+  const pe = document.getElementById('period_end').value;
+  try {
+    const res = await fetch('/payroll/run/save', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({period_start: ps, period_end: pe, entries: previewData.entries}),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    document.getElementById('step3').classList.add('hidden');
+    document.getElementById('step4').classList.remove('hidden');
+    document.getElementById('stubs-link').href = `/payroll/run/${data.run_id}/stubs`;
+    document.getElementById('step4').scrollIntoView({behavior:'smooth'});
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Save Payroll Run';
+    alert('Error saving: ' + e.message);
+  }
+}
+</script>
+{% endblock %}

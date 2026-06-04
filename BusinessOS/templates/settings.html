@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block header %}Settings{% endblock %}
+{% block content %}
+
+<div class="max-w-3xl space-y-6">
+
+  <!-- Company Information -->
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="font-semibold text-gray-900">Company Information</h2>
+      <p class="text-xs text-gray-400 mt-0.5">Used on pay stubs and tax reports</p>
+    </div>
+    <form method="POST" class="p-6 space-y-4">
+      <input type="hidden" name="action" value="update_company">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Business Name</label>
+          <input type="text" name="name" value="{{ company.name or '' }}" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">State</label>
+          <input type="text" name="state" value="{{ company.state or '' }}" maxlength="2" placeholder="TX"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">EIN</label>
+          <input type="text" name="ein" value="{{ company.ein or '' }}" placeholder="12-3456789"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+          <input type="text" name="phone" value="{{ company.phone or '' }}"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+          <input type="email" name="email" value="{{ company.email or '' }}"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Timezone</label>
+          <select name="timezone"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            {% for tz in ['America/Los_Angeles','America/Denver','America/Chicago','America/New_York','America/Phoenix','Pacific/Honolulu','America/Anchorage'] %}
+            <option value="{{ tz }}" {{ 'selected' if company.timezone == tz }}>{{ tz }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Address</label>
+        <input type="text" name="address" value="{{ company.address or '' }}" placeholder="123 Main St, City, State ZIP"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div class="flex justify-end pt-2 border-t border-gray-100">
+        <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors">
+          Save Company Info
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Module Management -->
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="font-semibold text-gray-900">Module Licenses</h2>
+      <p class="text-xs text-gray-400 mt-0.5">Enable or disable modules. Each module can be sold independently.</p>
+    </div>
+    <form method="POST" class="p-6">
+      <input type="hidden" name="action" value="update_modules">
+      <div class="space-y-3">
+        {% for mod in all_modules %}
+        <div class="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
+          <div class="flex items-center gap-4">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="mod_{{ mod.module }}" class="sr-only peer" {{ 'checked' if mod.enabled }}>
+              <div class="w-10 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-indigo-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+            </label>
+            <div>
+              <p class="text-sm font-medium text-gray-900">{{ mod.label }}</p>
+              <p class="text-xs text-gray-400">{{ mod.module }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ 'bg-green-100 text-green-700' if mod.enabled else 'bg-gray-100 text-gray-500' }}">
+              {{ 'Active' if mod.enabled else 'Disabled' }}
+            </span>
+            {% if mod.price_note %}
+            <p class="text-xs text-gray-400 mt-0.5">{{ mod.price_note }}</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="flex justify-end mt-4 pt-4 border-t border-gray-100">
+        <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors">
+          Save Module Settings
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Environment Variables (read-only) -->
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="font-semibold text-gray-900">Environment Config</h2>
+      <p class="text-xs text-gray-400 mt-0.5">Edit <code class="bg-gray-100 px-1 rounded">.env</code> to change these values</p>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-2 gap-3">
+        {% for key, val in env_vars.items() %}
+        <div class="bg-gray-50 rounded-lg px-4 py-3">
+          <p class="text-xs font-mono text-gray-400">{{ key }}</p>
+          <p class="text-sm font-medium text-gray-900 mt-0.5">
+            {% if 'PIN' in key or 'PASSWORD' in key %}••••{% else %}{{ val or '(not set)' }}{% endif %}
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Backup & Restore -->
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div>
+        <h2 class="font-semibold text-gray-900">Database Backup</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Full PostgreSQL backups compressed with gzip</p>
+      </div>
+      <form method="POST" action="{{ url_for('backup_create') }}">
+        <button type="submit" class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Create Backup
+        </button>
+      </form>
+    </div>
+
+    {% if backups %}
+    <table class="w-full">
+      <thead>
+        <tr class="text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-100">
+          <th class="text-left px-6 py-3">Filename</th>
+          <th class="text-left px-6 py-3">Type</th>
+          <th class="text-right px-6 py-3">Size</th>
+          <th class="text-left px-6 py-3">Created</th>
+          <th class="px-6 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for b in backups %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-3">
+            <p class="text-sm font-mono text-gray-700">{{ b.filename }}</p>
+          </td>
+          <td class="px-6 py-3">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ 'bg-blue-50 text-blue-600' if b.backup_type == 'auto' else 'bg-gray-100 text-gray-600' }}">
+              {{ b.backup_type or 'manual' }}
+            </span>
+          </td>
+          <td class="px-6 py-3 text-sm text-gray-500 text-right">
+            {{ '%.1f'|format(b.size / 1024) }} KB
+          </td>
+          <td class="px-6 py-3 text-sm text-gray-500">
+            {{ b.created_at.strftime('%b %d, %Y %I:%M %p') if b.created_at else '—' }}
+          </td>
+          <td class="px-6 py-3">
+            <div class="flex items-center gap-3 justify-end">
+              <a href="{{ url_for('backup_download', filename=b.filename) }}"
+                class="text-xs text-indigo-600 hover:underline">Download</a>
+              <form method="POST" action="{{ url_for('backup_restore', filename=b.filename) }}"
+                    onsubmit="return confirm('Restore database from {{ b.filename }}? Current data will be overwritten.')">
+                <button type="submit" class="text-xs text-orange-500 hover:underline">Restore</button>
+              </form>
+              <form method="POST" action="{{ url_for('backup_delete', filename=b.filename) }}"
+                    onsubmit="return confirm('Delete {{ b.filename }}?')">
+                <button type="submit" class="text-xs text-red-400 hover:underline">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="px-6 py-10 text-center">
+      <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      <p class="text-sm text-gray-500">No backups yet. Create your first one above.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Change Password -->
+  <div class="bg-white rounded-xl border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="font-semibold text-gray-900">Change Password</h2>
+    </div>
+    <form method="POST" class="p-6 space-y-4">
+      <input type="hidden" name="action" value="change_password">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Current Password</label>
+        <input type="password" name="current_password" required
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+          <input type="password" name="new_password" required minlength="6"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirm New Password</label>
+          <input type="password" name="confirm_password" required minlength="6"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </div>
+      <div class="flex justify-end pt-2 border-t border-gray-100">
+        <button type="submit" class="px-5 py-2 bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold rounded-lg transition-colors">
+          Update Password
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

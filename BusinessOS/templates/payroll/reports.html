@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block header %}Tax Reports{% endblock %}
+{% block content %}
+
+<!-- EIN banner -->
+<div class="bg-indigo-50 border border-indigo-200 rounded-xl px-5 py-4 mb-6 flex items-center gap-4">
+  <div class="p-2 bg-indigo-600 rounded-lg">
+    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+  </div>
+  <div>
+    <p class="text-sm font-semibold text-indigo-900">{{ company.name }} · EIN: {{ employer_ein }}</p>
+    <p class="text-xs text-indigo-600 mt-0.5">All tax forms are based on your payroll run history. Export data to prepare filings with your accountant or payroll service.</p>
+  </div>
+</div>
+
+<!-- Upcoming deadlines -->
+{% if deadlines %}
+<div class="bg-white rounded-xl border border-gray-200 mb-6">
+  <div class="px-6 py-4 border-b border-gray-100">
+    <h2 class="font-semibold text-gray-900">Upcoming Deadlines</h2>
+  </div>
+  <div class="divide-y divide-gray-50">
+    {% for d in deadlines %}
+    {% set days = (d.due - today).days %}
+    <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50">
+      <div class="flex items-center gap-4">
+        <div class="w-2 h-2 rounded-full flex-shrink-0 {{ 'bg-red-400' if days <= 14 else ('bg-yellow-400' if days <= 30 else 'bg-gray-300') }}"></div>
+        <div>
+          <p class="text-sm font-medium text-gray-900">{{ d.name }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">Due {{ d.due.strftime('%B %d, %Y') }}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-xs font-medium {{ 'text-red-600' if days <= 14 else ('text-yellow-600' if days <= 30 else 'text-gray-500') }}">
+          {{ days }} days away
+        </span>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 uppercase">
+          {{ d.form }}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Form cards grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+
+  <!-- 941 -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-1">Quarterly</p>
+        <h3 class="font-semibold text-gray-900">Form 941</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Employer's Quarterly Federal Tax Return</p>
+      </div>
+      <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 font-bold text-sm">941</div>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Reports withheld federal income tax, Social Security, and Medicare. Filed quarterly with the IRS.</p>
+    <div class="space-y-2">
+      {% for label, q, yr in [('Q1 (Jan–Mar)', 1, today.year), ('Q2 (Apr–Jun)', 2, today.year), ('Q3 (Jul–Sep)', 3, today.year), ('Q4 (Oct–Dec)', 4, today.year)] %}
+      <a href="{{ url_for('payroll.reports') }}?form=941&q={{ q }}&year={{ yr }}"
+        class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-indigo-50 group">
+        <span class="text-sm text-gray-700 group-hover:text-indigo-700">{{ label }} {{ yr }}</span>
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 940 FUTA -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-orange-600 mb-1">Annual</p>
+        <h3 class="font-semibold text-gray-900">Form 940</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Employer's Annual Federal Unemployment Tax Return</p>
+      </div>
+      <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600 font-bold text-sm">940</div>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Reports FUTA tax paid on first $7,000 of each W-2 employee's wages. Due January 31.</p>
+    <div class="space-y-2">
+      {% for yr in [today.year, today.year - 1] %}
+      <a href="{{ url_for('payroll.reports') }}?form=940&year={{ yr }}"
+        class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-orange-50 group">
+        <span class="text-sm text-gray-700 group-hover:text-orange-700">Year {{ yr }}</span>
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- W-2 -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-green-600 mb-1">Annual</p>
+        <h3 class="font-semibold text-gray-900">W-2 Prep</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Wage and Tax Statement data for all W-2 employees</p>
+      </div>
+      <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-600 font-bold text-sm">W-2</div>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Box 1, 2, 3, 4, 5, 6, 16, 17 data for each W-2 employee. Must be furnished to employees by Jan 31.</p>
+    <div class="space-y-2">
+      {% for yr in [today.year, today.year - 1] %}
+      <a href="{{ url_for('payroll.reports') }}?form=w2&year={{ yr }}"
+        class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-green-50 group">
+        <span class="text-sm text-gray-700 group-hover:text-green-700">Tax Year {{ yr }}</span>
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 1099 -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-purple-600 mb-1">Annual</p>
+        <h3 class="font-semibold text-gray-900">1099-NEC</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Nonemployee Compensation for contractors paid ≥ $600</p>
+      </div>
+      <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 font-bold text-xs">1099</div>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Required for each independent contractor paid $600 or more. Due January 31.</p>
+    <div class="space-y-2">
+      {% for yr in [today.year, today.year - 1] %}
+      <a href="{{ url_for('payroll.reports') }}?form=1099&year={{ yr }}"
+        class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-purple-50 group">
+        <span class="text-sm text-gray-700 group-hover:text-purple-700">Tax Year {{ yr }}</span>
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- SUTA -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-teal-600 mb-1">Quarterly</p>
+        <h3 class="font-semibold text-gray-900">State Unemployment (SUTA)</h3>
+        <p class="text-xs text-gray-500 mt-0.5">State unemployment tax summary by quarter</p>
+      </div>
+      <div class="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600 font-bold text-xs">SUI</div>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">State UI tax employer-side contributions. Due dates vary by state, typically within 30 days of quarter end.</p>
+    <div class="space-y-2">
+      {% for label, q in [('Q1', 1), ('Q2', 2), ('Q3', 3), ('Q4', 4)] %}
+      <a href="{{ url_for('payroll.reports') }}?form=suta&q={{ q }}&year={{ today.year }}"
+        class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-teal-50 group">
+        <span class="text-sm text-gray-700 group-hover:text-teal-700">{{ label }} {{ today.year }}</span>
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Deposit calendar -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">Reference</p>
+        <h3 class="font-semibold text-gray-900">Deposit Calendar</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Federal tax deposit schedule and key filing dates</p>
+      </div>
+      <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      </div>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Semi-weekly vs monthly deposit rules based on your lookback period liability. Critical to avoid penalties.</p>
+    <a href="{{ url_for('payroll.reports') }}?form=deposit&year={{ today.year }}"
+      class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 group">
+      <span class="text-sm text-gray-700 group-hover:text-gray-900">View {{ today.year }} Calendar</span>
+      <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+
+</div>
+
+<!-- Disclaimer -->
+<div class="mt-6 px-5 py-4 bg-yellow-50 border border-yellow-200 rounded-xl text-xs text-yellow-700">
+  <strong>Note:</strong> This tool provides data summaries to assist with tax preparation. All tax filings should be reviewed by a qualified accountant or CPA. Tax law changes frequently — consult IRS publications and your state's revenue department for current requirements.
+</div>
+
+{% endblock %}

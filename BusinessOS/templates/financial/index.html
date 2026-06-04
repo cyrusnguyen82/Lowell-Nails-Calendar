@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% block header %}Financial Dashboard{% endblock %}
+{% block header_actions %}
+  <button onclick="openExpenseModal()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+    Log Expense
+  </button>
+{% endblock %}
+{% block content %}
+
+<!-- KPI cards -->
+<div class="grid grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+  {% set change_week  = ((rev_week - rev_last_week) / rev_last_week * 100) if rev_last_week else 0 %}
+  {% set change_month = ((rev_month - rev_last_month) / rev_last_month * 100) if rev_last_month else 0 %}
+  {% for card in [
+    {"label": "Revenue This Week",  "value": fmt(rev_week),    "change": change_week,  "sub": "vs last week",  "color": "green"},
+    {"label": "Revenue This Month", "value": fmt(rev_month),   "change": change_month, "sub": "vs last month", "color": "blue"},
+    {"label": "Expenses This Month","value": fmt(exp_month),   "change": none,         "sub": "business only", "color": "red"},
+    {"label": "Est. Profit (Month)", "value": fmt(profit_month), "change": none,       "sub": "rev – exp – payroll", "color": "indigo"},
+  ] %}
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <p class="text-sm font-medium text-gray-500 mb-1">{{ card.label }}</p>
+    <p class="text-2xl font-bold text-gray-900">{{ card.value }}</p>
+    <div class="flex items-center gap-2 mt-1">
+      {% if card.change is not none %}
+        {% if card.change > 0 %}
+        <span class="text-xs text-green-600 font-medium">▲ {{ '%.1f'|format(card.change) }}%</span>
+        {% elif card.change < 0 %}
+        <span class="text-xs text-red-500 font-medium">▼ {{ '%.1f'|format(card.change|abs) }}%</span>
+        {% else %}
+        <span class="text-xs text-gray-400">—</span>
+        {% endif %}
+      {% endif %}
+      <span class="text-xs text-gray-400">{{ card.sub }}</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
+
+  <!-- Revenue trend chart (simple bar) -->
+  <div class="xl:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
+    <h2 class="font-semibold text-gray-900 mb-4">Revenue — Last 6 Months</h2>
+    {% if trend %}
+    {% set max_rev = trend|map(attribute='revenue')|max %}
+    <div class="flex items-end gap-2 h-40">
+      {% for m in trend %}
+      {% set pct = ((m.revenue / max_rev) * 100)|int if max_rev > 0 else 0 %}
+      <div class="flex-1 flex flex-col items-center gap-1">
+        <p class="text-xs text-gray-500 font-medium">{{ fmt(m.revenue) }}</p>
+        <div class="w-full bg-indigo-600 rounded-t transition-all"
+             style="height: {{ pct }}%; min-height: 4px;"></div>
+        <p class="text-xs text-gray-400">{{ m.month }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm text-gray-400 text-center py-10">No revenue data yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Expenses by category -->
+  <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <h2 class="font-semibold text-gray-900 mb-4">Expenses by Category</h2>
+    {% if exp_by_cat %}
+    {% set max_exp = exp_by_cat|map(attribute='total')|map('float')|max %}
+    <div class="space-y-3">
+      {% for cat in exp_by_cat %}
+      {% set pct = ((cat.total|float / max_exp) * 100)|int if max_exp > 0 else 0 %}
+      <div>
+        <div class="flex items-center justify-between text-xs mb-1">
+          <span class="text-gray-700 capitalize">{{ cat.category.replace('_',' ') }}</span>
+          <span class="font-semibold text-gray-900">{{ fmt(cat.total|float) }}</span>
+        </div>
+        <div class="h-1.5 bg-gray-100 rounded-full">
+          <div class="h-1.5 bg-indigo-400 rounded-full" style="width: {{ pct }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-sm text-gray-400 text-center py-10">No expenses this month.</p>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Year-to-date summary -->
+<div class="grid grid-cols-3 gap-5 mb-5">
+  <div class="bg-white rounded-xl border border-gray-200 p-5">
+    <p class="text-xs text-gray-500 mb-1">YTD Revenue</p>
+    <p class="text-2xl font-bold text-gray-900">{{ fmt(rev_year) }}</p>
+  </div>
+  <div class="bg-white rounded-xl border border-gray-200 p-5">
+    <p class="text-xs text-gray-500 mb-1">YTD Expenses</p>
+    <p class="text-2xl font-bold text-gray-900">{{ fmt(exp_year) }}</p>
+  </div>
+  <div class="bg-white rounded-xl border border-gray-200 p-5">
+    <p class="text-xs text-gray-500 mb-1">Payroll This Month</p>
+    <p class="text-2xl font-bold text-gray-900">{{ fmt(payroll_month) }}</p>
+  </div>
+</div>
+
+<!-- Recent expenses table -->
+<div class="bg-white rounded-xl border border-gray-200">
+  <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+    <h2 class="font-semibold text-gray-900">Recent Expenses</h2>
+    <p class="text-xs text-gray-400">Last 10 entries</p>
+  </div>
+  {% if recent_exp %}
+  <table class="w-full">
+    <thead>
+      <tr class="text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-100">
+        <th class="text-left px-6 py-3">Date</th>
+        <th class="text-left px-6 py-3">Category</th>
+        <th class="text-left px-6 py-3">Note</th>
+        <th class="text-center px-6 py-3">Recurring</th>
+        <th class="text-right px-6 py-3">Amount</th>
+        <th class="px-6 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {% for e in recent_exp %}
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-3 text-sm text-gray-500">{{ e.expense_date.strftime('%b %d, %Y') }}</td>
+        <td class="px-6 py-3">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 capitalize">
+            {{ e.category.replace('_',' ') }}
+          </span>
+        </td>
+        <td class="px-6 py-3 text-sm text-gray-700">{{ e.note or '—' }}</td>
+        <td class="px-6 py-3 text-center">
+          {% if e.recurring %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600">Monthly</span>
+          {% else %}—{% endif %}
+        </td>
+        <td class="px-6 py-3 text-sm font-semibold text-gray-900 text-right">{{ fmt(e.amount|float) }}</td>
+        <td class="px-6 py-3 text-right">
+          <form method="POST" action="{{ url_for('financial.delete_expense', exp_id=e.id) }}"
+                onsubmit="return confirm('Delete this expense?')">
+            <button type="submit" class="text-xs text-red-400 hover:underline">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="px-6 py-12 text-center">
+    <p class="text-gray-400 text-sm">No expenses logged yet.</p>
+    <button onclick="openExpenseModal()" class="mt-3 text-sm text-indigo-600 hover:underline">Log first expense →</button>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Add expense modal -->
+<div id="expense-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="font-semibold text-gray-900">Log Expense</h3>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form method="POST" action="{{ url_for('financial.add_expense') }}" class="p-6 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Amount ($)</label>
+          <input type="number" name="amount" step="0.01" min="0" required placeholder="0.00"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Date</label>
+          <input type="date" name="expense_date" value="{{ today }}"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+        <select name="category"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          {% for c in categories %}
+          <option value="{{ c }}">{{ c.replace('_',' ')|title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Vendor / Note</label>
+        <input type="text" name="note" placeholder="e.g. Amazon - supplies"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <input type="hidden" name="vendor" value="">
+      <div class="flex items-center gap-6">
+        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input type="checkbox" name="recurring" class="rounded border-gray-300 text-indigo-600">
+          Recurring monthly
+        </label>
+        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input type="checkbox" name="personal" class="rounded border-gray-300 text-indigo-600">
+          Personal (exclude from reports)
+        </label>
+      </div>
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+        <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">Cancel</button>
+        <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg">Save Expense</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function openExpenseModal() { document.getElementById('expense-modal').classList.remove('hidden'); }
+function closeModal() { document.getElementById('expense-modal').classList.add('hidden'); }
+document.getElementById('expense-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+{% endblock %}
