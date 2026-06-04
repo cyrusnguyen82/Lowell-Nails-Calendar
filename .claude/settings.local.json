@@ -26,7 +26,22 @@
       "Bash(Select-Object -Last 20)",
       "Bash(npx vite *)",
       "Bash(Select-Object -First 30)",
-      "Bash(Format-List FullName)"
+      "Bash(Format-List FullName)",
+      "WebSearch",
+      "WebFetch(domain:docs.ipospays.com)",
+      "Bash(pip install *)",
+      "Bash(py tools/pos_db.py)",
+      "Bash(py -c ' *)",
+      "Bash(dir \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\" /b)",
+      "Bash(py -c \"import sys; sys.path.insert\\(0,'tools'\\); import pos_db; import server; print\\('Backend imports OK'\\)\")",
+      "Bash(py -c \"import sys; sys.path.insert\\(0,'tools'\\); import payment_service; print\\('SPIn mode:', payment_service.SPIN_MODE\\); print\\('Reachable:', payment_service.ping\\(\\)\\)\")",
+      "Bash(arp -a)",
+      "PowerShell(1..254 | ForEach-Object { [System.Net.NetworkInformation.Ping]::new\\(\\).SendPingAsync\\(\"192.168.1.$_\", 100\\) } | ForEach-Object { $_.Wait\\(\\) }; arp -a | Select-String \"dynamic\")",
+      "PowerShell(Test-NetConnection -ComputerName 192.168.1.64 -Port 80 -InformationLevel Quiet 2>&1)",
+      "PowerShell(Test-NetConnection -ComputerName 192.168.1.64 -Port 443 -InformationLevel Quiet 2>&1)",
+      "PowerShell(Test-NetConnection -ComputerName 192.168.1.64 -Port 8080 -InformationLevel Quiet 2>&1)",
+      "Bash(route add *)",
+      "PowerShell(\\(netsh wlan show networks\\) 2>&1)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Cyrus\\Desktop\\Personal\\2026\\Calendar"
