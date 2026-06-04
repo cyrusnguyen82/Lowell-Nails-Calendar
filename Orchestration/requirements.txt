@@ -1,0 +1,12 @@
+# Orchestration dependencies
+# Install with: pip install -r Orchestration/requirements.txt
+
+apscheduler>=3.10.0      # Job scheduler
+sendgrid>=6.11.0         # Email delivery
+twilio>=8.0.0            # SMS delivery
+psycopg2-binary>=2.9.0   # PostgreSQL (already used by other tools)
+python-dotenv>=1.0.0     # .env loading (already used)
+requests>=2.31.0         # HTTP fallback
+pytz>=2024.1             # Timezone handling
+flask>=3.0.0             # Time clock web server
+python-dateutil>=2.9.0   # Payroll deposit calendar date math
