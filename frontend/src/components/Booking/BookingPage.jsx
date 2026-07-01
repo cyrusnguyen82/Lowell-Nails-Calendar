@@ -611,7 +611,7 @@ export default function BookingPage() {
 
   function renderConfirmation() {
     function handleDone() {
-      window.location.href = 'http://www.lowellnailsandspa.com'
+      window.location.href = 'https://www.lowellnailsandspa.com'
     }
     return (
       <div className="booking-confirm">

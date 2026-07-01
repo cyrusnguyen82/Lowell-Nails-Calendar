@@ -64,11 +64,11 @@
 .nav-btn:hover  { background: var(--pos-hover); color: var(--pos-text); border-color: rgba(255,255,255,0.1); }
 .nav-btn:active { background: var(--pos-hover); }
 .nav-btn.today  {
-  background: rgba(197,160,89,0.1);
-  border-color: rgba(197,160,89,0.3);
+  background: rgba(59,109,200,0.1);
+  border-color: rgba(59,109,200,0.3);
   color: var(--pos-gold);
 }
-.nav-btn.today:hover { background: rgba(197,160,89,0.2); }
+.nav-btn.today:hover { background: rgba(59,109,200,0.2); }
 
 .cal-toolbar-views {
   display: flex;
@@ -243,8 +243,8 @@
 }
 .slot:nth-child(2n) { border-bottom: 1px solid rgba(12,26,46,0.14); }
 .slot:nth-child(4n) { border-bottom: 2px solid rgba(12,26,46,0.22); }
-.slot:hover  { background: rgba(197,160,89,0.05); }
-.slot:active { background: rgba(197,160,89,0.1);  }
+.slot:hover  { background: rgba(59,109,200,0.05); }
+.slot:active { background: rgba(59,109,200,0.1);  }
 
 /* ── Appointment Block ────────────────────────────────────────── */
 .apt-block {
@@ -302,7 +302,7 @@
 .checkin-btn {
   display: flex; align-items: center; gap: 6px;
   padding: 7px 16px;
-  background: var(--pos-gold); color: var(--pos-bg);
+  background: #4ade80; color: #14532d;
   border: none; border-radius: var(--r);
   font-size: 13px; font-weight: 700; cursor: pointer;
   font-family: inherit; white-space: nowrap;
@@ -426,7 +426,7 @@
 .modal-notes {
   background: var(--pos-card); border-radius: var(--r);
   padding: 10px 12px; font-size: 13px; color: var(--pos-muted);
-  font-style: italic; border-left: 3px solid rgba(197,160,89,0.4);
+  font-style: italic; border-left: 3px solid rgba(59,109,200,0.4);
 }
 
 /* ── Form ─────────────────────────────────────────────────────── */
@@ -446,7 +446,7 @@
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--pos-gold);
-  box-shadow: 0 0 0 3px rgba(197,160,89,0.15);
+  box-shadow: 0 0 0 3px rgba(59,109,200,0.15);
 }
 .form-input::placeholder { color: var(--pos-muted); opacity: 0.5; }
 .form-textarea { resize: vertical; min-height: 70px; }
@@ -473,8 +473,8 @@
 }
 .btn-ghost:hover { background: var(--pos-hover); color: var(--pos-text); }
 
-.btn-primary { background: var(--pos-gold); color: var(--pos-bg); font-weight: 700; }
-.btn-primary:hover { background: #b08a47; }
+.btn-primary { background: #4ade80; color: #14532d; font-weight: 700; }
+.btn-primary:hover { background: #22c55e; color: #14532d; }
 
 .btn-danger {
   background: rgba(239,68,68,0.1); color: var(--pos-red);
@@ -532,7 +532,7 @@
 }
 .week-day-header:last-child { border-right: none; }
 .week-day-header:hover { background: var(--pos-hover); }
-.week-day-header.today { background: rgba(197,160,89,0.08); }
+.week-day-header.today { background: rgba(59,109,200,0.08); }
 
 .week-day-name { font-size: 11px; font-weight: 700; color: var(--pos-muted); text-transform: uppercase; letter-spacing: 0.06em; }
 .week-day-num  { font-size: 18px; font-weight: 700; color: var(--pos-text); margin-top: 2px; line-height: 1; }
@@ -556,7 +556,7 @@
   cursor: pointer; transition: background 0.1s;
 }
 .week-slot:nth-child(odd) { border-bottom-style: dashed; }
-.week-slot:hover { background: rgba(197,160,89,0.05); }
+.week-slot:hover { background: rgba(59,109,200,0.05); }
 
 .week-apt {
   position: absolute; left: 3px; right: 3px; border-radius: var(--r-sm);
@@ -607,7 +607,7 @@
 }
 .month-cell:hover { background: var(--pos-hover); }
 .month-cell.other-month { background: rgba(12, 17, 26, 0.6); }
-.month-cell.today { background: rgba(197,160,89,0.08); }
+.month-cell.today { background: rgba(59,109,200,0.08); }
 
 .month-cell-num {
   font-size: 13px; font-weight: 600; color: var(--pos-muted);
