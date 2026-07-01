@@ -4,7 +4,27 @@
       "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\\\\Financial\" -Recurse | Where-Object {!$_.PSIsContainer} | Select-Object FullName | Format-Table -AutoSize)",
       "PowerShell(Get-ChildItem \"c:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\\\\Orchestration\" -Recurse | Where-Object {!$_.PSIsContainer} | Select-Object FullName | Format-Table -AutoSize)",
       "Bash(Get-ChildItem \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\Calendar\" -Depth 0)",
-      "Bash(Select-Object Name, LastWriteTime)"
+      "Bash(Select-Object Name, LastWriteTime)",
+      "PowerShell(netstat -ano)",
+      "PowerShell($pids = @\\(9440, 25300, 4488, 19736, 7556, 24840, 20684, 10692, 17988, 14400, 23612, 15120\\); foreach \\($pid in $pids\\) { Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue }; Start-Sleep -Seconds 1; netstat -ano | findstr \":8000\")",
+      "PowerShell($ids = @\\(9440, 25300, 4488, 19736, 7556, 24840, 20684, 10692, 17988, 14400, 23612, 15120\\); foreach \\($id in $ids\\) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue }; Start-Sleep -Seconds 2; $remaining = netstat -ano | findstr \":8000 \"; Write-Host \"Remaining: $remaining\")",
+      "PowerShell(taskkill /F /PID 9440 /PID 25300 /PID 4488 /PID 19736 /PID 7556 /PID 24840 /PID 20684 /PID 10692 /PID 17988 /PID 14400 /PID 23612 /PID 15120 2>&1)",
+      "PowerShell(Start-Process -FilePath $pyExe -ArgumentList \"server.py\" -WorkingDirectory \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\" -WindowStyle Hidden)",
+      "PowerShell($pyExe = \"C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\")",
+      "PowerShell(Invoke-RestMethod \"http://localhost:8000/pos-api/transactions/6\" -Method GET)",
+      "Bash(C:UsersCyrusAppDataLocalProgramsPythonPython313python.exe -c ' *)",
+      "PowerShell(Start-Process -FilePath \"C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" -ArgumentList \"server.py\" -WorkingDirectory \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\" -WindowStyle Hidden)",
+      "PowerShell(Invoke-RestMethod \"http://localhost:8000/pos-api/config\" -Method GET)",
+      "PowerShell(C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe \"C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Cyrus-Desktop-Personal-2026-Calendar\\\\8062f151-87b6-407d-b791-3df84eb0c387\\\\scratchpad\\\\swap_tech_ids.py\")",
+      "PowerShell(Invoke-RestMethod \"http://localhost:8000/pos-api/admin/technicians\" | ForEach-Object { [PSCustomObject]@{id=$_.id; name=$_.name; active=$_.active; revenue=$_.revenue} } | Format-Table -AutoSize)",
+      "PowerShell(Stop-Process -Id 7984 -Force)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/transactions?range=today\" -UseBasicParsing)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/transactions\" -UseBasicParsing)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/transaction-history\" -UseBasicParsing)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/today\" -UseBasicParsing)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/history\" -UseBasicParsing)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/transactions/history\" -UseBasicParsing)",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\\\\imports\\\\appointments\")"
     ]
   }
 }
