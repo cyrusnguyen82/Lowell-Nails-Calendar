@@ -28,7 +28,7 @@
   font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s;
   background: var(--pos-card);
 }
-.gc-search:focus { border-color: var(--pos-gold); box-shadow: 0 0 0 3px rgba(197,160,89,0.15); }
+.gc-search:focus { border-color: var(--pos-gold); box-shadow: 0 0 0 3px rgba(59,109,200,0.15); }
 .gc-search::placeholder { color: var(--pos-muted); opacity: 0.6; }
 
 /* ── Summary stat cards ───────────────────────────────────────── */
@@ -57,8 +57,8 @@
 }
 .gc-filter-pill:hover { border-color: rgba(255,255,255,0.12); color: var(--pos-text); }
 .gc-filter-pill.active {
-  background: rgba(197,160,89,0.12);
-  border-color: rgba(197,160,89,0.35);
+  background: rgba(59,109,200,0.12);
+  border-color: rgba(59,109,200,0.35);
   color: var(--pos-gold);
 }
 

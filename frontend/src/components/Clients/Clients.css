@@ -40,7 +40,7 @@
 }
 .clients-search:focus {
   border-color: var(--pos-gold);
-  box-shadow: 0 0 0 3px rgba(197,160,89,0.15);
+  box-shadow: 0 0 0 3px rgba(59,109,200,0.15);
 }
 .clients-search::placeholder { color: var(--pos-muted); opacity: 0.6; }
 
@@ -61,9 +61,9 @@
 .clients-btn:active { transform: scale(0.98); }
 
 .clients-btn-primary {
-  background: var(--pos-gold); color: var(--pos-bg); font-weight: 700;
+  background: #4ade80; color: #14532d; font-weight: 700;
 }
-.clients-btn-primary:hover { background: #b08a47; }
+.clients-btn-primary:hover { background: #22c55e; }
 
 .clients-btn-ghost {
   background: var(--pos-card); color: var(--pos-muted);
@@ -110,7 +110,7 @@
 
 /* ── Badges ───────────────────────────────────────────────────── */
 .visit-badge {
-  background: rgba(197,160,89,0.15); color: var(--pos-gold);
+  background: rgba(59,109,200,0.12); color: var(--pos-gold);
   font-size: 12px; font-weight: 700; padding: 2px 10px;
   border-radius: 9999px; display: inline-block;
 }

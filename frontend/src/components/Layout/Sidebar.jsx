@@ -58,9 +58,9 @@ const NAV = [
 ]
 
 const ROLE_BADGE = {
-  admin:        { label: 'Admin',        bg: '#6366f1' },
-  receptionist: { label: 'Receptionist', bg: '#14b8a6' },
-  technician:   { label: 'Technician',   bg: '#10b981' },
+  admin:        { label: 'Admin',        bg: '#2d5aa8' },
+  receptionist: { label: 'Receptionist', bg: '#3b6dc8' },
+  technician:   { label: 'Technician',   bg: '#16a34a' },
 }
 
 export default function Sidebar({ page, onNavigate, onHide }) {

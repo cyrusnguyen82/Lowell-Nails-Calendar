@@ -112,7 +112,7 @@
 }
 .admin-form-input:focus, .admin-form-select:focus {
   border-color: var(--pos-gold);
-  box-shadow: 0 0 0 3px rgba(197,160,89,0.15);
+  box-shadow: 0 0 0 3px rgba(59,109,200,0.15);
 }
 .admin-form-input::placeholder { color: var(--pos-muted); opacity: 0.5; }
 .admin-form-select option { background: var(--pos-sidebar); color: var(--pos-text); }
@@ -213,8 +213,8 @@
 
 .admin-pin-lock {
   width: 54px; height: 54px; border-radius: 50%;
-  background: rgba(197,160,89,0.1);
-  border: 1px solid rgba(197,160,89,0.25);
+  background: rgba(59,109,200,0.1);
+  border: 1px solid rgba(59,109,200,0.25);
   display: flex; align-items: center; justify-content: center;
   color: var(--pos-gold); margin-bottom: 0.25rem;
 }
