@@ -6,10 +6,10 @@ cd /d "%~dp0.."
 
 echo.
 echo  Starting BusinessOS...
-echo  Open your browser to: http://localhost:8000
+echo  Open your browser to: http://localhost:5001
 echo  Press Ctrl+C to stop.
 echo.
 
-python BusinessOS\app.py --host 127.0.0.1 --port 8000
+python BusinessOS\app.py --host 127.0.0.1 --port 5001
 
 pause

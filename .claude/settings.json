@@ -24,7 +24,19 @@
       "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/today\" -UseBasicParsing)",
       "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/history\" -UseBasicParsing)",
       "PowerShell(Invoke-WebRequest -Uri \"http://localhost:8000/pos-api/transactions/history\" -UseBasicParsing)",
-      "PowerShell(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\\\\imports\\\\appointments\")"
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\\\\imports\\\\appointments\")",
+      "PowerShell(C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe \"C:\\\\Users\\\\Cyrus\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Cyrus-Desktop-Personal-2026-Calendar\\\\8062f151-87b6-407d-b791-3df84eb0c387\\\\scratchpad\\\\insert_appts.py\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Cyrus\\\\Desktop\\\\Personal\\\\2026\\\\POS_System\\\\.claude\\\\commands\")",
+      "Bash(python3 \"C:/Users/Cyrus/AppData/Local/Temp/claude/c--Users-Cyrus-Desktop-Personal-2026-Calendar/8062f151-87b6-407d-b791-3df84eb0c387/scratchpad/insert_jul3_tina.py\")",
+      "Read(//c/Users/Cyrus/AppData/Local/Programs/Python//**)",
+      "Bash(ls /c/Python*)",
+      "Read(//c/Users/Cyrus/**)",
+      "Bash(find /c/Users/Cyrus/AppData/Local/Programs/Python/Python313 -name \"python.exe\" 2>/dev/null | head -3)",
+      "Read(//c/Users/Cyrus/AppData/Local/Programs/Python/Python313/**)",
+      "Bash(/c/Users/Cyrus/AppData/Local/Programs/Python/Python313/python.exe \"C:/Users/Cyrus/AppData/Local/Temp/claude/c--Users-Cyrus-Desktop-Personal-2026-Calendar/8062f151-87b6-407d-b791-3df84eb0c387/scratchpad/insert_jul3_tina.py\")"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Cyrus\\Desktop\\Personal\\2026\\POS_System\\.claude"
     ]
   }
 }

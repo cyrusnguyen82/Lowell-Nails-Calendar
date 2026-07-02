@@ -1,0 +1,43 @@
+{
+  "name": "financial-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Lowell Nails Financial & Payroll — desktop app",
+  "main": "main.js",
+  "scripts": {
+    "build:ui": "npm --prefix ../ui run build",
+    "build:api": "node build.js api",
+    "dist": "node build.js all",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^3.0.3"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.lowellnails.financial",
+    "productName": "Lowell Nails Financial",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "main.js",
+      "package.json"
+    ],
+    "extraResources": [
+      { "from": "../ui/dist", "to": "ui" },
+      { "from": "../api-dist/financial-api", "to": "api" }
+    ],
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "LowellNailsFinancial-${version}.exe"
+    }
+  }
+}
