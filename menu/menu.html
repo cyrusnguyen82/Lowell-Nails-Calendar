@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lowell Nails &amp; Spa — Service Menu</title>
+<style>
+  @page { size: Letter; margin: 0; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #FBF8F1;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    color: #1F3A5F;
+  }
+
+  .page {
+    position: relative;
+    width: 8.5in;
+    height: 11in;
+    background: #FBF8F1;
+    overflow: hidden;
+  }
+  .page + .page {
+    page-break-before: always;
+  }
+
+  .body-outer {
+    position: absolute;
+    top: 0.85in;
+    left: 0.85in;
+    right: 0.85in;
+    bottom: 0.9in;
+    display: table;
+    width: 6.8in;
+  }
+  .body-wrap {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  /* ---------- corner flourishes ---------- */
+  .flourish {
+    position: absolute;
+    width: 1.15in;
+    height: 1.15in;
+  }
+  .flourish svg { width: 100%; height: 100%; display: block; }
+  .flourish.tl { top: 0.28in; left: 0.28in; }
+  .flourish.tr { top: 0.28in; right: 0.28in; transform: scaleX(-1); }
+  .flourish.bl { bottom: 0.28in; left: 0.28in; transform: scaleY(-1); }
+  .flourish.br { bottom: 0.28in; right: 0.28in; transform: scale(-1,-1); }
+
+  /* ---------- header ---------- */
+  .page-header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 0.40in;
+  }
+  .page-header .mark {
+    width: 0.62in;
+    height: auto;
+    margin: 0 auto 0.09in;
+    display: block;
+  }
+  .page-header .brand {
+    color: #1F3A5F;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .page-header .brand-rule {
+    width: 0.85in;
+    height: 1px;
+    background: #B08D57;
+    margin: 0.10in auto 0.24in;
+  }
+  .page-header .page-title {
+    color: #1F3A5F;
+    font-size: 25px;
+    letter-spacing: 0.06em;
+    margin: 0;
+  }
+  .page-header .page-tagline {
+    color: #8A6C3E;
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    margin: 0.08in 0 0;
+  }
+
+  /* ---------- columns (float-based: wkhtmltopdf's QtWebKit does not
+     reliably support CSS flexbox, so layout below uses floats / inline-block
+     / CSS tables only) ---------- */
+  .columns {
+    overflow: hidden;
+    margin-top: 0.10in;
+  }
+  .col {
+    float: left;
+    width: 47%;
+  }
+  .col.col-left { margin-right: 6%; }
+  .col.col-right { float: right; }
+
+  .cat { margin-bottom: 0.36in; }
+
+  .cat-head {
+    position: relative;
+    border-top: 1px solid #D9BD8A;
+    margin: 0.20in 0 0.22in;
+    text-align: center;
+  }
+  .cat-head .cat-title {
+    position: relative;
+    top: -0.09in;
+    display: inline-block;
+    background: #FBF8F1;
+    padding: 0 0.10in;
+    white-space: nowrap;
+    color: #1F3A5F;
+    font-size: 14px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .cat-head .cat-title .diamond {
+    width: 6px;
+    height: 6px;
+    vertical-align: middle;
+    margin: 0 0.06in;
+    position: relative;
+    top: -1px;
+  }
+
+  .svc-row {
+    overflow: hidden;
+    margin-bottom: 0.16in;
+  }
+  .svc-row .name-wrap {
+    float: left;
+  }
+  .svc-row .name {
+    font-size: 14px;
+    color: #1F3A5F;
+  }
+  .svc-row .dur {
+    display: block;
+    font-size: 9px;
+    color: #8A6C3E;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-style: italic;
+    margin-top: 2px;
+  }
+  .svc-row .price {
+    float: right;
+    font-size: 14px;
+    color: #B08D57;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  .svc-row .leader {
+    overflow: hidden;
+    border-bottom: 1px dotted #C9AD78;
+    margin: 0 0.08in 0.06in;
+  }
+
+  .note {
+    margin-top: 0.06in;
+    font-size: 10px;
+    font-style: italic;
+    color: #8A6C3E;
+  }
+
+  /* ---------- footer ---------- */
+  .page-footer {
+    position: absolute;
+    bottom: 0.42in;
+    left: 0;
+    width: 100%;
+    text-align: center;
+  }
+  .page-footer .footer-rule {
+    width: 0.6in;
+    height: 1px;
+    background: #D9BD8A;
+    margin: 0 auto 0.08in;
+  }
+  .page-footer .footer-text {
+    color: #8A6C3E;
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1 ============ -->
+<div class="page">
+
+  <div class="flourish tl">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+  <div class="flourish tr">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+  <div class="flourish bl">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+  <div class="flourish br">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="body-outer"><div class="body-wrap">
+  <div class="page-header">
+    <img class="mark" src="logo.png" alt="Lowell Nails and Spa, LLC">
+    <div class="brand">Lowell Nails &amp; Spa, LLC</div>
+    <div class="brand-rule"></div>
+    <h1 class="page-title">Manicures, Pedicures &amp; Enhancements</h1>
+    <p class="page-tagline">Classic hand &amp; foot care to modern nail enhancements</p>
+  </div>
+
+  <div class="columns">
+    <div class="col col-left">
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Manicure <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Regular Manicure</span><span class="dur">30 min</span></div>
+          <span class="price">$20</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Gel Manicure</span><span class="dur">35 min</span></div>
+          <span class="price">$38</span><div class="leader"></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Pedicure <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Regular Pedicure</span><span class="dur">35 min</span></div>
+          <span class="price">$32</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Gel Pedicure</span><span class="dur">45 min</span></div>
+          <span class="price">$48</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Special Pedicure</span><span class="dur">45 min</span></div>
+          <span class="price">$43</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Deluxe Pedicure</span><span class="dur">60 min</span></div>
+          <span class="price">$53</span><div class="leader"></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Combination <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Manicure + Pedicure Combo</span><span class="dur">65 min</span></div>
+          <span class="price">$52</span><div class="leader"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col col-right">
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Acrylic <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Acrylic Full Set</span><span class="dur">45 min</span></div>
+          <span class="price">$40</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Acrylic Full Set &mdash; Gel Polish</span><span class="dur">60 min</span></div>
+          <span class="price">$50</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Acrylic Fill</span><span class="dur">45 min</span></div>
+          <span class="price">$30</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Acrylic Fill &mdash; Gel Polish</span><span class="dur">60 min</span></div>
+          <span class="price">$40</span><div class="leader"></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Builder Gel <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Builder Gel Full Set</span><span class="dur">75 min</span></div>
+          <span class="price">$60</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Builder Gel Fill</span><span class="dur">60 min</span></div>
+          <span class="price">$48</span><div class="leader"></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Pink &amp; White <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Pink &amp; White Full Set</span><span class="dur">60 min</span></div>
+          <span class="price">$65</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Pink &amp; White Fill</span><span class="dur">45 min</span></div>
+          <span class="price">$48</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Pink Fill</span><span class="dur">45 min</span></div>
+          <span class="price">$35</span><div class="leader"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div></div>
+
+  <div class="page-footer">
+    <div class="footer-rule"></div>
+    <div class="footer-text">Prices subject to change without notice &middot; Gratuity not included</div>
+  </div>
+</div>
+
+<!-- ============ PAGE 2 ============ -->
+<div class="page">
+
+  <div class="flourish tl">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+  <div class="flourish tr">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+  <div class="flourish bl">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+  <div class="flourish br">
+    <svg viewBox="0 0 140 140">
+      <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110"
+            fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+      <g fill="#1F3A5F" opacity="0.85">
+        <path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/>
+      </g>
+      <g fill="#B08D57" opacity="0.9">
+        <path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/>
+      </g>
+      <g fill="#1F3A5F" opacity="0.75">
+        <path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/>
+      </g>
+      <g transform="translate(94,112)">
+        <g fill="#8A6C3E">
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+          <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+        </g>
+        <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+          <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+        </g>
+        <circle r="2.6" fill="#1393A0"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="body-outer"><div class="body-wrap">
+  <div class="page-header">
+    <img class="mark" src="logo.png" alt="Lowell Nails and Spa, LLC">
+    <div class="brand">Lowell Nails &amp; Spa, LLC</div>
+    <div class="brand-rule"></div>
+    <h1 class="page-title">Dip, Polish &amp; Finishing Touches</h1>
+    <p class="page-tagline">Color, powders &amp; the little extras that complete your visit</p>
+  </div>
+
+  <div class="columns">
+    <div class="col col-left">
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Dip Powder <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Dip Powder</span><span class="dur">60 min</span></div>
+          <span class="price">$48</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Ombr&eacute; Dip</span><span class="dur">75 min</span></div>
+          <span class="price">$63</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">French Dip</span><span class="dur">60 min</span></div>
+          <span class="price">$55</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Dip with Tips</span><span class="dur">60 min</span></div>
+          <span class="price">$55</span><div class="leader"></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Polish <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Shellac / Gel Polish</span><span class="dur">30 min</span></div>
+          <span class="price">$28</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Regular Polish &mdash; Hands</span><span class="dur">15 min</span></div>
+          <span class="price">$12</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Regular Polish &mdash; Toes</span><span class="dur">15 min</span></div>
+          <span class="price">$14</span><div class="leader"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="col col-right">
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Kids &middot; 12 &amp; Under <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Kids Polish</span><span class="dur">15 min</span></div>
+          <span class="price">$7</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Kids Pedicure</span><span class="dur">30 min</span></div>
+          <span class="price">$25</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Kids Manicure + Pedicure</span><span class="dur">40 min</span></div>
+          <span class="price">$40</span><div class="leader"></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Add-Ons <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Gel Polish Add-On</span><span class="dur">15 min</span></div>
+          <span class="price">$15</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Nail Art / Design, per nail</span><span class="dur">15 min</span></div>
+          <span class="price">$5</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Nail Repair</span><span class="dur">10 min</span></div>
+          <span class="price">$3</span><div class="leader"></div>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-head">
+          <span class="cat-title"><svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg> Take-Off <svg class="diamond" viewBox="0 0 10 10"><path d="M5,0 L10,5 L5,10 L0,5 Z" fill="#B08D57"/></svg></span>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Shellac Take-Off</span><span class="dur">15 min</span></div>
+          <span class="price">$7</span><div class="leader"></div>
+        </div>
+        <div class="svc-row">
+          <div class="name-wrap"><span class="name">Dip / Acrylic Take-Off</span><span class="dur">15 min</span></div>
+          <span class="price">$10</span><div class="leader"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div></div>
+
+  <div class="page-footer">
+    <div class="footer-rule"></div>
+    <div class="footer-text">Complimentary consultations always available &middot; Ask us about seasonal specials</div>
+  </div>
+</div>
+
+</body>
+</html>

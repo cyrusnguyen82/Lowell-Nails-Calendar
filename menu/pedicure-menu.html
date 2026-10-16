@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lowell Nails &amp; Spa — Pedicure Menu</title>
+<style>
+  @page { size: Letter; margin: 0; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #FBF8F1;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    color: #1F3A5F;
+  }
+
+  .page {
+    position: relative;
+    width: 8.5in;
+    height: 11in;
+    background: #FBF8F1;
+    overflow: hidden;
+  }
+  .page + .page { page-break-before: always; }
+
+  /* ============ COVER (page 1) ============ */
+  .cover-frame-outer {
+    position: absolute;
+    top: 0.45in; left: 0.45in; right: 0.45in; bottom: 0.45in;
+    border: 1px solid #B08D57;
+  }
+  .cover-frame-inner {
+    position: absolute;
+    top: 0.52in; left: 0.52in; right: 0.52in; bottom: 0.52in;
+    border: 1px solid #1393A0;
+    opacity: 0.45;
+  }
+  .cover-corner {
+    position: absolute;
+    width: 0.32in;
+    height: 0.32in;
+  }
+  .cover-corner svg { width: 100%; height: 100%; display: block; }
+  .cover-corner.cc-tl { top: 0.30in; left: 0.30in; }
+  .cover-corner.cc-tr { top: 0.30in; right: 0.30in; transform: scaleX(-1); }
+  .cover-corner.cc-bl { bottom: 0.30in; left: 0.30in; transform: scaleY(-1); }
+  .cover-corner.cc-br { bottom: 0.30in; right: 0.30in; transform: scale(-1,-1); }
+
+  .cover-outer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: table; }
+  .cover-content { display: table-cell; vertical-align: middle; text-align: center; padding: 0 0.9in; }
+  .cover-content .logo { width: 2.5in; height: auto; display: block; margin: 0 auto; }
+
+  .cover-eyebrow {
+    color: #8A6C3E;
+    font-style: italic;
+    font-size: 12.5px;
+    letter-spacing: 0.30em;
+    text-transform: uppercase;
+    margin: 0.28in 0 0.12in;
+  }
+  .cover-title {
+    color: #1F3A5F;
+    font-size: 46px;
+    font-weight: bold;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+  .cover-rule {
+    width: 1.7in;
+    height: 1px;
+    background: #B08D57;
+    margin: 0.24in auto;
+  }
+  .cover-subtitle {
+    color: #8A6C3E;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 4.3in;
+    margin: 0 auto;
+  }
+
+  .cover-blooms { margin-top: 0.5in; text-align: center; line-height: 0; }
+  .cover-blooms svg { display: inline-block; width: 0.6in; height: 0.95in; }
+  .cover-blooms svg + svg { margin-left: 0.55in; }
+
+  .cover-footer {
+    position: absolute;
+    bottom: 0.85in;
+    left: 0; width: 100%;
+    text-align: center;
+  }
+  .cover-footer .cf-rule {
+    width: 0.9in; height: 1px; background: #B08D57;
+    margin: 0 auto 0.14in;
+  }
+  .cover-footer .cf-line {
+    color: #1F3A5F;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    margin: 0.03in 0;
+  }
+
+  /* ============ CONTENT PAGES (2 & 3) ============ */
+  .body-outer {
+    position: absolute;
+    top: 0.7in; left: 0.85in; right: 0.85in; bottom: 0.55in;
+    display: block;
+  }
+
+  .flourish { position: absolute; width: 0.8in; height: 0.8in; }
+  .flourish svg { width: 100%; height: 100%; display: block; }
+  .flourish.f-tl { top: 0.22in; left: 0.26in; }
+  .flourish.f-tr { top: 0.22in; right: 0.26in; transform: scaleX(-1); }
+  .flourish.f-bl { bottom: 0.22in; left: 0.26in; transform: scaleY(-1); }
+  .flourish.f-br { bottom: 0.22in; right: 0.26in; transform: scale(-1,-1); }
+
+  .page-header { text-align: center; margin: 0 0 0.34in; }
+  .page-header .badge {
+    display: inline-block;
+    width: 0.72in; height: 0.72in;
+    background: #0A1E36;
+    border-radius: 9px;
+    padding: 0.08in;
+    margin-bottom: 0.13in;
+  }
+  .page-header .badge img { width: 100%; height: 100%; display: block; }
+  .page-header .h-title {
+    color: #1F3A5F;
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+  }
+  .page-header .h-tagline {
+    color: #8A6C3E;
+    font-style: italic;
+    font-size: 14px;
+    margin: 0.09in 0 0.22in;
+  }
+  .page-header .h-rule {
+    height: 1px;
+    background: #B08D57;
+  }
+
+  .tier { margin-bottom: 0.32in; }
+  .tier.shaded {
+    background: #F2E7D6;
+    border-radius: 8px;
+    padding: 0.28in 0.32in 0.30in;
+  }
+
+  .tier-head { overflow: hidden; margin-bottom: 0.11in; }
+  .tier-name-wrap { float: left; }
+  .tier-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1F3A5F;
+  }
+  .tier-badge {
+    display: inline-block;
+    background: #B08D57;
+    color: #FBF8F1;
+    font-size: 9px;
+    font-family: Georgia, serif;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 0.045in 0.11in;
+    border-radius: 10px;
+    margin-left: 0.14in;
+    position: relative;
+    top: -2px;
+  }
+  .tier-price-wrap { float: right; text-align: right; }
+  .tier-price { font-size: 23px; font-weight: bold; color: #B08D57; display: block; }
+  .tier-addon { font-size: 11px; color: #8A6C3E; display: block; margin-top: 2px; }
+
+  .tier-intro {
+    font-style: italic;
+    font-size: 13.5px;
+    color: #3D5473;
+    line-height: 1.55;
+    margin: 0 0 0.17in;
+  }
+
+  .tier ul {
+    list-style: none;
+    margin: 0 0 0.16in;
+    padding: 0;
+  }
+  .tier ul li {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: #33475E;
+    padding-left: 0.16in;
+    text-indent: -0.16in;
+    margin-bottom: 0.045in;
+  }
+  .tier ul li .bullet { color: #B08D57; margin-right: 0.06in; }
+  .tier ul li strong { color: #1F3A5F; }
+
+  .scent-box {
+    background: #FEFDFB;
+    border: 1px solid #E3D2AE;
+    border-radius: 6px;
+    padding: 0.16in 0.19in;
+    font-size: 12px;
+    color: #33475E;
+    line-height: 1.55;
+    margin: 0.16in 0 0.18in;
+  }
+  .scent-box strong { color: #8A6C3E; }
+
+  .tier-close {
+    font-style: italic;
+    font-weight: bold;
+    font-size: 13.5px;
+    color: #1F3A5F;
+    margin: 0.10in 0 0;
+  }
+  .tier-note {
+    font-style: italic;
+    font-size: 11.5px;
+    color: #8A6C3E;
+    margin: 0.08in 0 0;
+  }
+  .tier-note .spark { color: #B08D57; }
+
+  .section-rule { height: 1px; background: #D9BD8A; margin: 0.30in 0 0.26in; }
+
+  .section-title {
+    font-size: 15.5px;
+    font-weight: bold;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #1F3A5F;
+    margin: 0 0 0.18in;
+  }
+
+  .addon-row { overflow: hidden; margin-bottom: 0.13in; font-size: 13.5px; }
+  .addon-row .aname { float: left; color: #33475E; }
+  .addon-row .aprice { float: right; color: #B08D57; font-weight: bold; }
+
+  .kg-box {
+    background: #F2E7D6;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 0.08in;
+  }
+  .kg-col { float: left; width: 50%; padding: 0.24in 0.26in; }
+  .kg-col.right { border-left: 1px solid #E3D2AE; }
+  .kg-title { font-size: 14.5px; font-weight: bold; color: #1F3A5F; }
+  .kg-title .kg-price { color: #B08D57; font-weight: bold; margin-left: 0.08in; }
+  .kg-desc { font-size: 12px; color: #33475E; margin-top: 0.07in; line-height: 1.5; }
+
+  .closing-quote {
+    text-align: center;
+    font-style: italic;
+    color: #1F3A5F;
+    font-size: 16px;
+    margin: 0.46in 0 0.10in;
+  }
+  .see-you {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #8A6C3E;
+    margin-bottom: 0.24in;
+  }
+  .page3-footer {
+    text-align: center;
+  }
+  .page3-footer .pf-rule {
+    width: 1.1in; height: 1px; background: #D9BD8A;
+    margin: 0 auto 0.16in;
+  }
+  .page3-footer .pf-line {
+    font-size: 11px;
+    color: #6B7C93;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1: COVER ============ -->
+<div class="page">
+  <div class="cover-frame-outer"></div>
+  <div class="cover-frame-inner"></div>
+
+  <div class="cover-corner cc-tl"><svg viewBox="0 0 40 40">
+    <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <circle cx="2" cy="2" r="2.4" fill="#D9BD8A"/>
+    <circle cx="18" cy="20" r="1.5" fill="#1393A0"/>
+    <circle cx="20" cy="18" r="1.5" fill="#1393A0"/>
+  </svg></div>
+  <div class="cover-corner cc-tr"><svg viewBox="0 0 40 40">
+    <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <circle cx="2" cy="2" r="2.4" fill="#D9BD8A"/>
+    <circle cx="18" cy="20" r="1.5" fill="#1393A0"/>
+    <circle cx="20" cy="18" r="1.5" fill="#1393A0"/>
+  </svg></div>
+  <div class="cover-corner cc-bl"><svg viewBox="0 0 40 40">
+    <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <circle cx="2" cy="2" r="2.4" fill="#D9BD8A"/>
+    <circle cx="18" cy="20" r="1.5" fill="#1393A0"/>
+    <circle cx="20" cy="18" r="1.5" fill="#1393A0"/>
+  </svg></div>
+  <div class="cover-corner cc-br"><svg viewBox="0 0 40 40">
+    <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+    <circle cx="2" cy="2" r="2.4" fill="#D9BD8A"/>
+    <circle cx="18" cy="20" r="1.5" fill="#1393A0"/>
+    <circle cx="20" cy="18" r="1.5" fill="#1393A0"/>
+  </svg></div>
+
+  <div class="cover-outer"><div class="cover-content">
+    <img class="logo" src="logo.png" alt="Lowell Nails and Spa, LLC">
+    <div class="cover-eyebrow">Lowell Nails and Spa, LLC</div>
+    <h1 class="cover-title">Pedicure Menu</h1>
+    <div class="cover-rule"></div>
+    <p class="cover-subtitle">Three ways to treat your feet &mdash; from a quick refresh to a real spa treat</p>
+
+    <div class="cover-blooms">
+      <svg viewBox="0 0 60 95">
+        <path d="M30,90 C 27,68 34,58 30,40" fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+        <g transform="translate(30,28)">
+          <g fill="#8A6C3E">
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(72)"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(144)"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(216)"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(288)"/>
+          </g>
+          <g fill="#D9BD8A" transform="translate(-1.2,-1.2)">
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(36)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(108)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(180)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(252)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(324)"/>
+          </g>
+          <circle r="2.4" fill="#1393A0"/>
+        </g>
+      </svg><svg viewBox="0 0 60 95">
+        <path d="M30,90 C 27,68 34,58 30,40" fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+        <g transform="translate(30,28)">
+          <g fill="#8A6C3E">
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(72)"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(144)"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(216)"/>
+            <path d="M0,0 C -6,-9 -4,-21 0,-25 C 4,-21 6,-9 0,0 Z" transform="rotate(288)"/>
+          </g>
+          <g fill="#D9BD8A" transform="translate(-1.2,-1.2)">
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(36)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(108)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(180)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(252)"/>
+            <path d="M0,0 C -4,-8 -2,-17 0,-20 C 2,-17 4,-8 0,0 Z" transform="rotate(324)"/>
+          </g>
+          <circle r="2.4" fill="#1393A0"/>
+        </g>
+      </svg>
+    </div>
+  </div></div>
+
+  <div class="cover-footer">
+    <div class="cf-rule"></div>
+    <div class="cf-line">505 W. Main St., Suite B &middot; Lowell, MI 49331</div>
+    <div class="cf-line">(616) 319-7924</div>
+  </div>
+</div>
+
+<!-- ============ PAGE 2 ============ -->
+<div class="page">
+  <div class="flourish f-tl"><svg viewBox="0 0 140 140">
+    <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110" fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+    <g fill="#1F3A5F" opacity="0.85"><path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/></g>
+    <g fill="#B08D57" opacity="0.9"><path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/></g>
+    <g fill="#1F3A5F" opacity="0.75"><path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/></g>
+    <g transform="translate(94,112)">
+      <g fill="#8A6C3E">
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+      </g>
+      <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+      </g>
+      <circle r="2.6" fill="#1393A0"/>
+    </g>
+  </svg></div>
+  <div class="flourish f-tr"><svg viewBox="0 0 140 140">
+    <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110" fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+    <g fill="#1F3A5F" opacity="0.85"><path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/></g>
+    <g fill="#B08D57" opacity="0.9"><path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/></g>
+    <g fill="#1F3A5F" opacity="0.75"><path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/></g>
+    <g transform="translate(94,112)">
+      <g fill="#8A6C3E">
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+      </g>
+      <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+      </g>
+      <circle r="2.6" fill="#1393A0"/>
+    </g>
+  </svg></div>
+
+  <div class="body-outer">
+
+    <div class="page-header">
+      <div class="badge"><img src="logo.png" alt="Lowell Nails and Spa, LLC"></div>
+      <h1 class="h-title">Pedicure Menu</h1>
+      <p class="h-tagline">Three ways to treat your feet &mdash; from a quick refresh to a real spa treat</p>
+      <div class="h-rule"></div>
+    </div>
+
+    <div class="tier">
+      <div class="tier-head">
+        <div class="tier-name-wrap"><span class="tier-name">The Essential Pedicure</span></div>
+        <div class="tier-price-wrap"><span class="tier-price">$33</span><span class="tier-addon">+$15 gel polish</span></div>
+      </div>
+      <p class="tier-intro">A quick, no-frills reset designed to get feet clean, trimmed, and polished &mdash; nothing more.</p>
+      <ul>
+        <li><span class="bullet">&bull;</span><strong>Foot Soak</strong> &mdash; A warm soak to soften skin before treatment.</li>
+        <li><span class="bullet">&bull;</span><strong>Nail Trimming &amp; Shaping</strong> &mdash; Carefully trimmed and shaped for a clean look.</li>
+        <li><span class="bullet">&bull;</span><strong>Cuticle Care</strong> &mdash; Basic grooming to keep nails tidy.</li>
+        <li><span class="bullet">&bull;</span><strong>Callus Smoothing</strong> &mdash; A quick pass to smooth rough spots.</li>
+        <li><span class="bullet">&bull;</span><strong>Brief Massage</strong> &mdash; A short massage to ease tension.</li>
+        <li><span class="bullet">&bull;</span><strong>Polish of Your Choice</strong> &mdash; Finished with your color of choice.</li>
+      </ul>
+      <p class="tier-close">Quick, clean, and reliable &mdash; a straightforward pedicure with no extras.</p>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <div class="tier shaded">
+      <div class="tier-head">
+        <div class="tier-name-wrap"><span class="tier-name">The Spa Pedicure</span><span class="tier-badge">Guest Favorite</span></div>
+        <div class="tier-price-wrap"><span class="tier-price">$43</span><span class="tier-addon">+$15 gel polish</span></div>
+      </div>
+      <p class="tier-intro">Our most-loved upgrade: a true spa treatment built around VOESH's Pedi-in-a-Box system, finished in a scent you pick yourself.</p>
+      <ul>
+        <li><span class="bullet">&bull;</span><strong>Nourishing Foot Soak</strong> &mdash; Softens skin and preps feet for treatment.</li>
+        <li><span class="bullet">&bull;</span><strong>Nail Trimming &amp; Shaping</strong> &mdash; Precision shaping for a clean, polished finish.</li>
+        <li><span class="bullet">&bull;</span><strong>Cuticle Grooming</strong> &mdash; Careful cuticle care for healthy-looking nails.</li>
+        <li><span class="bullet">&bull;</span><strong>VOESH Sea Salt Soak</strong> &mdash; Detoxifies and deodorizes tired feet.</li>
+        <li><span class="bullet">&bull;</span><strong>VOESH Sugar Scrub Exfoliation</strong> &mdash; Buffs away dead skin to reveal softer feet.</li>
+        <li><span class="bullet">&bull;</span><strong>VOESH Mud Masque</strong> &mdash; Draws out impurities, wrapped in a warm towel.</li>
+        <li><span class="bullet">&bull;</span><strong>VOESH Massage Butter</strong> &mdash; A relaxing massage that leaves skin soft and hydrated.</li>
+      </ul>
+      <div class="scent-box"><strong>Choose your scent:</strong> Lavender Relieve &middot; Eucalyptus Energy Boost &middot; Cucumber Refresh &middot; Green Tea Detox &middot; Tangerine Twist &middot; seasonal rotation (Pumpkin Spice &amp; more)</div>
+      <p class="tier-close">Leaves feet soft, scented, and genuinely spa-fresh.</p>
+      <p class="tier-note"><span class="spark">&#10022;</span> Most guests complete this with a Gel Polish Toe Upgrade <strong>+$15</strong> &mdash; ask your technician.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ PAGE 3 ============ -->
+<div class="page">
+  <div class="flourish f-bl"><svg viewBox="0 0 140 140">
+    <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110" fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+    <g fill="#1F3A5F" opacity="0.85"><path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/></g>
+    <g fill="#B08D57" opacity="0.9"><path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/></g>
+    <g fill="#1F3A5F" opacity="0.75"><path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/></g>
+    <g transform="translate(94,112)">
+      <g fill="#8A6C3E">
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+      </g>
+      <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+      </g>
+      <circle r="2.6" fill="#1393A0"/>
+    </g>
+  </svg></div>
+  <div class="flourish f-br"><svg viewBox="0 0 140 140">
+    <path d="M6,6 C 6,45 18,62 52,66 C 82,70 90,86 92,110" fill="none" stroke="#8A6C3E" stroke-width="1.3"/>
+    <g fill="#1F3A5F" opacity="0.85"><path d="M28,20 C 16,15 6,20 2,34 C 15,36 26,30 28,20 Z"/></g>
+    <g fill="#B08D57" opacity="0.9"><path d="M55,45 C 42,38 30,44 24,58 C 38,61 51,56 55,45 Z"/></g>
+    <g fill="#1F3A5F" opacity="0.75"><path d="M78,68 C 66,63 56,69 51,82 C 64,84 75,80 78,68 Z"/></g>
+    <g transform="translate(94,112)">
+      <g fill="#8A6C3E">
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(72)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(144)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(216)"/>
+        <path d="M0,0 C -7,-11 -5,-25 0,-29 C 5,-25 7,-11 0,0 Z" transform="rotate(288)"/>
+      </g>
+      <g fill="#D9BD8A" transform="translate(-1.3,-1.3)">
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(36)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(108)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(180)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(252)"/>
+        <path d="M0,0 C -5,-9 -3,-19 0,-22 C 3,-19 5,-9 0,0 Z" transform="rotate(324)"/>
+      </g>
+      <circle r="2.6" fill="#1393A0"/>
+    </g>
+  </svg></div>
+
+  <div class="body-outer" style="top: 0.75in;">
+
+    <div class="tier shaded">
+      <div class="tier-head">
+        <div class="tier-name-wrap"><span class="tier-name">The Deluxe Pedicure</span><span class="tier-badge">Most Indulgent</span></div>
+        <div class="tier-price-wrap"><span class="tier-price">$53</span><span class="tier-addon">+$15 gel polish</span></div>
+      </div>
+      <p class="tier-intro">Everything in the Spa Pedicure, taken further with warm paraffin and a hot stone massage &mdash; where it starts to feel like a real treat.</p>
+      <ul>
+        <li><span class="bullet">&bull;</span><strong>Everything in the Spa Pedicure</strong> &mdash; the full VOESH treatment, scent and all.</li>
+        <li><span class="bullet">&bull;</span><strong>Warm Paraffin Wax Dip</strong> &mdash; Deeply moisturizes and soothes tired joints.</li>
+        <li><span class="bullet">&bull;</span><strong>Hot Stone Massage</strong> &mdash; Warm stones melt away tension and improve circulation.</li>
+      </ul>
+      <p class="tier-close">Ten dollars more than Spa, twice the relaxation.</p>
+      <p class="tier-note"><span class="spark">&#10022;</span> Pairs beautifully with a Gel Polish Toe Upgrade <strong>+$15</strong> for a finish that lasts.</p>
+    </div>
+
+    <div class="section-rule"></div>
+
+    <div class="section-title">Add-Ons &mdash; Any Tier</div>
+    <div class="addon-row"><span class="aname">Gel Polish Toe Upgrade</span><span class="aprice">+$15</span></div>
+    <div class="addon-row"><span class="aname">Paraffin Wax Treatment</span><span class="aprice">+$10</span></div>
+    <div class="addon-row"><span class="aname">Extended Massage (+5 min)</span><span class="aprice">+$7</span></div>
+    <div class="addon-row"><span class="aname">Hot Stone Add-On</span><span class="aprice">+$8</span></div>
+    <div class="addon-row"><span class="aname">Intensive Callus Treatment</span><span class="aprice">+$8</span></div>
+
+    <div class="section-rule"></div>
+
+    <div class="section-title">Kids &amp; Group Savings</div>
+    <div class="kg-box">
+      <div class="kg-col"><div class="kg-title">Kids Pedicure<span class="kg-price">$25</span></div><div class="kg-desc">Ages 12 &amp; under. All the essentials, gently done.</div></div>
+      <div class="kg-col right"><div class="kg-title">Two-Person Booking<span class="kg-price">Save $5 each</span></div><div class="kg-desc">Book with a friend or family member (2+) and add gel polish or higher &mdash; everyone saves $5.</div></div>
+    </div>
+
+    <p class="closing-quote">&ldquo;Because your feet deserve a little luxury too.&rdquo;</p>
+    <p class="see-you">See You in the Chair</p>
+
+    <div class="page3-footer">
+      <div class="pf-rule"></div>
+      <div class="pf-line">505 W. Main St., Suite B &middot; Lowell, MI 49331 &middot; (616) 319-7924 &middot; Walk-ins welcome or call for an appointment</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

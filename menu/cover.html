@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lowell Nails &amp; Spa — Menu Cover</title>
+<style>
+  @page { size: Letter; margin: 0; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 8.5in;
+    height: 11in;
+    background: #0A1E36;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .page {
+    position: relative;
+    width: 8.5in;
+    height: 11in;
+    background: #0A1E36;
+    overflow: hidden;
+  }
+
+  /* thin gold inset frame */
+  .frame-outer {
+    position: absolute;
+    top: 0.45in;
+    left: 0.45in;
+    right: 0.45in;
+    bottom: 0.45in;
+    border: 1px solid #B08D57;
+  }
+  .frame-inner {
+    position: absolute;
+    top: 0.52in;
+    left: 0.52in;
+    right: 0.52in;
+    bottom: 0.52in;
+    border: 1px solid #4FCBDA;
+    opacity: 0.55;
+  }
+
+  /* corner ornaments on the frame */
+  .corner-mark {
+    position: absolute;
+    width: 0.34in;
+    height: 0.34in;
+  }
+  .corner-mark svg { width: 100%; height: 100%; display: block; }
+  .corner-mark.cm-tl { top: 0.31in; left: 0.31in; }
+  .corner-mark.cm-tr { top: 0.31in; right: 0.31in; transform: scaleX(-1); }
+  .corner-mark.cm-bl { bottom: 0.31in; left: 0.31in; transform: scaleY(-1); }
+  .corner-mark.cm-br { bottom: 0.31in; right: 0.31in; transform: scale(-1,-1); }
+
+  .content-outer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: table;
+  }
+  .content {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0 0.9in;
+  }
+
+  .logo {
+    width: 2.95in;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .rule {
+    width: 1.5in;
+    height: 1px;
+    background: #B08D57;
+    margin: 0.30in auto 0.24in;
+  }
+
+  .eyebrow {
+    color: #4FCBDA;
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-size: 12.5px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    margin: 0 0 0.10in;
+  }
+
+  .title {
+    color: #F3E6C8;
+    font-size: 33px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: normal;
+    margin: 0;
+  }
+
+  .subtitle {
+    color: #C9AD78;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin: 0.16in 0 0;
+  }
+
+  .art-row {
+    margin-top: 0.55in;
+    text-align: center;
+    line-height: 0;
+  }
+  .art-row .sprig {
+    display: inline-block;
+    vertical-align: middle;
+    width: 0.72in;
+    height: 1.85in;
+  }
+  .art-row .sprig.right {
+    transform: scaleX(-1);
+  }
+  .art-row .divider {
+    display: inline-block;
+    vertical-align: middle;
+    width: 1px;
+    height: 1.55in;
+    background: #C9AD78;
+    margin: 0 0.30in;
+    opacity: 0.8;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0.95in;
+    left: 0;
+    width: 100%;
+    text-align: center;
+  }
+  .footer .place {
+    color: #F3E6C8;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .footer .rule-sm {
+    width: 0.65in;
+    height: 1px;
+    background: #4FCBDA;
+    opacity: 0.6;
+    margin: 0.13in auto;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="frame-outer"></div>
+    <div class="frame-inner"></div>
+
+    <!-- corner marks: small three-dot / bar botanical mark -->
+    <div class="corner-mark cm-tl">
+      <svg viewBox="0 0 40 40">
+        <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <circle cx="2" cy="2" r="2.4" fill="#C9AD78"/>
+        <circle cx="18" cy="20" r="1.5" fill="#4FCBDA"/>
+        <circle cx="20" cy="18" r="1.5" fill="#4FCBDA"/>
+      </svg>
+    </div>
+    <div class="corner-mark cm-tr">
+      <svg viewBox="0 0 40 40">
+        <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <circle cx="2" cy="2" r="2.4" fill="#C9AD78"/>
+        <circle cx="18" cy="20" r="1.5" fill="#4FCBDA"/>
+        <circle cx="20" cy="18" r="1.5" fill="#4FCBDA"/>
+      </svg>
+    </div>
+    <div class="corner-mark cm-bl">
+      <svg viewBox="0 0 40 40">
+        <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <circle cx="2" cy="2" r="2.4" fill="#C9AD78"/>
+        <circle cx="18" cy="20" r="1.5" fill="#4FCBDA"/>
+        <circle cx="20" cy="18" r="1.5" fill="#4FCBDA"/>
+      </svg>
+    </div>
+    <div class="corner-mark cm-br">
+      <svg viewBox="0 0 40 40">
+        <path d="M2,2 C 2,14 6,20 18,20" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <path d="M2,2 C 14,2 20,6 20,18" fill="none" stroke="#B08D57" stroke-width="1.1"/>
+        <circle cx="2" cy="2" r="2.4" fill="#C9AD78"/>
+        <circle cx="18" cy="20" r="1.5" fill="#4FCBDA"/>
+        <circle cx="20" cy="18" r="1.5" fill="#4FCBDA"/>
+      </svg>
+    </div>
+
+    <div class="content-outer"><div class="content">
+      <img class="logo" src="logo.png" alt="Lowell Nails and Spa, LLC">
+      <div class="rule"></div>
+      <div class="eyebrow">Est. in the Heart of West Michigan</div>
+      <div class="title">Service&nbsp;Menu</div>
+      <div class="subtitle">Manicure &middot; Pedicure &middot; Enhancements</div>
+
+      <div class="art-row">
+        <svg class="sprig left" viewBox="0 0 100 260">
+          <!-- stem -->
+          <path d="M50,255 C 46,200 58,170 44,120 C 32,76 52,55 48,10"
+                fill="none" stroke="#C9AD78" stroke-width="1.4"/>
+          <!-- leaf pairs -->
+          <g fill="#4FCBDA" opacity="0.9">
+            <path d="M46,205 C 30,198 18,205 10,222 C 24,224 38,220 46,205 Z"/>
+            <path d="M50,205 C 66,199 76,207 82,224 C 68,225 55,220 50,205 Z"/>
+          </g>
+          <g fill="#F3E6C8" opacity="0.92">
+            <path d="M40,150 C 24,145 13,153 6,169 C 20,170 33,166 40,150 Z"/>
+            <path d="M46,150 C 61,144 71,153 76,170 C 63,171 51,165 46,150 Z"/>
+          </g>
+          <g fill="#4FCBDA" opacity="0.9">
+            <path d="M40,95 C 26,89 16,96 10,111 C 23,113 34,109 40,95 Z"/>
+            <path d="M46,96 C 59,89 70,96 76,111 C 63,113 51,108 46,96 Z"/>
+          </g>
+          <!-- bloom -->
+          <g transform="translate(48,42)">
+            <g fill="#C9AD78">
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(72)"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(144)"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(216)"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(288)"/>
+            </g>
+            <g fill="#F3E6C8" transform="translate(-1.5,-1.5)">
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(36)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(108)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(180)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(252)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(324)"/>
+            </g>
+            <circle r="3.2" fill="#4FCBDA"/>
+          </g>
+        </svg>
+
+        <div class="divider"></div>
+
+        <svg class="sprig right" viewBox="0 0 100 260">
+          <path d="M50,255 C 46,200 58,170 44,120 C 32,76 52,55 48,10"
+                fill="none" stroke="#C9AD78" stroke-width="1.4"/>
+          <g fill="#4FCBDA" opacity="0.9">
+            <path d="M46,205 C 30,198 18,205 10,222 C 24,224 38,220 46,205 Z"/>
+            <path d="M50,205 C 66,199 76,207 82,224 C 68,225 55,220 50,205 Z"/>
+          </g>
+          <g fill="#F3E6C8" opacity="0.92">
+            <path d="M40,150 C 24,145 13,153 6,169 C 20,170 33,166 40,150 Z"/>
+            <path d="M46,150 C 61,144 71,153 76,170 C 63,171 51,165 46,150 Z"/>
+          </g>
+          <g fill="#4FCBDA" opacity="0.9">
+            <path d="M40,95 C 26,89 16,96 10,111 C 23,113 34,109 40,95 Z"/>
+            <path d="M46,96 C 59,89 70,96 76,111 C 63,113 51,108 46,96 Z"/>
+          </g>
+          <g transform="translate(48,42)">
+            <g fill="#C9AD78">
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(72)"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(144)"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(216)"/>
+              <path d="M0,0 C -8,-13 -6,-29 0,-34 C 6,-29 8,-13 0,0 Z" transform="rotate(288)"/>
+            </g>
+            <g fill="#F3E6C8" transform="translate(-1.5,-1.5)">
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(36)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(108)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(180)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(252)"/>
+              <path d="M0,0 C -6,-10 -4,-22 0,-25 C 4,-22 6,-10 0,0 Z" transform="rotate(324)"/>
+            </g>
+            <circle r="3.2" fill="#4FCBDA"/>
+          </g>
+        </svg>
+      </div>
+    </div></div>
+
+    <div class="footer">
+      <div class="rule-sm"></div>
+      <div class="place">Lowell &middot; Michigan</div>
+    </div>
+  </div>
+</body>
+</html>
