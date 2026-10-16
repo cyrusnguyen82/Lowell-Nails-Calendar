@@ -1,9 +1,25 @@
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
 const { spawn, execSync } = require('child_process');
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+
+// Common fix for Electron crashing before window creation on VMs / remote
+// desktop sessions where GPU acceleration is unreliable.
+app.disableHardwareAcceleration();
+app.commandLine.appendSwitch('disable-gpu');
+app.commandLine.appendSwitch('disable-gpu-compositing');
+app.commandLine.appendSwitch('no-sandbox');
+
+const LOG_FILE = path.join(app.getPath('userData'), 'financial-desktop.log');
+function log(...args) {
+  const line = `[${new Date().toISOString()}] ${args.join(' ')}\n`;
+  try { fs.appendFileSync(LOG_FILE, line); } catch (e) { /* ignore */ }
+  console.log(...args);
+}
+process.on('uncaughtException', (err) => log('uncaughtException:', err.stack || err.message));
 
 const API_PORT = 5002;
 const UI_PORT = 5300;
@@ -60,12 +76,15 @@ function waitForHealth(url, timeoutMs) {
 }
 
 function startApi(paths) {
+  log('Spawning API:', paths.apiExe, 'cwd:', paths.apiCwd);
   apiProcess = spawn(paths.apiExe, [], { cwd: paths.apiCwd });
   apiProcess.on('error', (err) => {
+    log('API spawn error:', err.message);
     dialog.showErrorBox('Financial API failed to start', err.message);
   });
-  apiProcess.stdout?.on('data', (d) => console.log(`[api] ${d}`));
-  apiProcess.stderr?.on('data', (d) => console.error(`[api] ${d}`));
+  apiProcess.on('exit', (code, signal) => log(`API process exited code=${code} signal=${signal}`));
+  apiProcess.stdout?.on('data', (d) => log(`[api] ${d}`));
+  apiProcess.stderr?.on('data', (d) => log(`[api:err] ${d}`));
 }
 
 function startStaticServer(uiDist) {
@@ -76,7 +95,9 @@ function startStaticServer(uiDist) {
       createProxyMiddleware({
         target: `http://127.0.0.1:${API_PORT}`,
         changeOrigin: true,
-        pathRewrite: { '^/fin-api': '/api' },
+        // Express's `use('/fin-api', ...)` mount already strips the '/fin-api' prefix
+        // before this middleware sees req.url, so we only need to prepend '/api' here.
+        pathRewrite: (path) => `/api${path}`,
       })
     );
     expressApp.use(express.static(uiDist));
@@ -97,6 +118,7 @@ function killApiProcess() {
 }
 
 async function createWindow() {
+  log('createWindow() starting. isPackaged=', app.isPackaged, 'userData=', app.getPath('userData'));
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -104,21 +126,29 @@ async function createWindow() {
     autoHideMenuBar: true,
   });
   mainWindow.loadURL(splashHtml());
+  log('Splash window created.');
 
   const paths = resourcePaths();
+  log('Resolved paths:', JSON.stringify(paths));
 
   try {
     startApi(paths);
+    log('Waiting for API health check...');
     await waitForHealth(`http://127.0.0.1:${API_PORT}/api/health`, 15000);
+    log('API healthy. Starting static server...');
     await startStaticServer(paths.uiDist);
+    log(`Static server up on ${UI_PORT}. Loading app UI.`);
     mainWindow.loadURL(`http://127.0.0.1:${UI_PORT}`);
   } catch (err) {
+    log('Startup failed:', err.stack || err.message);
     dialog.showErrorBox('Failed to start Financial', err.message);
-    app.quit();
   }
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  log('app.whenReady fired.');
+  createWindow();
+}).catch((err) => log('whenReady rejected:', err.stack || err.message));
 
 app.on('window-all-closed', () => {
   killApiProcess();
